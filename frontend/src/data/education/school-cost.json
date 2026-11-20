@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "name": "学校種別の学習費（幼稚園〜高校）",
+    "source": "https://www.mext.go.jp/b_menu/toukei/chousa03/gakushuuhi/kekka/k_detail/mext_00002.html",
+    "sourceName": "文部科学省 令和5年度子供の学習費調査 結果の概要",
+    "checkedAt": "2026-08-10",
+    "effectiveFrom": "2023-04",
+    "note": "令和5年度（2023年度）調査。令和6年12月25日公表、令和8年1月16日に訂正版公表。原典 PDF は https://www.mext.go.jp/content/20260116-mxt_chousa01-000039333_1.pdf （結果のポイント）と https://www.mext.go.jp/content/20260116-mxt_chousa01-000039333_3.pdf （調査結果の概要・表5）。学習費総額 = 学校教育費 + 学校給食費 + 学校外活動費。学校外活動費は補助学習費（塾・家庭教師・参考書）とその他の学校外活動費（習い事・スポーツ・文化活動）に分かれる。**このアプリでは塾を利用者の入力（cramSchoolPeriods）として別に扱うため、補助学習費をここから使わないこと。二重計上になる。** 掲載値はいずれも全世帯の平均であり、実際にその費目を支出した世帯だけの平均ではない。塾に通わせる世帯の実額は補助学習費の平均を上回る。高校の学校給食費は調査対象外（…表記）のため 0 としている。"
+  },
+  "values": {
+    "kindergarten": {
+      "public": {
+        "total": 184646,
+        "schoolEducation": 69362,
+        "schoolLunch": 15235,
+        "outsideActivity": 100049,
+        "supplementaryStudy": 33644,
+        "otherOutsideActivity": 66405
+      },
+      "private": {
+        "total": 347338,
+        "schoolEducation": 154062,
+        "schoolLunch": 35741,
+        "outsideActivity": 157535,
+        "supplementaryStudy": 49592,
+        "otherOutsideActivity": 107943
+      }
+    },
+    "elementary": {
+      "public": {
+        "total": 366599,
+        "schoolEducation": 74336,
+        "schoolLunch": 35774,
+        "outsideActivity": 256489,
+        "supplementaryStudy": 112485,
+        "otherOutsideActivity": 144004,
+        "supplementaryStudyByGrade": [80572, 65947, 76470, 116753, 143318, 186559]
+      },
+      "private": {
+        "total": 1741516,
+        "schoolEducation": 978271,
+        "schoolLunch": 53578,
+        "outsideActivity": 709667,
+        "supplementaryStudy": 366436,
+        "otherOutsideActivity": 343231,
+        "supplementaryStudyByGrade": [275581, 233705, 256898, 353001, 490673, 595670]
+      }
+    },
+    "juniorHigh": {
+      "public": {
+        "total": 542450,
+        "schoolEducation": 150761,
+        "schoolLunch": 35671,
+        "outsideActivity": 356018,
+        "supplementaryStudy": 271574,
+        "otherOutsideActivity": 84444,
+        "supplementaryStudyByGrade": [172481, 249354, 390200]
+      },
+      "private": {
+        "total": 1560359,
+        "schoolEducation": 1128061,
+        "schoolLunch": 9317,
+        "outsideActivity": 422981,
+        "supplementaryStudy": 236986,
+        "otherOutsideActivity": 185995,
+        "supplementaryStudyByGrade": [235949, 208470, 267207]
+      }
+    },
+    "highSchool": {
+      "public": {
+        "total": 596954,
+        "schoolEducation": 351523,
+        "schoolLunch": 0,
+        "outsideActivity": 245431,
+        "supplementaryStudy": 200994,
+        "otherOutsideActivity": 44437,
+        "supplementaryStudyByGrade": [140247, 182074, 285156],
+        "tuitionPaid": {
+          "amount": 45272,
+          "note": "2026-11-17 に足した。出典は meta の調査結果の概要 PDF（https://www.mext.go.jp/content/20260116-mxt_chousa01-000039333_3.pdf ）の表４－４「高等学校（全日制）の学校教育費の支出構成」の公立の「授業料」（curl と pypdf で読んだ）。学校教育費 351,523 円の内訳。授業料の標準額 118,800 円（high-school-support.json）を大きく下回るので、就学支援金を引いた後に保護者が払った額の平均と読む。新しい計算はこれを授業料の標準額に置き換えてから支援金を引く"
+        }
+      },
+      "private": {
+        "total": 1179261,
+        "schoolEducation": 832650,
+        "schoolLunch": 0,
+        "outsideActivity": 346611,
+        "supplementaryStudy": 238422,
+        "otherOutsideActivity": 108189,
+        "supplementaryStudyByGrade": [169414, 246408, 304816],
+        "tuitionPaid": {
+          "amount": 279170,
+          "note": "2026-11-17 に足した。出典は meta の調査結果の概要 PDF（https://www.mext.go.jp/content/20260116-mxt_chousa01-000039333_3.pdf ）の表４－４「高等学校（全日制）の学校教育費の支出構成」の私立の「授業料」（curl と pypdf で読んだ）。学校教育費 832,650 円の内訳。私立の初年度授業料の全国平均 457,331 円（high-school-support.json）を大きく下回るので、就学支援金を引いた後に保護者が払った額の平均と読む。新しい計算はこれを授業料の標準額に置き換えてから支援金を引く"
+        }
+      }
+    }
+  }
+}

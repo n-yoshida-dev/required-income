@@ -1,0 +1,814 @@
+{
+  "meta": {
+    "name": "所得税（国税）",
+    "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm",
+    "sourceName": "No.2260 所得税の税率｜国税庁 タックスアンサー",
+    "additionalSources": [
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm",
+        "sourceName": "No.1410 給与所得控除｜国税庁 タックスアンサー",
+        "usedFor": "給与所得控除の表（令和8年分・令和9年分／令和7年分／令和2年分から令和6年分）と、令和8・9年分の低収入帯の特例表（注2）の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm",
+        "sourceName": "No.1199 基礎控除｜国税庁 タックスアンサー",
+        "usedFor": "基礎控除の額を合計所得金額の区分×年分（令和6年分以前／令和7年分／令和8年分・令和9年分／令和10年分以後）で確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm",
+        "sourceName": "No.1191 配偶者控除｜国税庁 タックスアンサー",
+        "usedFor": "配偶者控除額（一般38/26/13万円・老人48/32/16万円）と控除対象配偶者の所得要件（令和8年分以後62万円以下／令和7年分58万円以下／令和2〜6年分48万円以下）の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1195.htm",
+        "sourceName": "No.1195 配偶者特別控除｜国税庁 タックスアンサー",
+        "usedFor": "配偶者特別控除の表（令和8年分以降／令和7年分／令和2年分から令和6年分）の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm",
+        "sourceName": "No.1180 扶養控除｜国税庁 タックスアンサー",
+        "usedFor": "扶養控除額（一般38万円・特定63万円・老人48万円・同居老親等58万円）、年齢区分、扶養親族の所得要件の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm",
+        "sourceName": "No.1177 特定親族特別控除｜国税庁 タックスアンサー",
+        "usedFor": "特定親族特別控除の表（令和8年分以後）と特定親族の範囲（19歳以上23歳未満・合計所得123万円以下・控除対象扶養親族に該当しないこと）の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2072.htm",
+        "sourceName": "No.2072 青色申告特別控除｜国税庁 タックスアンサー",
+        "usedFor": "青色申告特別控除 65万円・55万円・10万円の額と要件の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm",
+        "sourceName": "No.1130 社会保険料控除｜国税庁 タックスアンサー",
+        "usedFor": "社会保険料控除が「その年に実際に支払った金額または給与・公的年金から差し引かれた金額の全額」であることの確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1500.htm",
+        "sourceName": "No.1500 雑所得｜国税庁 タックスアンサー",
+        "usedFor": "業務に係る雑所得（副業）が「総収入金額−必要経費」であり特別控除が無いこと、損益通算ができないことの確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/publication/pamph/gensen/2026kaisei.pdf",
+        "sourceName": "源泉所得税の改正のあらまし（令和8年4月・国税庁）",
+        "usedFor": "令和8年度税制改正の改正表。基礎控除（令和8・9年分／令和10年分以後）、給与所得控除の最低保障額65万円→74万円、扶養親族等の所得要件58万円→62万円、改正後の配偶者特別控除額・特定親族特別控除額の表"
+      },
+      {
+        "url": "https://www.nta.go.jp/users/gensen/2026kiso/pdf/0026005-024.pdf",
+        "sourceName": "令和8年度税制改正（所得税の基礎控除の引上げ等関係）Ｑ＆Ａ（令和8年5月・国税庁）",
+        "usedFor": "改正の適用時期（令和8年12月1日施行・令和8年分以後の所得税について適用）とひとり親控除の引上げ（令和9年分以後）の確認"
+      },
+      {
+        "url": "https://www.nta.go.jp/publication/pamph/gensen/0025004-025.pdf",
+        "sourceName": "令和7年度税制改正による所得税の基礎控除の見直し等について（源泉所得税関係）（令和7年4月・国税庁）",
+        "usedFor": "令和7年度税制改正の改正表。給与所得控除の最低保障額55万円→65万円、令和7年分の基礎控除、特定親族特別控除の創設と令和7年分の控除額表"
+      },
+      {
+        "url": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2026-12-01&response_format=json",
+        "sourceName": "所得税法（昭和四十年法律第三十三号）e-Gov 法令検索 API v2（2026年12月1日時点＝令和8年分以後に適用される改正後の版）",
+        "usedFor": "第28条第3項（給与所得控除額・最低保障69万円）・第86条（基礎控除の本体62万円）の逐語"
+      },
+      {
+        "url": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "sourceName": "所得税法 e-Gov 法令検索 API v2（2028年1月1日時点＝令和10年分以後の版）",
+        "usedFor": "第74条（社会保険料控除）・第35条（雑所得）・第83条（配偶者控除）・第83条の2（配偶者特別控除）・第84条（扶養控除）・第84条の2（特定親族特別控除）・第89条（税率）の逐語"
+      },
+      {
+        "url": "https://laws.e-gov.go.jp/api/2/law_data/332AC0000000026?asof=2026-12-01&response_format=json",
+        "sourceName": "租税特別措置法（昭和三十二年法律第二十六号）e-Gov 法令検索 API v2（2026年12月1日時点）",
+        "usedFor": "第25条の2（青色申告特別控除10万円・55万円・65万円）・第29条の4（令和8年・令和9年の給与所得控除の最低控除額等の特例74万円）・第41条の16の2（令和8年分以後の基礎控除の特例加算）の逐語"
+      }
+    ],
+    "checkedAt": "2026-09-14",
+    "effectiveFrom": "2020-01",
+    "effectiveFromNote": "このファイルが持つ表のうち最も古いものは令和2年分（2020年分）の給与所得控除・配偶者特別控除・基礎控除。速算表（values.brackets）はそれより古く平成27年分（2015年分）以後で、国税庁 No.2260 の見出しに「平成27年分以後」とある。各表は values 内の schedule の fromYear / untilYear（いずれも「年分」＝暦年）で適用年を持つ。",
+    "statuteVersion": "所得税法：340AC0000000033_20261201_508AC0000000012（令和8年法律第12号、2026-12-01 施行）および 340AC0000000033_20280101_508AC0000000012（同法、2028-01-01 施行）／租税特別措置法：332AC0000000026_20261201_508AC0000000012（令和8年法律第12号、2026-12-01 施行）。いずれも e-Gov 法令検索 API v2 から 2026-09-14 に取得",
+    "quoteNormalization": "reference.statute の条文引用は、e-Gov 法令検索 API の生テキストから改行・インデント・字間の空白だけを詰めた逐語。文字の追加・言い換え・要約はしていない。号を並べた条文は号番号と本文の間の空白も詰まっているため『一その居住者の…』のように続けて読む。長い条文は連続した部分文字列を抜き出し、間を（中略）で明示している。",
+    "note": "総合課税（給与・事業・不動産・雑）の所得税。**2年続けて大きな改正が入っており、年分ごとに表が違う。** ①令和7年度税制改正（令和7年12月1日施行・令和7年分以後）で給与所得控除の最低保障額が55万円→65万円、基礎控除に特例加算、特定親族特別控除が創設された。②令和8年度税制改正（令和8年12月1日施行・令和8年分以後）でさらに給与所得控除の最低保障額が65万円→74万円（令和8年分・令和9年分の時限措置。所得税法本体の最低保障額は69万円で令和10年分以後はこちら）、基礎控除は本体が58万円→62万円に上がったうえで令和8・9年分と令和10年分以後で加算額が変わり、扶養親族等の所得要件が58万円→62万円になった。**このため domain 側は「その年分に適用される表」を年で選ぶ必要がある。** 付加税（復興特別所得税・防衛特別所得税）は values.surtaxes に持ち、タグ `v1-final` の capital-gains.json（T13 で消した）の surtaxes と同じ内容。この JSON は総合課税の所得控除・税率だけを扱い、分離課税（譲渡・配当等）、税額控除（住宅ローン控除・配当控除）、医療費控除・生命保険料控除・iDeCo（小規模企業共済等掛金控除）・ひとり親控除・障害者控除などは含まない（reference.scope を参照）。"
+  },
+  "values": {
+    "brackets": [
+      { "upTo": 1950000, "rate": 0.05, "deduction": 0 },
+      { "upTo": 3300000, "rate": 0.1, "deduction": 97500 },
+      { "upTo": 6950000, "rate": 0.2, "deduction": 427500 },
+      { "upTo": 9000000, "rate": 0.23, "deduction": 636000 },
+      { "upTo": 18000000, "rate": 0.33, "deduction": 1536000 },
+      { "upTo": 40000000, "rate": 0.4, "deduction": 2796000 },
+      { "upTo": null, "rate": 0.45, "deduction": 4796000 }
+    ],
+    "bracketsMeta": {
+      "effectiveFromYear": 2015,
+      "taxableIncomeRoundDownTo": 1000,
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm",
+      "note": "課税される所得金額（1,000円未満切捨て後）に対する所得税額＝課税所得×rate−deduction。**upTo は所得税法第89条の超過累進の区切り（195万円以下／330万円以下／…）をそのまま入れている。** 国税庁の速算表は同じ区分を「1,000円から1,949,000円まで」「1,950,000円から3,299,000円まで」…と1,000円単位で書いているが、課税所得は1,000円未満切捨てなので両者は同じ意味になる（境界の1,950,000円はどちらの式でも税額97,500円で一致する）。令和7年分以後は基準所得金額が3億3,000万円を超える場合に「特定の基準所得金額の課税の特例」（措法41の19、いわゆるミニマムタックス）が加算されるが、この JSON には含めていない。"
+    },
+    "employmentIncomeDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1410.htm",
+      "formula": "給与所得控除額＝max(収入金額×rate＋deduction, minimum)。給与所得＝給与等の収入金額−給与所得控除額。",
+      "note": "table の各行は「収入金額が upTo 以下のとき、収入金額×rate＋deduction」。rate が 0 の行は deduction が定額。minimum はその年分の最低保障額で、**令和10年分以後は table の式に最低保障額が織り込まれていないため、必ず max を取る必要がある**（令和9年分以前は最低保障額が table の先頭行の定額として現れるので、max を取っても結果は変わらない）。",
+      "schedule": [
+        {
+          "fromYear": 2020,
+          "untilYear": 2024,
+          "label": "令和2年分から令和6年分",
+          "minimum": 550000,
+          "table": [
+            { "upTo": 1625000, "rate": 0, "deduction": 550000 },
+            { "upTo": 1800000, "rate": 0.4, "deduction": -100000 },
+            { "upTo": 3600000, "rate": 0.3, "deduction": 80000 },
+            { "upTo": 6600000, "rate": 0.2, "deduction": 440000 },
+            { "upTo": 8500000, "rate": 0.1, "deduction": 1100000 },
+            { "upTo": null, "rate": 0, "deduction": 1950000 }
+          ]
+        },
+        {
+          "fromYear": 2025,
+          "untilYear": 2025,
+          "label": "令和7年分（令和7年度税制改正で最低保障額55万円→65万円）",
+          "minimum": 650000,
+          "table": [
+            { "upTo": 1900000, "rate": 0, "deduction": 650000 },
+            { "upTo": 3600000, "rate": 0.3, "deduction": 80000 },
+            { "upTo": 6600000, "rate": 0.2, "deduction": 440000 },
+            { "upTo": 8500000, "rate": 0.1, "deduction": 1100000 },
+            { "upTo": null, "rate": 0, "deduction": 1950000 }
+          ]
+        },
+        {
+          "fromYear": 2026,
+          "untilYear": 2027,
+          "label": "令和8年分・令和9年分（令和8年度税制改正で最低保障額65万円→74万円。租税特別措置法第29条の4による2年間の特例）",
+          "minimum": 740000,
+          "table": [
+            { "upTo": 2200000, "rate": 0, "deduction": 740000 },
+            { "upTo": 3600000, "rate": 0.3, "deduction": 80000 },
+            { "upTo": 6600000, "rate": 0.2, "deduction": 440000 },
+            { "upTo": 8500000, "rate": 0.1, "deduction": 1100000 },
+            { "upTo": null, "rate": 0, "deduction": 1950000 }
+          ],
+          "specialRulesForLowIncome": {
+            "note": "租税特別措置法第29条の4第2項。令和8年・令和9年に収入金額が691,000円以上2,200,000円未満の場合は、上の table によらず**給与所得の金額そのもの**が次のとおり決まる。範囲は incomeFrom 以上 incomeBelow 未満。employmentIncome が null の行は式（収入金額−740,000円）で求める。",
+            "rows": [
+              { "incomeFrom": 691000, "incomeBelow": 741000, "employmentIncome": 0 },
+              {
+                "incomeFrom": 741000,
+                "incomeBelow": 2191000,
+                "employmentIncome": null,
+                "formula": "収入金額 − 740000"
+              },
+              { "incomeFrom": 2191000, "incomeBelow": 2193000, "employmentIncome": 1451000 },
+              { "incomeFrom": 2193000, "incomeBelow": 2196000, "employmentIncome": 1453000 },
+              { "incomeFrom": 2196000, "incomeBelow": 2200000, "employmentIncome": 1456000 }
+            ]
+          }
+        },
+        {
+          "fromYear": 2028,
+          "untilYear": null,
+          "label": "令和10年分以後（所得税法第28条第3項の本体。最低保障額69万円）",
+          "minimum": 690000,
+          "table": [
+            { "upTo": 3600000, "rate": 0.3, "deduction": 80000 },
+            { "upTo": 6600000, "rate": 0.2, "deduction": 440000 },
+            { "upTo": 8500000, "rate": 0.1, "deduction": 1100000 },
+            { "upTo": null, "rate": 0, "deduction": 1950000 }
+          ],
+          "note": "収入金額×30％＋8万円が69万円に満たないとき69万円。式が69万円に届くのは収入金額 2,033,334円 以上（2,033,333円では689,999.9円で69万円未満）。境界が1円単位の端数になるため table には行を足さず minimum で表している。"
+        }
+      ]
+    },
+    "basicDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1199.htm",
+      "note": "table の各行は「納税者本人の合計所得金額が totalIncomeUpTo 以下のとき amount」。所得税法第86条の本体（令和7年分まで48万円、令和7年度改正後58万円、令和8年分以後62万円）に、租税特別措置法第41条の16の2の加算額を足した後の金額を入れている。**加算は居住者にだけ適用される**（非居住者の最高額は令和7年分58万円・令和8年分以後62万円）。令和元年分以前は合計所得金額にかかわらず一律38万円。",
+      "schedule": [
+        {
+          "fromYear": 2020,
+          "untilYear": 2024,
+          "label": "令和2年分から令和6年分",
+          "table": [
+            { "totalIncomeUpTo": 24000000, "amount": 480000 },
+            { "totalIncomeUpTo": 24500000, "amount": 320000 },
+            { "totalIncomeUpTo": 25000000, "amount": 160000 },
+            { "totalIncomeUpTo": null, "amount": 0 }
+          ]
+        },
+        {
+          "fromYear": 2025,
+          "untilYear": 2025,
+          "label": "令和7年分（本体58万円＋特例加算37/30/10/5万円）",
+          "table": [
+            { "totalIncomeUpTo": 1320000, "amount": 950000 },
+            { "totalIncomeUpTo": 3360000, "amount": 880000 },
+            { "totalIncomeUpTo": 4890000, "amount": 680000 },
+            { "totalIncomeUpTo": 6550000, "amount": 630000 },
+            { "totalIncomeUpTo": 23500000, "amount": 580000 },
+            { "totalIncomeUpTo": 24000000, "amount": 480000 },
+            { "totalIncomeUpTo": 24500000, "amount": 320000 },
+            { "totalIncomeUpTo": 25000000, "amount": 160000 },
+            { "totalIncomeUpTo": null, "amount": 0 }
+          ]
+        },
+        {
+          "fromYear": 2026,
+          "untilYear": 2027,
+          "label": "令和8年分・令和9年分（本体62万円＋特例加算42万円（合計所得489万円以下）／5万円（489万円超655万円以下））",
+          "table": [
+            { "totalIncomeUpTo": 1320000, "amount": 1040000 },
+            { "totalIncomeUpTo": 3360000, "amount": 1040000 },
+            { "totalIncomeUpTo": 4890000, "amount": 1040000 },
+            { "totalIncomeUpTo": 6550000, "amount": 670000 },
+            { "totalIncomeUpTo": 23500000, "amount": 620000 },
+            { "totalIncomeUpTo": 24000000, "amount": 480000 },
+            { "totalIncomeUpTo": 24500000, "amount": 320000 },
+            { "totalIncomeUpTo": 25000000, "amount": 160000 },
+            { "totalIncomeUpTo": null, "amount": 0 }
+          ]
+        },
+        {
+          "fromYear": 2028,
+          "untilYear": null,
+          "label": "令和10年分以後（本体62万円＋特例加算37万円（合計所得132万円以下のみ））",
+          "table": [
+            { "totalIncomeUpTo": 1320000, "amount": 990000 },
+            { "totalIncomeUpTo": 3360000, "amount": 620000 },
+            { "totalIncomeUpTo": 4890000, "amount": 620000 },
+            { "totalIncomeUpTo": 6550000, "amount": 620000 },
+            { "totalIncomeUpTo": 23500000, "amount": 620000 },
+            { "totalIncomeUpTo": 24000000, "amount": 480000 },
+            { "totalIncomeUpTo": 24500000, "amount": 320000 },
+            { "totalIncomeUpTo": 25000000, "amount": 160000 },
+            { "totalIncomeUpTo": null, "amount": 0 }
+          ]
+        }
+      ]
+    },
+    "spouseDeduction": {
+      "ordinary": {
+        "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1191.htm",
+        "note": "配偶者控除。納税者本人の合計所得金額が1,000万円を超えると適用されない。elderly（老人控除対象配偶者）はその年12月31日現在の年齢が70歳以上の控除対象配偶者。配偶者が青色事業専従者として給与の支払を受けている場合・白色事業専従者である場合は対象外。",
+        "table": [
+          { "taxpayerTotalIncomeUpTo": 9000000, "general": 380000, "elderly": 480000 },
+          { "taxpayerTotalIncomeUpTo": 9500000, "general": 260000, "elderly": 320000 },
+          { "taxpayerTotalIncomeUpTo": 10000000, "general": 130000, "elderly": 160000 }
+        ],
+        "elderlyFromAge": 70,
+        "spouseIncomeRequirement": {
+          "note": "控除対象配偶者となる配偶者の合計所得金額の上限（この額以下）。令和8年分の額は令和8年12月1日施行。",
+          "schedule": [
+            {
+              "fromYear": 2020,
+              "untilYear": 2024,
+              "totalIncomeUpTo": 480000,
+              "salaryOnlyRevenueUpTo": 1030000
+            },
+            {
+              "fromYear": 2025,
+              "untilYear": 2025,
+              "totalIncomeUpTo": 580000,
+              "salaryOnlyRevenueUpTo": 1230000
+            },
+            {
+              "fromYear": 2026,
+              "untilYear": null,
+              "totalIncomeUpTo": 620000,
+              "salaryOnlyRevenueUpTo": 1360000
+            }
+          ]
+        }
+      },
+      "special": {
+        "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1195.htm",
+        "note": "配偶者特別控除。納税者本人の合計所得金額が1,000万円以下で、配偶者の合計所得金額が「配偶者控除の所得要件を超え133万円以下」のときに適用される。各行は配偶者の合計所得金額が spouseTotalIncomeOver 超 spouseTotalIncomeUpTo 以下のときの額で、amountsByTaxpayerIncome は本人の合計所得金額の区分別（この額以下）。年分による違いは**先頭行の下限だけ**（配偶者控除の所得要件と連動する）。",
+        "schedule": [
+          {
+            "fromYear": 2020,
+            "untilYear": 2024,
+            "label": "令和2年分から令和6年分",
+            "table": [
+              {
+                "spouseTotalIncomeOver": 480000,
+                "spouseTotalIncomeUpTo": 950000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 380000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 130000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 950000,
+                "spouseTotalIncomeUpTo": 1000000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 360000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 240000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 120000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1000000,
+                "spouseTotalIncomeUpTo": 1050000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 310000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 110000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1050000,
+                "spouseTotalIncomeUpTo": 1100000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 180000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 90000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1100000,
+                "spouseTotalIncomeUpTo": 1150000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 140000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 70000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1150000,
+                "spouseTotalIncomeUpTo": 1200000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 160000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 60000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1200000,
+                "spouseTotalIncomeUpTo": 1250000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 80000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 40000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1250000,
+                "spouseTotalIncomeUpTo": 1300000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 60000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 40000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 20000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1300000,
+                "spouseTotalIncomeUpTo": 1330000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 30000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 20000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 10000 }
+                ]
+              }
+            ]
+          },
+          {
+            "fromYear": 2025,
+            "untilYear": 2025,
+            "label": "令和7年分（下限が58万円超に変わった）",
+            "table": [
+              {
+                "spouseTotalIncomeOver": 580000,
+                "spouseTotalIncomeUpTo": 950000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 380000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 130000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 950000,
+                "spouseTotalIncomeUpTo": 1000000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 360000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 240000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 120000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1000000,
+                "spouseTotalIncomeUpTo": 1050000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 310000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 110000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1050000,
+                "spouseTotalIncomeUpTo": 1100000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 180000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 90000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1100000,
+                "spouseTotalIncomeUpTo": 1150000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 140000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 70000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1150000,
+                "spouseTotalIncomeUpTo": 1200000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 160000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 60000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1200000,
+                "spouseTotalIncomeUpTo": 1250000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 80000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 40000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1250000,
+                "spouseTotalIncomeUpTo": 1300000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 60000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 40000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 20000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1300000,
+                "spouseTotalIncomeUpTo": 1330000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 30000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 20000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 10000 }
+                ]
+              }
+            ]
+          },
+          {
+            "fromYear": 2026,
+            "untilYear": null,
+            "label": "令和8年分以降（下限が62万円超に変わった）",
+            "table": [
+              {
+                "spouseTotalIncomeOver": 620000,
+                "spouseTotalIncomeUpTo": 950000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 380000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 130000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 950000,
+                "spouseTotalIncomeUpTo": 1000000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 360000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 240000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 120000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1000000,
+                "spouseTotalIncomeUpTo": 1050000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 310000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 110000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1050000,
+                "spouseTotalIncomeUpTo": 1100000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 260000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 180000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 90000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1100000,
+                "spouseTotalIncomeUpTo": 1150000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 210000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 140000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 70000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1150000,
+                "spouseTotalIncomeUpTo": 1200000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 160000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 60000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1200000,
+                "spouseTotalIncomeUpTo": 1250000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 110000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 80000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 40000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1250000,
+                "spouseTotalIncomeUpTo": 1300000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 60000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 40000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 20000 }
+                ]
+              },
+              {
+                "spouseTotalIncomeOver": 1300000,
+                "spouseTotalIncomeUpTo": 1330000,
+                "amountsByTaxpayerIncome": [
+                  { "taxpayerTotalIncomeUpTo": 9000000, "amount": 30000 },
+                  { "taxpayerTotalIncomeUpTo": 9500000, "amount": 20000 },
+                  { "taxpayerTotalIncomeUpTo": 10000000, "amount": 10000 }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "dependentDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1180.htm",
+      "note": "扶養控除。年齢はその年12月31日現在。控除対象扶養親族は16歳以上（16歳未満は扶養控除の対象外）。特定扶養親族は19歳以上23歳未満、老人扶養親族は70歳以上で、うち納税者またはその配偶者の直系尊属で同居を常況とする人が同居老親等。納税者本人の合計所得金額による制限は無い。",
+      "amounts": {
+        "general": 380000,
+        "specific": 630000,
+        "elderly": 480000,
+        "elderlyCohabitingParent": 580000
+      },
+      "ages": {
+        "controlledDependentFromAge": 16,
+        "specificFromAge": 19,
+        "specificBelowAge": 23,
+        "elderlyFromAge": 70,
+        "judgedOn": "12-31"
+      },
+      "dependentIncomeRequirement": {
+        "note": "扶養親族となる人の合計所得金額の上限（この額以下）。令和8年分の額は令和8年12月1日施行。",
+        "schedule": [
+          {
+            "fromYear": 2020,
+            "untilYear": 2024,
+            "totalIncomeUpTo": 480000,
+            "salaryOnlyRevenueUpTo": 1030000
+          },
+          {
+            "fromYear": 2025,
+            "untilYear": 2025,
+            "totalIncomeUpTo": 580000,
+            "salaryOnlyRevenueUpTo": 1230000
+          },
+          {
+            "fromYear": 2026,
+            "untilYear": null,
+            "totalIncomeUpTo": 620000,
+            "salaryOnlyRevenueUpTo": 1360000
+          }
+        ]
+      }
+    },
+    "specifiedRelativeSpecialDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1177.htm",
+      "createdFromYear": 2025,
+      "note": "特定親族特別控除（令和7年度税制改正で創設）。生計を一にする19歳以上23歳未満の親族等で、合計所得金額が123万円以下かつ控除対象扶養親族に該当しない人（＝扶養控除の所得要件を超えた人）が対象。扶養控除（特定扶養親族63万円）と重複しては受けられず、所得が要件を超えた時点でこちらに移る。各行は特定親族の合計所得金額が totalIncomeOver 超 totalIncomeUpTo 以下のときの控除額。年分による違いは**先頭行の下限だけ**（扶養親族の所得要件と連動する）。",
+      "schedule": [
+        {
+          "fromYear": 2025,
+          "untilYear": 2025,
+          "label": "令和7年分",
+          "table": [
+            { "totalIncomeOver": 580000, "totalIncomeUpTo": 850000, "amount": 630000 },
+            { "totalIncomeOver": 850000, "totalIncomeUpTo": 900000, "amount": 610000 },
+            { "totalIncomeOver": 900000, "totalIncomeUpTo": 950000, "amount": 510000 },
+            { "totalIncomeOver": 950000, "totalIncomeUpTo": 1000000, "amount": 410000 },
+            { "totalIncomeOver": 1000000, "totalIncomeUpTo": 1050000, "amount": 310000 },
+            { "totalIncomeOver": 1050000, "totalIncomeUpTo": 1100000, "amount": 210000 },
+            { "totalIncomeOver": 1100000, "totalIncomeUpTo": 1150000, "amount": 110000 },
+            { "totalIncomeOver": 1150000, "totalIncomeUpTo": 1200000, "amount": 60000 },
+            { "totalIncomeOver": 1200000, "totalIncomeUpTo": 1230000, "amount": 30000 }
+          ]
+        },
+        {
+          "fromYear": 2026,
+          "untilYear": null,
+          "label": "令和8年分以後",
+          "table": [
+            { "totalIncomeOver": 620000, "totalIncomeUpTo": 850000, "amount": 630000 },
+            { "totalIncomeOver": 850000, "totalIncomeUpTo": 900000, "amount": 610000 },
+            { "totalIncomeOver": 900000, "totalIncomeUpTo": 950000, "amount": 510000 },
+            { "totalIncomeOver": 950000, "totalIncomeUpTo": 1000000, "amount": 410000 },
+            { "totalIncomeOver": 1000000, "totalIncomeUpTo": 1050000, "amount": 310000 },
+            { "totalIncomeOver": 1050000, "totalIncomeUpTo": 1100000, "amount": 210000 },
+            { "totalIncomeOver": 1100000, "totalIncomeUpTo": 1150000, "amount": 110000 },
+            { "totalIncomeOver": 1150000, "totalIncomeUpTo": 1200000, "amount": 60000 },
+            { "totalIncomeOver": 1200000, "totalIncomeUpTo": 1230000, "amount": 30000 }
+          ]
+        }
+      ]
+    },
+    "blueReturnDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2072.htm",
+      "blue65": 650000,
+      "blue55": 550000,
+      "blue10": 100000,
+      "requirements": {
+        "blue55": "不動産所得または事業所得を生ずべき事業を営み、正規の簿記の原則（一般的には複式簿記）により記帳し、その記帳に基づく貸借対照表・損益計算書等を確定申告書に添付して、確定申告期限（翌年3月15日）までに提出すること。現金主義による所得計算の特例を選択している場合は受けられない。",
+        "blue65": "55万円の要件に加えて、①その年分の事業に係る仕訳帳・総勘定元帳について優良な電子帳簿の要件を満たす電子帳簿保存を行い一定の届出書を提出しているか、②確定申告書・貸借対照表・損益計算書等を提出期限までに e-Tax で送信していること、のいずれかに該当すること。",
+        "blue10": "55万円・65万円の要件に該当しない青色申告者が受けられる。"
+      },
+      "limitedToIncome": true,
+      "note": "控除額は不動産所得の金額・事業所得の金額（10万円控除では山林所得の金額も）の合計額が限度で、その順に控除する（損益通算前の黒字の所得だけで合計する）。**事業所得が赤字のときに控除で赤字を膨らませることはできない。** 65万円・55万円は事業的規模の不動産所得か事業所得が要る点に注意（雑所得で申告する副業には青色申告特別控除が無い）。"
+    },
+    "socialInsuranceDeduction": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm",
+      "deductibleRatio": 1,
+      "note": "控除できる金額は「その年に実際に支払った金額または給与や公的年金から差し引かれた金額の全額」（国税庁 No.1130 概要）。上限なし。自己だけでなく生計を一にする配偶者その他の親族の負担すべき社会保険料を支払った場合も含む（所得税法第74条第1項）。対象には健康保険・厚生年金保険・国民年金・国民健康保険（税）・介護保険・雇用保険の被保険者負担分が含まれる。**iDeCo（個人型確定拠出年金）の掛金は社会保険料控除ではなく小規模企業共済等掛金控除**で、この JSON では扱っていない。"
+    },
+    "miscellaneousIncome": {
+      "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1500.htm",
+      "specialDeduction": 0,
+      "formula": "業務に係る雑所得＝総収入金額 − 必要経費",
+      "note": "副業を雑所得（業務に係るもの）で申告する場合、**特別控除は無く、所得＝総収入金額−必要経費**（国税庁 No.1500「所得の計算方法」(2)、所得税法第35条第2項第2号）。青色申告特別控除も適用されない。**雑所得の金額の計算上生じた損失は他の所得と損益通算できない**（同ページ「注意事項」）点が事業所得との大きな違い。公的年金等に係る雑所得は公的年金等控除を差し引いて計算するが、この JSON には公的年金等控除の表を入れていない（reference.unverified を参照）。"
+    },
+    "surtaxes": [
+      {
+        "name": "復興特別所得税",
+        "rate": 0.021,
+        "fromYear": 2013,
+        "untilYear": 2026
+      },
+      {
+        "name": "復興特別所得税（令和8年法律第12号による改正後）",
+        "rate": 0.011,
+        "fromYear": 2027,
+        "untilYear": 2047
+      },
+      {
+        "name": "防衛特別所得税",
+        "rate": 0.01,
+        "fromYear": 2027,
+        "untilYear": null
+      }
+    ],
+    "surtaxesMeta": {
+      "base": "incomeTax",
+      "note": "付加税は課税標準ではなく**基準所得税額（所得税の額）に掛ける**。2027年（令和9年）分から復興特別所得税が2.1％→1.1％に下がり、同時に防衛特別所得税1％が創設されるため、合計は2.1％のまま変わらない。untilYear が null は法文上「当分の間」で終期が定まっていないことを示す。**この配列は前の版の capital-gains.json（T13 で消した。タグ `v1-final` にある）の values.surtaxes と完全に同じ内容**（同じ付加税なので当然）。条文の逐語はタグ `v1-final` の capital-gains.json の reference.surtaxSchedule / reference.upcomingChange にある。",
+      "sources": [
+        "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/2260.htm",
+        "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1500.htm"
+      ]
+    }
+  },
+  "reference": {
+    "statute": {
+      "taxRate": {
+        "article": "所得税法 第89条第1項（税率）",
+        "text": "居住者に対して課する所得税の額は、その年分の課税総所得金額又は課税退職所得金額をそれぞれ次の表の上欄に掲げる金額に区分してそれぞれの金額に同表の下欄に掲げる税率を乗じて計算した金額を合計した金額と、その年分の課税山林所得金額の五分の一に相当する金額を同表の上欄に掲げる金額に区分してそれぞれの金額に同表の下欄に掲げる税率を乗じて計算した金額を合計した金額に五を乗じて計算した金額との合計額とする。百九十五万円以下の金額百分の五百九十五万円を超え三百三十万円以下の金額百分の十三百三十万円を超え六百九十五万円以下の金額百分の二十六百九十五万円を超え九百万円以下の金額百分の二十三九百万円を超え千八百万円以下の金額百分の三十三千八百万円を超え四千万円以下の金額百分の四十四千万円を超える金額百分の四十五",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "条文は超過累進の表（195万円以下5％…4,000万円超45％）で、国税庁 No.2260 の速算表はこれを「課税所得×税率−控除額」の形に直したもの。values.brackets の upTo はこの条文の区切りに合わせてある。"
+      },
+      "employmentIncomeDeduction": {
+        "article": "所得税法 第28条第2項・第3項（給与所得）",
+        "text": "２給与所得の金額は、その年中の給与等の収入金額から給与所得控除額を控除した残額とする。３前項に規定する給与所得控除額は、次の各号に掲げる場合の区分に応じ当該各号に定める金額とする。一前項に規定する収入金額が三百六十万円以下である場合八万円と当該収入金額の百分の三十に相当する金額との合計額（当該合計額が六十九万円に満たない場合には、六十九万円）二前項に規定する収入金額が三百六十万円を超え六百六十万円以下である場合百十六万円と当該収入金額から三百六十万円を控除した金額の百分の二十に相当する金額との合計額三前項に規定する収入金額が六百六十万円を超え八百五十万円以下である場合百七十六万円と当該収入金額から六百六十万円を控除した金額の百分の十に相当する金額との合計額四前項に規定する収入金額が八百五十万円を超える場合百九十五万円４その年中の給与等の収入金額が六百六十万円未満である場合には、当該給与等に係る給与所得の金額は、前二項の規定にかかわらず、当該収入金額を別表第五の給与等の金額として、同表により当該金額に応じて求めた同表の給与所得控除後の給与等の金額に相当する金額とする。",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2026-12-01&response_format=json",
+        "note": "令和8年法律第12号による改正後の本体（2026-12-01 施行、令和8年分以後に適用）。最低保障額は**69万円**で、これが values.employmentIncomeDeduction の令和10年分以後の entry に対応する。令和8年分・令和9年分は下の措法29の4が74万円に置き換えるため、69万円が実際に効くのは令和10年分以後。第2号以下は『116万円＋(収入−360万円)×20％』の形だが、展開すると収入×20％＋44万円になり、国税庁 No.1410 の表と一致する（660万円超850万円以下＝収入×10％＋110万円、850万円超＝195万円も同じ）。**第4項のとおり収入660万円未満は別表第五（1,000円刻みの表）で求める**ため、式で計算した値と最大で数百円ずれる（reference.modelingGap を参照）。"
+      },
+      "employmentIncomeDeductionSpecial": {
+        "article": "租税特別措置法 第29条の4第1項・第2項（給与所得控除の最低控除額等の特例）",
+        "text": "令和八年又は令和九年において、その年中の所得税法第二十八条第一項に規定する給与等（以下この項及び次項において「給与等」という。）の収入金額が二百二十万円以下である場合には、当該給与等に係る同条第三項に規定する給与所得控除額は、同項第一号の規定にかかわらず、七十四万円（当該収入金額が七十四万円に満たない場合には、当該収入金額に相当する金額）とする。２令和八年又は令和九年において、その年中の給与等の収入金額が六十九万千円以上二百二十万円未満である場合には、当該給与等に係る給与所得の金額については、前項及び所得税法第二十八条第二項から第四項までの規定にかかわらず、次に定めるところによる。一その年中の給与等の収入金額が六十九万千円以上七十四万千円未満である場合には、当該給与等に係る給与所得の金額は、ないものとする。二その年中の給与等の収入金額が七十四万千円以上二百十九万千円未満である場合には、当該給与等に係る給与所得の金額は、当該収入金額から七十四万円を控除した残額とする。三その年中の給与等の収入金額が二百十九万千円以上二百十九万三千円未満である場合には、当該給与等に係る給与所得の金額は、百四十五万千円とする。四その年中の給与等の収入金額が二百十九万三千円以上二百十九万六千円未満である場合には、当該給与等に係る給与所得の金額は、百四十五万三千円とする。五その年中の給与等の収入金額が二百十九万六千円以上二百二十万円未満である場合には、当該給与等に係る給与所得の金額は、百四十五万六千円とする。",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/332AC0000000026?asof=2026-12-01&response_format=json",
+        "note": "**最低保障額74万円は令和8年・令和9年だけの時限措置**であることがこの条文で確認できる（「令和八年又は令和九年において」）。第2項は values.employmentIncomeDeduction の specialRulesForLowIncome に対応。国税庁 No.1410 の注2 の表は HTML 上「145万円3,000円」「145万円6,000円」と誤植があるが、条文は「百四十五万三千円」「百四十五万六千円」で、JSON は条文の値を採用している。"
+      },
+      "basicDeduction": {
+        "article": "所得税法 第86条第1項（基礎控除）",
+        "text": "合計所得金額が二千五百万円以下である居住者については、その者のその年分の総所得金額、退職所得金額又は山林所得金額から次の各号に掲げる場合の区分に応じ当該各号に定める金額を控除する。一その居住者の合計所得金額が二千三百五十万円以下である場合六十二万円二その居住者の合計所得金額が二千三百五十万円を超え二千四百万円以下である場合四十八万円三その居住者の合計所得金額が二千四百万円を超え二千四百五十万円以下である場合三十二万円四その居住者の合計所得金額が二千四百五十万円を超え二千五百万円以下である場合十六万円",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2026-12-01&response_format=json",
+        "note": "令和8年分以後の本体。合計所得2,350万円以下の基礎控除は**62万円**（令和7年分は58万円、令和6年分以前は48万円）。ここに下の措法41の16の2の加算が乗る。2,350万円超の48／32／16万円と2,500万円超の0円は改正されていない。"
+      },
+      "basicDeductionSpecial": {
+        "article": "租税特別措置法 第41条の16の2第1項（令和8年分以後の各年分の基礎控除等の特例）",
+        "text": "令和八年分以後の各年分において、居住者のその年分の所得税に係る合計所得金額（所得税法第二条第一項第三十号の合計所得金額をいう。第一号において同じ。）が六百五十五万円（令和十年分以後の各年分にあつては、百三十二万円）以下である場合における同法第八十六条第二項に規定する基礎控除の額は、同条第一項の規定にかかわらず、同項第一号に定める金額に次の各号に掲げる年分の区分に応じ当該各号に定める金額を加算した額とする。一令和八年分及び令和九年分次に掲げる場合の区分に応じそれぞれ次に定める金額イその居住者のその年分の所得税に係る合計所得金額が四百八十九万円以下である場合四十二万円ロその居住者のその年分の所得税に係る合計所得金額が四百八十九万円を超える場合五万円二令和十年分以後の各年分三十七万円",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/332AC0000000026?asof=2026-12-01&response_format=json",
+        "note": "values.basicDeduction の令和8年分以後の表はこの加算を足した後の金額。令和8・9年分は 62万＋42万＝104万円（合計所得489万円以下）、62万＋5万＝67万円（489万円超655万円以下）、655万円超は加算なしで62万円。令和10年分以後は132万円以下だけ 62万＋37万＝99万円で、それ以外は62万円。**加算は居住者にだけ適用される。**"
+      },
+      "spouseDeduction": {
+        "article": "所得税法 第83条第1項（配偶者控除）",
+        "text": "居住者が控除対象配偶者を有する場合には、その居住者のその年分の総所得金額、退職所得金額又は山林所得金額から次の各号に掲げる場合の区分に応じ当該各号に定める金額を控除する。一その居住者の第二条第一項第三十号（定義）に規定する合計所得金額（以下この項、次条第一項、第八十四条の二第一項（特定親族特別控除）及び第八十六条第一項（基礎控除）において「合計所得金額」という。）が九百万円以下である場合三十八万円（その控除対象配偶者が老人控除対象配偶者である場合には、四十八万円）二その居住者の合計所得金額が九百万円を超え九百五十万円以下である場合二十六万円（その控除対象配偶者が老人控除対象配偶者である場合には、三十二万円）三その居住者の合計所得金額が九百五十万円を超え千万円以下である場合十三万円（その控除対象配偶者が老人控除対象配偶者である場合には、十六万円）",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "国税庁 No.1191 の表（38/26/13万円、老人48/32/16万円）と一致。**配偶者の所得要件は条文の『控除対象配偶者』の定義（所法2①三十三の二）側にあり年分で変わる**ため、values.spouseDeduction.ordinary.spouseIncomeRequirement に年分ごとに持たせた。"
+      },
+      "spouseSpecialDeduction": {
+        "article": "所得税法 第83条の2第1項（配偶者特別控除）",
+        "text": "居住者が生計を一にする配偶者（第二条第一項第三十三号（定義）に規定する青色事業専従者等を除くものとし、合計所得金額が百三十三万円以下であるものに限る。）で控除対象配偶者に該当しないもの（合計所得金額が千万円以下である当該居住者の配偶者に限る。）を有する場合には、その居住者のその年分の総所得金額、退職所得金額又は山林所得金額から次の各号に掲げる場合の区分に応じ当該各号に定める金額を控除する。一その居住者の合計所得金額が九百万円以下である場合その居住者の配偶者の次に掲げる区分に応じそれぞれ次に定める金額イ合計所得金額が九十五万円以下である配偶者三十八万円ロ合計所得金額が九十五万円を超え百三十万円以下である配偶者三十八万円からその配偶者の合計所得金額のうち九十三万一円を超える部分の金額（当該超える部分の金額が五万円の整数倍の金額から三万円を控除した金額でないときは、五万円の整数倍の金額から三万円を控除した金額で当該超える部分の金額に満たないもののうち最も多い金額とする。）を控除した金額ハ合計所得金額が百三十万円を超える配偶者三万円二その居住者の合計所得金額が九百万円を超え九百五十万円以下である場合その居住者の配偶者の前号イからハまでに掲げる区分に応じそれぞれ同号イからハまでに定める金額の三分の二に相当する金額（当該金額に一万円未満の端数がある場合には、これを切り上げた金額）三その居住者の合計所得金額が九百五十万円を超え千万円以下である場合その居住者の配偶者の第一号イからハまでに掲げる区分に応じそれぞれ同号イからハまでに定める金額の三分の一に相当する金額（当該金額に一万円未満の端数がある場合には、これを切り上げた金額）",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "**条文は下限を書かず『控除対象配偶者に該当しないもの』としているだけ**なので、表の先頭行の下限（令和8年分以後62万円超、令和7年分58万円超、令和2〜6年分48万円超）は配偶者控除の所得要件と自動的に連動する。上限は133万円以下で年分によらず一定。本人の所得が900万円超950万円以下は2/3、950万円超1,000万円以下は1/3（いずれも1万円未満切上げ）で、国税庁 No.1195 の表の数値と一致する。"
+      },
+      "dependentDeduction": {
+        "article": "所得税法 第84条第1項（扶養控除）",
+        "text": "居住者が控除対象扶養親族を有する場合には、その居住者のその年分の総所得金額、退職所得金額又は山林所得金額から、その控除対象扶養親族一人につき三十八万円（その者が特定扶養親族である場合には六十三万円とし、その者が老人扶養親族である場合には四十八万円とする。）を控除する。",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "同居老親等の58万円は条文本体ではなく租税特別措置法第41条の16（老人扶養親族の特例）による上乗せで、国税庁 No.1180 の表に58万円として載っている（同ページの根拠法令等に「措法41の16」がある）。**措法41条の16の逐語は未取得**（reference.unverified を参照）。"
+      },
+      "specifiedRelativeSpecialDeduction": {
+        "article": "所得税法 第84条の2第1項（特定親族特別控除）",
+        "text": "居住者が生計を一にする年齢十九歳以上二十三歳未満の親族（その居住者の配偶者を除く。）及び児童福祉法第二十七条第一項第三号（都道府県の採るべき措置）の規定により同法第六条の四（定義）に規定する里親に委託された児童（第五十七条第一項（事業に専従する親族がある場合の必要経費の特例等）に規定する青色事業専従者に該当するもので同項に規定する給与の支払を受けるもの及び同条第三項に規定する事業専従者に該当するものを除くものとし、合計所得金額が百二十三万円以下であるものに限る。）で控除対象扶養親族に該当しないもの（以下この項及び次項において「特定親族」という。）を有する場合には、その居住者のその年分の総所得金額、退職所得金額又は山林所得金額から、その特定親族一人につきその特定親族の次の各号に掲げる区分に応じ当該各号に定める金額を控除する。一合計所得金額が八十五万円以下である特定親族六十三万円二合計所得金額が八十五万円を超え百十五万円以下である特定親族六十三万円からその特定親族の合計所得金額のうち八十四万一円を超える部分の金額に二を乗じた金額（当該乗じた金額が十万円の整数倍の金額から八万円を控除した金額でないときは、十万円の整数倍の金額から八万円を控除した金額で当該乗じた金額に満たないもののうち最も多い金額とする。）を控除した金額三合計所得金額が百十五万円を超え百二十万円以下である特定親族六万円四合計所得金額が百二十万円を超える特定親族三万円",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "配偶者特別控除と同じく条文に下限は無く『控除対象扶養親族に該当しないもの』（＝扶養親族の所得要件を超えた人）で、上限は123万円以下。第2号の式を展開すると85万円超90万円以下61万円、90万円超95万円以下51万円…となり、国税庁 No.1177 の表と一致する。**本人（納税者）の合計所得金額による制限は無い**点が配偶者特別控除と違う。"
+      },
+      "blueReturnDeduction": {
+        "article": "租税特別措置法 第25条の2第1項・第3項・第4項（青色申告特別控除）",
+        "text": "青色申告書を提出することにつき税務署長の承認を受けている個人のその承認を受けている年分（第三項の規定の適用を受ける年分を除く。）の不動産所得の金額、事業所得の金額又は山林所得の金額は、（中略）次に掲げる金額のうちいずれか低い金額を控除した金額とする。一十万円二所得税法第二十六条第二項、第二十七条第二項又は第三十二条第三項の規定により計算した不動産所得の金額、事業所得の金額（中略）又は山林所得の金額の合計額（中略）３青色申告書を提出することにつき税務署長の承認を受けている個人で不動産所得又は事業所得を生ずべき事業を営むもの（中略）が、同法第百四十八条第一項の規定により、当該事業につき帳簿書類を備え付けてこれにその承認を受けている年分の不動産所得の金額又は事業所得の金額に係る取引を記録している場合（これらの所得の金額に係る一切の取引の内容を詳細に記録している場合として財務省令で定める場合に限る。）には、その年分の不動産所得の金額又は事業所得の金額は、（中略）次に掲げる金額のうちいずれか低い金額を控除した金額とする。一五十五万円二所得税法第二十六条第二項又は第二十七条第二項の規定により計算した不動産所得の金額又は事業所得の金額の合計額４前項に規定する個人が同項に規定する場合に該当する場合において、次に掲げる要件のいずれかを満たすものであるときは、同項第一号中「五十五万円」とあるのは、「六十五万円」として、同項の規定を適用することができる。",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/332AC0000000026?asof=2026-12-01&response_format=json",
+        "note": "10万円・55万円・65万円が条文の数字として確認できる。いずれも『控除額』と『所得の金額』の低い方なので、所得が控除額に満たなければ所得までしか引けない（values.blueReturnDeduction.limitedToIncome）。第4項の要件は一号が優良な電子帳簿の保存、二号が e-Tax での期限内送信。"
+      },
+      "socialInsuranceDeduction": {
+        "article": "所得税法 第74条第1項（社会保険料控除）",
+        "text": "居住者が、各年において、自己又は自己と生計を一にする配偶者その他の親族の負担すべき社会保険料を支払つた場合又は給与から控除される場合には、その支払つた金額又はその控除される金額を、その居住者のその年分の総所得金額、退職所得金額又は山林所得金額から控除する。",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "**控除額に上限や割合の定めが無く、支払額（給与から差し引かれた額）がそのまま控除される**ことが条文から確認できる。国税庁 No.1130 の「その年に実際に支払った金額または給与や公的年金から差し引かれた金額の全額です」と一致する。"
+      },
+      "miscellaneousIncome": {
+        "article": "所得税法 第35条第1項・第2項（雑所得）",
+        "text": "雑所得とは、利子所得、配当所得、不動産所得、事業所得、給与所得、退職所得、山林所得、譲渡所得及び一時所得のいずれにも該当しない所得をいう。２雑所得の金額は、次の各号に掲げる金額の合計額とする。一その年中の公的年金等の収入金額から公的年金等控除額を控除した残額二その年中の雑所得（公的年金等に係るものを除く。）に係る総収入金額から必要経費を控除した金額",
+        "source": "https://laws.e-gov.go.jp/api/2/law_data/340AC0000000033?asof=2028-01-01&response_format=json",
+        "note": "第2項第2号のとおり、公的年金等以外の雑所得（副業など）は**総収入金額−必要経費**だけで、特別控除の定めが無い。"
+      }
+    },
+    "modelingGap": {
+      "employmentIncomeTableForUnder6_6M": {
+        "description": "給与等の収入金額が660万円未満の場合、所得税法第28条第4項により給与所得の金額は式ではなく別表第五（年末調整等のための給与所得控除後の給与等の金額の表）で求める。別表第五は収入を4,000円刻み（低所得帯は1,000円刻み）の階級に丸めた表なので、values.employmentIncomeDeduction の式で計算した値と最大で数千円ずれる。",
+        "impact": "年次シミュレーションでは所得税額で数百円程度の差にしかならないため、この JSON は式（速算表）だけを持つ。**1円単位で申告額に合わせる用途には使えない。**",
+        "status": "accepted"
+      },
+      "incomeAdjustmentDeduction": {
+        "description": "所得金額調整控除（給与収入850万円超で23歳未満の扶養親族がいる場合などに最大15万円、給与所得と公的年金等雑所得の両方がある場合の調整）を持っていない。",
+        "impact": "給与収入が850万円を超え、かつ23歳未満の子がいる世帯では給与所得を最大15万円多く見積もる（税額で数万円の過大計上）。",
+        "status": "notIncluded"
+      }
+    },
+    "scope": {
+      "notIncluded": [
+        "医療費控除・生命保険料控除・地震保険料控除・寄附金控除（ふるさと納税）・小規模企業共済等掛金控除（iDeCo）",
+        "ひとり親控除・寡婦控除・障害者控除・勤労学生控除（ひとり親控除は令和8年度税制改正で令和9年分以後38万円、改正前35万円）",
+        "所得金額調整控除（給与収入850万円超で23歳未満の扶養親族がいる場合など）",
+        "税額控除（住宅借入金等特別控除・配当控除・外国税額控除）",
+        "特定の基準所得金額の課税の特例（措法41の19。令和7年分以後、基準所得金額3億3,000万円超のいわゆるミニマムタックス）",
+        "公的年金等控除の表（所得税法第35条第4項）",
+        "分離課税（土地建物等の譲渡・株式等の譲渡・配当所得の申告分離）※譲渡は前の版の capital-gains.json（T13 で消した。タグ `v1-final` にある）",
+        "住民税（所得割・均等割）※別ファイルにする",
+        "定額減税（令和6年分の一時措置。令和7年分以後は無い）"
+      ]
+    },
+    "unverified": [
+      {
+        "key": "elderlyCohabitingParentStatute",
+        "description": "同居老親等の扶養控除58万円の根拠条文（租税特別措置法第41条の16）の逐語",
+        "reason": "金額は国税庁 No.1180 の表で確認できたが、条文の逐語までは取得していない。所得税法第84条第1項は老人扶養親族48万円までしか定めておらず、58万円は措置法側の上乗せ。",
+        "impact": "金額は一次ソース（国税庁）で確認済みなので値としては使える。条文レベルの裏取りが要るときは e-Gov で 332AC0000000026 の第41条の16 を引くこと。",
+        "status": "unverified"
+      },
+      {
+        "key": "publicPensionDeduction",
+        "description": "公的年金等控除の表",
+        "reason": "今回の依頼の対象（給与・事業・不動産・副業）に含まれないため取得していない。所得税法第35条第4項に条文があり、逐語も取得済みだが、老齢期の年金課税を扱うときは65歳以上／未満の区分を含めて別途データ化が要る。",
+        "impact": "リタイア後の年金収入に対する所得税を計算できない。",
+        "status": "unverified"
+      },
+      {
+        "key": "bracketsStartYear",
+        "description": "速算表（5％〜45％の7段階）が正確に何年分から適用されているか",
+        "reason": "国税庁 No.2260 の表の見出しが「平成27年分以後」であることは HTML から確認したが、改正沿革までは遡っていない。",
+        "impact": "2015年分より前を再現する用途では values.bracketsMeta.effectiveFromYear を信用しないこと。将来のシミュレーションでは影響なし。",
+        "status": "partiallyVerified"
+      },
+      {
+        "key": "basicDeductionColumnHeader",
+        "description": "国税庁 No.1199 の基礎控除の表で、3列目の見出しが「令和8年分 令和9年分 以後」と読める点",
+        "reason": "4列目に「令和10年分以後」が独立してあること、租税特別措置法第41条の16の2第1項第1号が『令和八年分及び令和九年分』、第2号が『令和十年分以後の各年分』と分けていることから、3列目は令和8年分・令和9年分の2年分と判断した。見出しの「以後」は表記の揺れとみなしている。",
+        "impact": "条文で裏が取れているため値への影響は無いが、国税庁ページの見出しだけを見ると別の読み方もできる。",
+        "status": "resolvedByStatute"
+      }
+    ]
+  }
+}

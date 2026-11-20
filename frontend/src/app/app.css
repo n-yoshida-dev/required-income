@@ -1,0 +1,1738 @@
+/*
+ * 新しい画面の見た目。決まりと理由は リポジトリ直下の DESIGN.md（値の正本はこのファイル）。
+ *
+ * 色は 3 役：墨（字と線）・階段の面・朱（見込みで届かない所だけ）。白い面は「選んだ段とその内訳」と「入れる欄」だけ。
+ * 見た目の値は :root の変数だけに置き、部品の中に色や大きさを直書きしない。
+ * 方向は 2026-11-17 のコンペで仮に決めた（docs/design-candidates/2026-11-17-home-look/。土台は案 A）。
+ */
+
+:root {
+  color-scheme: light;
+
+  /* 色（役割で持つ） */
+  --paper: #edf1f1; /* 画面の地 */
+  --surface: #ffffff; /* 選んだ段とその内訳・入れる欄 */
+  --surface-hover: rgb(255 255 255 / 0.55); /* 押せる段にマウスが乗ったとき */
+  --ink: #16223a; /* 字・階段の線・合計 */
+  --ink-soft: #4f5c73; /* 添える字（期限・単位・断り書き）。地・白・階段の面のどの上でも 4.5:1 以上 */
+  --mass: #cfd9de; /* 階段の面（要る世帯年収） */
+  --rule: #c2ccd1; /* 区切りの細い線 */
+  --track: #7b8aa0; /* 貯まり具合の棒の残り（0% でも全長が見える濃さ。地と 3:1、墨の棒と 4.5:1） */
+  --short: #d2360f; /* 見込みで届かない所（面） */
+  --short-ink: #b02a08; /* 見込みで届かない所（字） */
+  --alert-ink: var(--ink); /* 知らせ・入力の誤り。朱は使わず、太字で目立たせる */
+  --ink-disabled: #a3aebb; /* 押せない・打てない物の線と字（見本のままの「計画」） */
+  /* 「見直す」の階段に重ねる今の計画の線（案の墨の線より薄い。貯まり具合の棒の残りと同じ色で、地と 3:1） */
+  --compare-line: var(--track);
+  /* 入力：既定値のままの欄は添える字の色、直した欄は本文の字（T6） */
+  --field-default-ink: var(--ink-soft);
+  --field-touched-ink: var(--ink);
+  --field-bg: var(--surface);
+  --field-line: var(--track);
+
+  /* 字。外の字は読み込まない。端末に無い名前は飛ばされ、最後は端末の既定のゴシックになる */
+  --font-text:
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'BIZ UDPGothic', 'Yu Gothic UI', 'Noto Sans JP',
+    'Noto Sans CJK JP', system-ui, sans-serif;
+  /* 数字：幅の狭い字があれば使う（Mac・iPhone の DIN Alternate、Windows の Bahnschrift）。無ければ本文の字 */
+  --font-num: 'DIN Alternate', 'Bahnschrift', var(--font-text);
+
+  /* 字の大きさ（概要の枠 → 階段 → 一覧 の順に小さく）。12px を下回らない */
+  --size-hero: clamp(4rem, 20vw, 4.75rem);
+  --size-hero-long: clamp(3rem, 15vw, 3.75rem); /* 4 桁の金額・「届かない」 */
+  --size-hero-unit: 1.375rem;
+  --size-lead: 1.0625rem;
+  --size-body: 1rem;
+  --size-title: 1.375rem; /* 「計画」の題（今は読み上げだけの見出し。「見直す」は使わない） */
+  --size-num: 1.0625rem; /* 本文の中の数字 */
+  --size-num-mid: 1.1875rem; /* 目標の金額・換算の金額 */
+  --size-num-large: 1.625rem; /* 内訳の要る年収・今の年収で足りているときの金額 */
+  --size-mid: 0.875rem; /* 内訳の行・埋め方の名前・ボタン・「計画」の添える字（判断に使う数字なので 14px） */
+  --size-small: 0.8125rem; /* 「ながめる」の添える字 */
+  --size-tiny: 0.75rem; /* 断り書き・範囲・タブ。これより小さくしない */
+
+  /* 間隔と幅 */
+  --gutter: 1rem;
+  --gap-section: 1.75rem;
+  --gap-row: 0.5rem;
+  --content-max: 40rem;
+  --tabs-height: 3.5rem;
+  --tap-min: 2.75rem;
+  --radius: 0.75rem; /* 選んだ段の柱の上・内訳の下・概要の枠 */
+  --radius-small: 0.25rem; /* 見本の印・入れる欄 */
+  /* 入力欄の幅 */
+  --input-number: 6.5rem;
+  --input-year: 4.5rem;
+  --input-month: 3.5rem;
+  --input-text: 12rem;
+  --field-pad: 0.25rem 0.5rem;
+  /* 「見直す」の押して動かす欄の値の幅。本文の字の数字（幅の広い方）の太字で「4,860万円」「2029年1月」が入る（幅 360px で測った） */
+  --knob-value: 5.25rem;
+  /* 「見直す」の上に留める所：数字 2 つの高さ（名前・金額・年・差か「前は …」2 行）と、小さな階段の面の高さ */
+  --review-summary-height: 6.5rem;
+  --review-plot-height: 5.5rem;
+
+  /* 階段 */
+  --stair-line: 2.5px; /* 階段の線（図と「見直す」の小さな階段で同じ太さ） */
+  --plot-height: 11.5rem; /* 階段の図：面の高さ */
+  --value-zone: 2rem; /* 階段の図：上の数字の帯 */
+  --year-zone: 1.75rem; /* 階段の図：下の年の帯 */
+
+  font-family: var(--font-text);
+  font-size: var(--size-body);
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper);
+  /* ラジオ・チェックも墨（ブラウザ既定の青を 4 つ目の色にしない） */
+  accent-color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 幅の広い画面：並びは縦 1 列のまま、大きさだけ少し上げる（タブは下のまま。SPEC §4） */
+@media (min-width: 48rem) {
+  :root {
+    --size-hero: 5.5rem;
+    --size-hero-long: 4.5rem;
+    --size-hero-unit: 1.625rem;
+    --plot-height: 14rem;
+    --review-plot-height: 8rem;
+    --gap-section: 2.25rem;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* 数字：幅の狭い字で、桁の幅を揃える */
+.num {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 読み上げにだけ残す見出し */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---- 骨組み：本文と下のタブ ---- */
+
+.app__main {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--gutter) var(--gutter)
+    calc(var(--tabs-height) + env(safe-area-inset-bottom, 0px) + 2rem);
+}
+
+.tabs {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: calc(var(--tabs-height) + env(safe-area-inset-bottom, 0px));
+  /* PC の幅でも、タブは本文と同じ幅に収める */
+  padding: 0 max(0px, (100% - var(--content-max)) / 2) env(safe-area-inset-bottom, 0px);
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
+}
+
+.tabs__link {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.0625rem;
+  margin-top: -1px;
+  border-top: 2px solid transparent;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: var(--size-tiny);
+}
+
+.tabs__link svg {
+  width: 1.375rem;
+  height: 1.375rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+}
+
+/* 今いるタブ：墨の字と、上の線 */
+.tabs__link.active {
+  color: var(--ink);
+  font-weight: 700;
+  border-top-color: var(--ink);
+}
+
+.tabs__link.active svg {
+  stroke-width: 2.25;
+}
+
+/* ---- 見本の印と、自分の数字にする入口（ながめる・計画） ---- */
+
+.home__sample,
+.plan__sample {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gutter);
+}
+
+.tag {
+  padding: 0.125rem 0.5rem 0.125rem 0.6875rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-small);
+  font-size: var(--size-small);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+}
+
+.home__start,
+.plan__start {
+  min-height: var(--tap-min);
+  padding: 0 1.125rem;
+  border: 0;
+  border-radius: calc(var(--tap-min) / 2);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--size-mid);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* 知らせ（保存を開けなかった・計算できなかった）。朱は使わない */
+.home__alert,
+.plan__alert {
+  color: var(--alert-ink);
+  font-size: var(--size-small);
+  font-weight: 700;
+}
+
+/* ---- ながめる ---- */
+
+.home {
+  display: grid;
+  gap: var(--gap-section);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.home .num {
+  font-weight: 700;
+}
+
+.home__notices {
+  display: grid;
+  gap: var(--gap-row);
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+  /* 「計画」のカードの知らせと同じく文節の切れ目で折り返す（「96万円」を数字と単位の間で割らない。Chromium だけで効く） */
+  word-break: auto-phrase;
+}
+
+/*
+ * 概要の枠（D42）：「ながめる」の先頭で、ここだけが文で読む所。図は図だけで見せる。
+ * 枠は地と分ける最小の形（区切りの細い線 1 本の角丸。面の色・影・左の色帯は使わない）。
+ *
+ *  ┌──────────────────────────────┐
+ *  │ やりたいことを全部やるには、 │
+ *  │ 2029年から年収               │
+ *  │ 948万円                      │
+ *  │ が要ります      あと2年2か月 │
+ *  │ 年収：家族の年収の合計。…    │
+ *  │ ・今の年収 900万円より …     │
+ *  │ ・2029年に変わること         │
+ *  │   車のローンの返済が始まる  月4.3万円 │
+ *  │ ・いちばん高いのは …         │
+ *  └──────────────────────────────┘
+ */
+.summary {
+  display: grid;
+  gap: 0.375rem;
+  padding: 1rem 1rem 1.125rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+/* 前の行・金額・「が要ります」の行を縦に並べる。行の中は文節で折り返す（1〜2 字だけ次の行に落とさない） */
+.summary__line,
+.summary__verb {
+  display: block;
+  font-size: var(--size-lead);
+  line-height: 1.5;
+  word-break: auto-phrase;
+}
+
+/* 「が要ります」と「あと◯年◯か月」：文の終わりを左、残りの時間を右に（文の邪魔をしない） */
+.summary__verb {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0 0.75rem;
+  /* 金額の字の下（数字に下がりが無く、行の箱の下が空く）と「が要ります」の字の間を、上の行と金額の字の間と同じくらいに詰める。
+     幅 390px の字のインクで、上の行と金額の間 10px・金額と「が要ります」の間 10px（詰める前は 21px。PR #99 の見た目の点検） */
+  margin-top: -0.6875rem;
+}
+
+/* 4 桁の金額（カンマの下が線の下へ出る）と「届かない」（字が箱の下まである）は引き上げない。
+   引き上げるとカンマが「が要ります」の「要」に触れ、「届かない」の右下に「あと◯年◯か月」が付いて見えた（PR #100 の見た目の点検）。
+   幅 375・390・1280px の字のインクで、カンマと「が要ります」の間 9・10・12px、「届かない」と「あと…」の間 8・7・9px */
+.summary.is-long .summary__verb {
+  margin-top: 0;
+}
+
+.summary__left {
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.summary__amount {
+  display: block;
+  margin-left: -0.125rem;
+  font-size: var(--size-hero);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.summary.is-long .summary__amount {
+  font-size: var(--size-hero-long);
+}
+
+.summary__unit {
+  margin-left: 0.25rem;
+  font-family: var(--font-text);
+  font-size: var(--size-hero-unit);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* 「年収」の注：見出しの文の下に 1 回だけ、小さい字で */
+.summary__note {
+  color: var(--ink-soft);
+  font-size: var(--size-small);
+  line-height: 1.5;
+}
+
+/* 注の文のかたまり。折り返しはかたまりの間だけ（1 つの文が幅に入らないときだけ文節で割る） */
+.summary__note-phrase {
+  display: inline-block;
+  word-break: auto-phrase;
+}
+
+/* 箇条書き 3 つ：今の年収との差／その年に変わること／その先の流れ。本文の字で、文節で折り返す */
+.summary__points {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+  padding-left: 1.125rem;
+  list-style: disc;
+  line-height: 1.55;
+  word-break: auto-phrase;
+}
+
+.summary__points > li::marker {
+  color: var(--ink-soft);
+}
+
+.summary__points .num {
+  font-size: var(--size-num);
+}
+
+/* 箇条書きの文：文ごとに行を改める。文の中は文節のかたまりの間だけで折り返す（「多い／金額です」と割らない） */
+.summary__said {
+  display: block;
+}
+
+/* 文節のかたまり。幅に入らない長いかたまり（長い名前）だけ、中で文節に割る */
+.summary__chunk {
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* 「2029年に変わること」と、その下の名前と動きの言い回し・月額（右にそろえる） */
+.summary__causes {
+  display: grid;
+  gap: 0.125rem;
+  margin-top: 0.125rem;
+}
+
+.summary__causes li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+/* 言い回しは文節で折り返す（「学校（1人目）の費用が」「終わる」）。1 文節が幅を超えるときだけ字の間で割る */
+.summary__cause-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.summary__cause-amt {
+  white-space: nowrap;
+}
+
+.summary__cause-amt .num {
+  margin-inline: 0.0625rem;
+}
+
+/* 次の段が無い・段が無いとき：同じ字の調子で 1〜2 行だけ */
+.summary__headline {
+  font-size: var(--size-lead);
+  word-break: auto-phrase;
+}
+
+/* 足りているときの「今の年収 900万円で足ります」。金額は大きい字 */
+.summary__enough-amount .num {
+  margin-right: 0.0625rem;
+  font-size: var(--size-num-large);
+}
+
+/* ---- 階段の図 ---- */
+
+/* 図の題：概要の見出しの文と同じ字の調子で、終わりの年までの全体だと言う（W18・W19） */
+.home__stairs-title {
+  font-size: var(--size-lead);
+  font-weight: 400;
+  line-height: 1.5;
+  word-break: auto-phrase;
+}
+
+.stairs {
+  position: relative;
+  height: calc(var(--value-zone) + var(--plot-height) + var(--year-zone));
+  font-size: var(--size-small);
+}
+
+/* 面と線。枠いっぱいに伸ばし、線の太さは伸ばさない */
+.stairs__plot {
+  position: absolute;
+  z-index: 1;
+  top: var(--value-zone);
+  left: 0;
+  width: 100%;
+  height: var(--plot-height);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.stairs__mass {
+  fill: var(--mass);
+}
+
+.stairs__gap {
+  fill: var(--short);
+  shape-rendering: crispEdges;
+}
+
+.stairs__profile,
+.stairs__expected-line {
+  fill: none;
+  stroke: var(--ink);
+  vector-effect: non-scaling-stroke;
+}
+
+.stairs__profile {
+  stroke-width: var(--stair-line);
+  stroke-linejoin: miter;
+}
+
+/* 比べる相手（「見直す」の今の計画）の要る年収の線：案の線と同じ太さで薄い色。案と同じ所は案の線に隠れる */
+.stairs__compare {
+  fill: none;
+  stroke: var(--compare-line);
+  stroke-width: var(--stair-line);
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+/* 見込みは細い破線（要る年収の太い線と分ける） */
+.stairs__expected-line {
+  stroke-width: 1.5px;
+  stroke-dasharray: 5 4;
+}
+
+/* 段：押す所は図の高さいっぱいで、幅はその段の年の幅（狭い段は両隣から譲って最低 24px 相当。stairsGeometry.ts の minHitWidth） */
+.stairs__step {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--hx) * 100%);
+  width: calc(var(--hw) * 100%);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+/* 柱：年数に比例した段の位置。選んだ段の白い柱と、金額・年はここに置く（押す所が広がっても段からずれない） */
+.stairs__column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc((var(--x) - var(--hx)) / var(--hw) * 100%);
+  width: calc(var(--w) / var(--hw) * 100%);
+  border-radius: var(--radius) var(--radius) 0 0;
+  transition: background-color 0.2s;
+}
+
+@media (hover: hover) {
+  .stairs__step:hover .stairs__column {
+    background: var(--surface-hover);
+  }
+}
+
+/* 選んだ段：白い柱が下の内訳の白い面までつながる */
+.stairs__step.is-selected .stairs__column {
+  background: var(--surface);
+}
+
+/* キーボードの枠は面の上に重ねる（面に隠れないように） */
+.stairs__step:focus-visible {
+  outline: none;
+}
+
+.stairs__step:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.stairs__value,
+.stairs__year,
+.stairs__end,
+.stairs__expected {
+  position: absolute;
+  z-index: 2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.stairs__value {
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: var(--size-body);
+  line-height: 1.25rem;
+}
+
+/* 4 桁の金額と狭い段の 3 桁は 1 段小さい字にして、段の幅に収める（stairsGeometry.ts の shortLabelFits・longLabelFits） */
+.stairs__value.is-small {
+  gap: 0.125rem;
+  font-size: var(--size-mid);
+}
+
+/* 届く段の金額は段の中（墨）、届かない段の金額は段の上（朱）。見込みの線と重ならない */
+.stairs__step:not(.is-short) .stairs__value {
+  top: calc(var(--value-zone) + var(--plot-height) * (1 - var(--h)) + 0.4375rem);
+}
+
+.stairs__step.is-short .stairs__value {
+  bottom: calc(var(--year-zone) + var(--plot-height) * var(--h) + 0.3125rem);
+  color: var(--short-ink);
+}
+
+/* 押すと開く印（押せる段だけに出る） */
+.stairs__caret {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-top: -0.25rem;
+  border: solid var(--ink-soft);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+}
+
+.stairs__step.is-selected .stairs__caret {
+  border-color: var(--ink);
+  transform: translateY(0.25rem) rotate(225deg);
+}
+
+.stairs__year,
+.stairs__end {
+  bottom: 0;
+  height: var(--year-zone);
+  padding-top: 0.375rem;
+  color: var(--ink-soft);
+}
+
+.home .stairs__year,
+.home .stairs__end {
+  font-weight: 400;
+}
+
+.stairs__year {
+  left: 0;
+  padding-left: 0.125rem;
+}
+
+.stairs__end {
+  right: 0;
+  padding-right: 0.125rem;
+}
+
+.stairs__expected {
+  right: calc(var(--r) * 100% + 0.25rem);
+  color: var(--ink-soft);
+  line-height: 1.25rem;
+}
+
+.stairs__expected.is-above {
+  bottom: calc(var(--year-zone) + var(--plot-height) * var(--e) + 0.25rem);
+}
+
+.stairs__expected.is-below {
+  top: calc(var(--value-zone) + var(--plot-height) * (1 - var(--e)) + 0.375rem);
+}
+
+.stairs__expected .num {
+  margin-inline: 0.125rem 0.0625rem;
+  color: var(--ink);
+  font-size: var(--size-body);
+}
+
+/* ---- 段の内訳：選んだ段の下の白い面。足し算として上から読む ---- */
+
+.breakdown {
+  display: grid;
+  gap: 0.875rem;
+  padding: 1rem var(--gutter) 1.125rem;
+  background: var(--surface);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+.breakdown__years {
+  font-size: var(--size-lead);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.breakdown__rows,
+.breakdown__bridge {
+  display: grid;
+  gap: 0.375rem;
+  font-size: var(--size-mid);
+  line-height: 1.4;
+}
+
+.breakdown__rows li,
+.breakdown__bridge li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--gutter);
+}
+
+.breakdown__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.breakdown__amt {
+  white-space: nowrap;
+  font-size: var(--size-small);
+}
+
+.breakdown__amt .num {
+  margin-right: 0.0625rem;
+  font-size: var(--size-num);
+}
+
+/* 区切りの線は「ここまでの足し算の答え」の上にだけ引く */
+.breakdown__bridge {
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--rule);
+}
+
+.breakdown__net,
+.breakdown__gross {
+  font-weight: 700;
+}
+
+.breakdown__gross {
+  margin-top: 0.25rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--size-body);
+}
+
+.breakdown__gross .num {
+  font-size: var(--size-num-large);
+  line-height: 1;
+}
+
+.breakdown__note {
+  display: block;
+  font-size: var(--size-tiny);
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.breakdown__expect {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.25rem var(--gutter);
+  font-size: var(--size-small);
+}
+
+.breakdown__expect .num {
+  margin-inline: 0.125rem 0.0625rem;
+  font-size: var(--size-num);
+}
+
+.breakdown__lack {
+  color: var(--short-ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 埋め方の換算：3 つとも同じ形の行（名前を左、金額を右、範囲をその下）。どれも目立たせない */
+.fills {
+  display: grid;
+  border-top: 1px solid var(--rule);
+}
+
+.fills__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.125rem 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fills__row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.fills__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: var(--size-mid);
+}
+
+.fills__amt {
+  white-space: nowrap;
+  font-size: var(--size-small);
+}
+
+.fills__amt .num {
+  margin-inline: 0.0625rem;
+  font-size: var(--size-num-mid);
+  line-height: 1.2;
+}
+
+.fills__range,
+.fills__note {
+  grid-column: 1 / -1;
+  font-size: var(--size-tiny);
+  color: var(--ink-soft);
+}
+
+.fills__range {
+  text-align: right;
+}
+
+/* ---- 目標の一覧：名前・金額・期限・貯まり具合の行。年でまとめず、区切り線も引かない ---- */
+
+.goals {
+  display: grid;
+}
+
+/* 見直しで外した目標：「計画」のオフのカードと同じく、字を添える字の色に（濃さは 4.5:1 を保つ） */
+.goals .is-off .goals__row,
+.goals .is-off .goals__pct {
+  color: var(--ink-soft);
+}
+
+.goals .is-off .goals__track i {
+  background: var(--ink-soft);
+}
+
+.goals__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 0.75rem;
+  align-items: baseline;
+  gap: 0.125rem 0.625rem;
+  min-height: var(--tap-min);
+  padding: 0.5rem 0;
+  text-decoration: none;
+}
+
+.goals__name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.goals__amount {
+  white-space: nowrap;
+  font-size: var(--size-small);
+}
+
+.goals__amount .num {
+  margin-inline: 0.0625rem;
+  font-size: var(--size-num-mid);
+}
+
+/* 押すと「計画」のカードへ */
+.goals__go {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  align-self: center;
+  justify-self: end;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border: solid var(--ink-soft);
+  border-width: 1.5px 1.5px 0 0;
+  transform: rotate(45deg);
+}
+
+.goals__meta {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+}
+
+.goals__period {
+  white-space: nowrap;
+}
+
+/* 貯まり具合：墨の棒と %。0% でも棒の全長が見える */
+.goals__progress {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.goals__track {
+  flex: 1;
+  height: 0.375rem;
+  background: var(--track);
+}
+
+.goals__track i {
+  display: block;
+  width: calc(var(--p) * 100%);
+  height: 100%;
+  background: var(--ink);
+}
+
+.goals__pct {
+  min-width: 2.5rem;
+  text-align: right;
+  color: var(--ink);
+  font-size: var(--size-tiny);
+}
+
+.goals__pct .num {
+  margin-right: 0.0625rem;
+  font-size: var(--size-num);
+}
+
+/* ---- 入力欄（features/shared/fields） ---- */
+
+.field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--gutter);
+  align-items: center;
+  padding: var(--gap-row) 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* 選ぶ欄：名前は割らず、選択肢が収まらないときは選択肢の側を次の行（右寄せ）へ落とす */
+.choice {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0 var(--gutter);
+  padding: var(--gap-row) 0;
+  min-width: 0;
+}
+
+.choice > .field__label {
+  white-space: nowrap;
+}
+
+.choice__options {
+  margin-left: auto;
+}
+
+.field__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 0;
+}
+
+.field__control,
+.choice__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-row);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.field__input {
+  min-height: var(--tap-min);
+  padding: var(--field-pad);
+  font: inherit;
+  color: var(--field-touched-ink);
+  background: var(--field-bg);
+  border: 1px solid var(--field-line);
+  border-radius: var(--radius-small);
+}
+
+/* 打てない欄（見本のままの「計画」）：白い面をやめ、枠を押せない色に。字は読める濃さのまま */
+.field__input:disabled {
+  color: var(--ink-soft);
+  background: transparent;
+  border-color: var(--ink-disabled);
+  opacity: 1;
+}
+
+.field__input--number {
+  width: var(--input-number);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__input--year {
+  width: var(--input-year);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.field__input--month {
+  width: var(--input-month);
+}
+
+/* 選択肢の多い欄（塾の学年。4 個以上は select）：月の欄と同じ幅から、選択肢の字に合わせて広がる */
+.field__input--select {
+  min-width: var(--input-month);
+}
+
+.field__input--text,
+.field__input--code {
+  width: var(--input-text);
+  max-width: 100%;
+}
+
+/* 既定値のままの欄は添える字の色（直した欄と見分ける） */
+.field.is-default .field__input,
+.choice.is-default .choice__option {
+  color: var(--field-default-ink);
+}
+
+.field__unit {
+  font-size: var(--size-mid);
+  color: var(--ink-soft);
+}
+
+.field__error,
+.field__note {
+  grid-column: 1 / -1;
+  font-size: var(--size-mid);
+  text-align: right;
+  /* 文節の切れ目で折り返す（Chromium だけで効き、ほかのブラウザでは無視される） */
+  word-break: auto-phrase;
+}
+
+.field__error {
+  color: var(--alert-ink);
+  font-weight: 700;
+}
+
+.field__note {
+  color: var(--ink-soft);
+}
+
+.choice__option {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  min-height: var(--tap-min);
+  white-space: nowrap;
+}
+
+/*
+ * 選択肢に額を添える欄（大学資金の進路。D37）：選択肢を縦に並べ、名前の幅と額の右端を揃える。
+ * 名前は 1 行目の選択肢の高さの中央に合わせる（3 行の真ん中に浮かせない）
+ */
+.choice--stacked {
+  align-items: flex-start;
+}
+
+.choice--stacked > .field__label {
+  line-height: var(--tap-min);
+}
+
+.choice--stacked .choice__options {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+}
+
+.choice--stacked .choice__text {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: var(--gutter);
+}
+
+.choice__name {
+  min-width: 4em;
+}
+
+.choice__amount {
+  margin-left: auto;
+}
+
+.choice__amount .field__unit {
+  margin-left: 0.125rem;
+}
+
+/* ---- 計画 ---- */
+
+.plan {
+  display: grid;
+  gap: var(--gap-section);
+}
+
+.plan h1 {
+  font-size: var(--size-title);
+}
+
+.plan__form {
+  display: grid;
+  gap: var(--gap-section);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.plan__section {
+  display: grid;
+  gap: var(--gap-row);
+  min-width: 0;
+}
+
+.plan__section h2 {
+  margin: 0;
+  font-size: var(--size-lead);
+}
+
+.plan__block {
+  display: grid;
+  min-width: 0;
+}
+
+.plan__block h3 {
+  margin: 0;
+  font-size: var(--size-body);
+}
+
+.plan__block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 足す・外すの並ぶ行（子・見込み） */
+.plan__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--gutter);
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.plan__row > .field {
+  flex: 1 1 14rem;
+}
+
+.plan__outlook {
+  display: grid;
+}
+
+/* 今年以前の見込みの段（計算に使われない）は添える字の色 */
+.plan__row.is-past {
+  color: var(--ink-soft);
+}
+
+.plan__row.is-past .field__input {
+  color: var(--ink-soft);
+}
+
+.plan__past {
+  font-size: var(--size-mid);
+}
+
+.plan__adds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-row);
+}
+
+/* 足す・外す・消す：墨の線のボタン（入口の塗りのボタンより 1 段弱く） */
+.plan__add,
+.plan__remove {
+  min-height: var(--tap-min);
+  padding: 0 0.875rem;
+  border: 1.5px solid var(--ink);
+  border-radius: calc(var(--tap-min) / 2);
+  background: none;
+  font-size: var(--size-mid);
+  cursor: pointer;
+}
+
+/* 押せない物（見本のままの「計画」）：線と字を押せない色に落とす */
+.plan__add:disabled,
+.plan__remove:disabled,
+.home__start:disabled,
+.plan__start:disabled {
+  border-color: var(--ink-disabled);
+  color: var(--ink-disabled);
+  cursor: default;
+}
+
+/* 塗りのボタンが押せないときは、塗りをやめて線だけにし、字は読める濃さにする（DESIGN.md「押せない物の見せ方」） */
+.home__start:disabled,
+.plan__start:disabled {
+  border: 1.5px solid var(--ink-disabled);
+  background: none;
+  color: var(--ink-soft);
+}
+
+.plan__add {
+  justify-self: start;
+}
+
+/* 目標カード */
+.cards {
+  display: grid;
+  gap: var(--gap-row);
+}
+
+.card.is-off .card__summary {
+  color: var(--ink-soft);
+}
+
+/* 1 行目：開閉の印・名前・毎月いくら。2 行目（あれば）：オフの印と重さ（名前の下から右端まで。T11） */
+.card__summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0 var(--gutter);
+  align-items: baseline;
+  min-height: var(--tap-min);
+  padding: var(--gap-row) 0;
+  cursor: pointer;
+}
+
+/* 開ける・閉じられることの印（summary を flex にすると既定の三角が消えるため） */
+.card__summary::-webkit-details-marker {
+  display: none;
+}
+
+.card__summary::before {
+  content: '▸';
+  color: var(--ink-soft);
+}
+
+.card[open] > .card__summary::before {
+  content: '▾';
+}
+
+.card__name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.card__off {
+  font-size: var(--size-mid);
+}
+
+/*
+ * 見出しの 2 行目（いつも置く）。オフの印を左、重さを右に置き、入らなければ重さを次の行へ落とす（重さの言葉は割らない）。
+ * 重さは後から出るので、出る前も空の 1 行（重さの場所に空白 1 字）で高さを取っておく
+ */
+.card__sub {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--gutter);
+  align-items: baseline;
+}
+
+/* 重さ（「外すと 61万円下がる」）：言葉は添える字、差の数字だけ字の色。色で目立たせない（朱は見込みで届かない所だけ） */
+.card__impact {
+  margin-left: auto;
+  color: var(--ink-soft);
+  font-size: var(--size-mid);
+  white-space: nowrap;
+}
+
+.card__impact-value {
+  color: var(--ink);
+}
+
+.card.is-off .card__impact-value {
+  color: inherit;
+}
+
+/* 目標の節の頭：見出しを左、重さの基準（「いちばん高い段 998万円」）を右。基準は 1 回だけ */
+.plan__goals-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--gutter);
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.plan__peak {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--size-mid);
+  white-space: nowrap;
+}
+
+.plan__peak-value {
+  color: var(--ink);
+}
+
+.card__body {
+  display: grid;
+  gap: var(--gap-row);
+  padding-bottom: var(--gutter);
+}
+
+.card__bands,
+.card__notices {
+  display: grid;
+  gap: var(--gap-row);
+  font-size: var(--size-mid);
+}
+
+.card__bands li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--gutter);
+}
+
+.card__period {
+  grid-column: 1 / -1;
+  color: var(--ink-soft);
+}
+
+.card__notices {
+  color: var(--ink-soft);
+  /* 補足と同じく文節の切れ目で折り返す（「上限」「2人ぶん」を語の途中で割らない。Chromium だけで効く） */
+  word-break: auto-phrase;
+}
+
+.card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gutter);
+}
+
+.card__toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  align-items: center;
+  min-height: var(--tap-min);
+}
+
+.card__pending {
+  color: var(--ink-soft);
+}
+
+/* 家のカードの数字（頭金＋諸費用・借りる額・年収の何倍か。T7）。目安を超えた行だけ足りない色にする */
+.card__facts {
+  display: grid;
+  gap: var(--gap-row);
+  margin: 0;
+  font-size: var(--size-mid);
+}
+
+.card__facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--gutter);
+}
+
+.card__facts dt {
+  color: var(--ink-soft);
+}
+
+.card__facts dd {
+  margin: 0;
+  text-align: right;
+}
+
+.card__facts .is-over dd {
+  color: var(--short-ink);
+}
+
+.card__limit {
+  display: block;
+  color: var(--ink-soft);
+}
+
+/* 大学資金・老後資金の到達額：内訳の行の下に細い線を引き、答え（使う月の到達額）を太字で置く（足し算の答えの上の線。DESIGN.md「Shapes」） */
+/* 到達額のまとまりは帯の並びと別の物なので、その間だけ間隔を広げる（「大学資金の積立」を足し算の 1 行目と読ませない） */
+.card__reach {
+  margin-top: var(--gap-row);
+}
+
+/* 貯まっている額の「今の額 →」（使う月の額へ増える元。添える字） */
+.card__from {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.card__total {
+  padding-top: var(--gap-row);
+  border-top: 1px solid var(--rule);
+  font-weight: 700;
+}
+
+.card__facts .card__total dt {
+  color: var(--ink);
+}
+
+/*
+ * 子の費用のカードの塾の行（T9）。名前「塾」の下に行を並べ、最後に足すボタン。
+ * 1 行は「[高1] から [高3] まで」の 1 列と「月額・外す」の 1 列。行の中は詰め、行と行の間は広く空けて、まとまりを間隔で見せる
+ */
+.card__rows {
+  display: grid;
+  gap: var(--gutter);
+  padding: var(--gap-row) 0;
+}
+
+.card__cram {
+  display: grid;
+}
+
+.card__grades {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-row);
+  min-height: var(--tap-min);
+}
+
+.card__grades.is-default .field__input {
+  color: var(--field-default-ink);
+}
+
+/*
+ * ---- 見直す（SPEC §4.3） ----
+ * 上に留める所（数字 2 つ → 小さな階段（今の計画の薄い線と案）→「元に戻す」「この案にする」）→ 段の内訳・知らせ → 動かす物。
+ * 留める所は行ごとの高さを先に取り、状態（差がある・前は…・計算できない）で伸び縮みしない。
+ * 動かす物は押して 1 つずつ動かす（[−] 値 [+]）。今の計画から動かした値だけ墨の太字
+ */
+
+.review {
+  display: grid;
+  gap: var(--gap-section);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.review__head .num {
+  font-weight: 700;
+}
+
+.review__plot .stairs__year,
+.review__plot .stairs__end {
+  font-weight: 400;
+}
+
+/*
+ * 上に留める：下の欄を動かしている間も、数字・階段・ボタンが見える。下の端の線は「ここから下が流れる」境目（タブの上の線と同じ意味）。
+ * 階段は高さを抑える（幅 375・高さ 667 で、動かす欄が 4 行ぶん以上見える）
+ */
+.review__head {
+  --plot-height: var(--review-plot-height);
+  --value-zone: 1.75rem;
+  --year-zone: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  gap: 0.375rem;
+  margin: calc(-1 * var(--gutter)) calc(-1 * var(--gutter)) 0;
+  padding: var(--gap-row) var(--gutter);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* 数字 2 つ：名前 → 金額 → 年 → 差か「前は …」（2 行まで）。行ごとの高さを先に取る */
+.review__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gutter);
+  height: var(--review-summary-height);
+  margin: 0;
+}
+
+.review__figure {
+  display: grid;
+  grid-template-rows: 1.125rem 2rem 1.125rem auto;
+  min-width: 0;
+}
+
+.review__figure dt {
+  font-size: var(--size-tiny);
+  line-height: 1.125rem;
+  color: var(--ink-soft);
+}
+
+.review__figure dd {
+  display: contents;
+}
+
+.review__amount {
+  overflow: hidden;
+  font-size: var(--size-small);
+  line-height: 2rem;
+  white-space: nowrap;
+}
+
+.review__value {
+  font-weight: 700;
+}
+
+.review__value .num {
+  margin-right: 0.0625rem;
+  font-size: var(--size-num-large);
+}
+
+.review__plain {
+  font-weight: 700;
+  font-size: var(--size-mid);
+}
+
+.review__when {
+  font-size: var(--size-small);
+  line-height: 1.125rem;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* 差（今の計画と同じ年から始まる段どうしで、どちらも解けているとき） */
+.review__delta {
+  font-size: var(--size-small);
+  white-space: nowrap;
+}
+
+.review__delta .num {
+  margin-right: 0.0625rem;
+  font-size: var(--size-num);
+}
+
+/* 差を出せないときの今の計画の値。かけら（「前は」「2029年から」「948万円」）の中では折り返さない（2 行まで） */
+.review__was {
+  max-height: 2.25rem;
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: var(--size-tiny);
+  line-height: 1.125rem;
+}
+
+.review__piece {
+  white-space: nowrap;
+}
+
+.review__piece + .review__piece {
+  margin-left: 0.25em;
+}
+
+/* 階段の場所。計算できない・段が無いときも、同じ高さの中に理由を出す（下が動かない） */
+.review__plot {
+  height: calc(var(--value-zone) + var(--plot-height) + var(--year-zone));
+  margin: 0;
+}
+
+.review__plot--message {
+  display: flex;
+  align-items: center;
+  overflow: auto;
+  color: var(--alert-ink);
+  font-size: var(--size-small);
+  font-weight: 700;
+  word-break: auto-phrase;
+}
+
+.review__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--gap-row);
+  min-height: var(--tap-min);
+}
+
+.review__actions .tag {
+  margin-right: auto;
+}
+
+/* この案にする・自分の数字にする：入口と同じ墨で塗った丸い端のボタン */
+.review__adopt,
+.review__reset {
+  min-height: var(--tap-min);
+  border: 1.5px solid var(--ink);
+  border-radius: calc(var(--tap-min) / 2);
+  font-size: var(--size-mid);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.review__adopt {
+  padding: 0 1.125rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+/* 元に戻す：墨の線の丸い端のボタン（入口より 1 段弱く） */
+.review__reset {
+  padding: 0 0.875rem;
+  background: none;
+}
+
+/* 押せない：線だけにする。塗りのボタンの字は読める濃さ（ink-soft。今の計画にした直後の「今の計画にしました」を読む） */
+.review__adopt:disabled,
+.review__reset:disabled {
+  border-color: var(--ink-disabled);
+  background: none;
+  cursor: default;
+}
+
+.review__adopt:disabled {
+  color: var(--ink-soft);
+}
+
+.review__reset:disabled {
+  color: var(--ink-disabled);
+}
+
+/* 段の内訳は留める所の下に、それだけで白い面にする（柱につながらないので角を丸める） */
+.review .breakdown {
+  border-radius: var(--radius);
+}
+
+.review__alert {
+  color: var(--alert-ink);
+  font-size: var(--size-small);
+  font-weight: 700;
+}
+
+.review__notices {
+  display: grid;
+  gap: var(--gap-row);
+  font-size: var(--size-small);
+  color: var(--ink-soft);
+}
+
+.review__section {
+  display: grid;
+  gap: var(--gap-row);
+  min-width: 0;
+}
+
+.review__section h2 {
+  font-size: var(--size-lead);
+}
+
+.review__goals {
+  display: grid;
+  gap: var(--gap-row);
+}
+
+.review__goal {
+  display: grid;
+  min-width: 0;
+}
+
+.review__toggle {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  min-height: var(--tap-min);
+  cursor: pointer;
+}
+
+.review__toggle input {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+}
+
+.review__name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* 外した目標は名前を添える字の色（opacity で薄くしない。DESIGN.md） */
+.review__goal.is-off .review__name {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+/*
+ * 時期と金額。スマホの幅では、どの目標も時期・金額を 1 つずつの行にして右へそろえる（片手で押す側。行の数が目標でばらばらにならない）。
+ * 広い幅では 1 行に並べ、時期は左、金額は右（片方だけの目標も、金額は右の列）
+ */
+.review__knobs {
+  display: grid;
+  justify-items: end;
+  gap: var(--gap-row);
+}
+
+@media (min-width: 30rem) {
+  .review__knobs {
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+  }
+
+  .review__knobs .knob--time {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .review__knobs .knob--amount {
+    grid-column: 2;
+  }
+}
+
+.review__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-row) var(--gutter);
+}
+
+.review__label {
+  min-width: 0;
+}
+
+/* 押して 1 つずつ動かす欄：[−] 値 [+] */
+.knob {
+  display: flex;
+  align-items: center;
+}
+
+.knob__step {
+  flex: none;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  padding: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  background: none;
+  font-size: var(--size-lead);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.knob__step:disabled {
+  border-color: var(--ink-disabled);
+  color: var(--ink-disabled);
+  cursor: default;
+}
+
+/* 値：押しても位置が動かないよう幅を取る（4 桁の万円でも「−」が動かない）。今の計画のままは添える字、動かした値は墨の太字 */
+.knob__value {
+  min-width: var(--knob-value);
+  padding: 0 0.25rem;
+  text-align: center;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.knob__value .num {
+  font-size: var(--size-num);
+}
+
+/* 単位（万円・年・月・%）は数字より小さく、本文の字で添える */
+.knob__unit {
+  font-size: var(--size-small);
+}
+
+.knob__value.is-changed {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stairs__column,
+  .stairs__caret {
+    transition: none;
+  }
+}

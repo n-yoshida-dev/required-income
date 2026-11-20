@@ -1,0 +1,452 @@
+{
+  "meta": {
+    "name": "社会保険料（被用者・協会けんぽ（都道府県支部））",
+    "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/index.html",
+    "sourceName": "令和8年度の協会けんぽの保険料率は3月分（4月納付分）から改定されます｜都道府県毎の保険料率｜協会けんぽ",
+    "additionalSources": [
+      {
+        "url": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html",
+        "sourceName": "令和8年度保険料額表｜都道府県毎の保険料額表｜協会けんぽ",
+        "usedFor": "全47都道府県支部の保険料額表 PDF（R8_<コード><支部名>.pdf）の一覧。47 支部の料率欄を料率の表と突き合わせた（2026-11-20）。等級表と注記（賞与の上限・厚生年金の等級の読み替え・端数処理）が支部で共通であることは、北海道・東京・神奈川・大阪の 4 支部の PDF で、支部名・適用月・保険料額の列を除いて一字も違わない（空白を除く）ことを確かめた（2026-11-20）"
+      },
+      {
+        "url": "https://www.kyoukaikenpo.or.jp/shibu/kanagawa/assets/ryouritsutokurei08.pdf",
+        "sourceName": "神奈川支部の令和８年度保険料率に係る特例的な取扱いについて｜協会けんぽ神奈川支部",
+        "usedFor": "ratesByPrefecture の 14 の率が据え置きの特例によること（reference.unverified の healthInsuranceRateAfter2027）"
+      },
+      {
+        "url": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/003/index.html",
+        "sourceName": "協会けんぽの子ども・子育て支援金率について｜保険料率｜協会けんぽ",
+        "usedFor": "子ども・子育て支援金率0.23％が全国一律であること、一般の被保険者は令和8年4月分（5月納付分）から適用されることの確認"
+      },
+      {
+        "url": "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html",
+        "sourceName": "厚生年金保険の保険料｜日本年金機構",
+        "usedFor": "厚生年金保険料率18.3％が平成29年9月以降固定であること、労使折半、標準報酬月額が1等級（8万8千円）〜32等級（65万円）の32等級であること、標準賞与額の上限150万円の逐語"
+      },
+      {
+        "url": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000147284_00024.html",
+        "sourceName": "厚生年金等の標準報酬月額の上限の段階的引上げについて｜厚生労働省",
+        "usedFor": "令和7年法改正による標準報酬月額の上限の段階的引上げ（2027年9月に68万円、2028年9月に71万円、2029年9月に75万円）の逐語"
+      },
+      {
+        "url": "https://www.mhlw.go.jp/content/001692566.pdf",
+        "sourceName": "令和８（2026）年度 雇用保険料率のご案内｜厚生労働省",
+        "usedFor": "令和8年度（2026-04-01〜2027-03-31）の雇用保険料率。一般の事業の労働者負担5/1,000、令和7年度は5.5/1,000であったことの逐語"
+      },
+      {
+        "url": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm",
+        "sourceName": "No.1130 社会保険料控除｜国税庁 タックスアンサー",
+        "usedFor": "健康保険料・厚生年金保険料・介護保険料・雇用保険料の被保険者負担分が社会保険料控除の対象で、控除額はその年に支払った（給与から差し引かれた）全額であることの確認"
+      }
+    ],
+    "checkedAt": "2026-09-14",
+    "effectiveFrom": "2026-03",
+    "effectiveFromNote": "項目ごとに適用開始が違う。健康保険料率（都道府県支部ごと）と介護保険料率（1.62％）は令和8年3月分（4月納付分）から、子ども・子育て支援金率（0.23％）は令和8年4月分（5月納付分）から、厚生年金保険料率（18.3％）は平成29年9月分から、雇用保険料率（労働者負担5/1,000）は2026年4月1日から2027年3月31日まで。各値の効力開始は values 内の effectiveFromMonth / fiscalYear に持たせている。",
+    "note": "会社員（協会けんぽの被保険者）の本人負担ぶんの社会保険料を、額面の月給と賞与から計算するための表。健康保険・介護保険・子ども・子育て支援金・厚生年金は標準報酬月額（等級表で丸めた額）と標準賞与額に料率を掛け、労使折半なので本人負担は半分。雇用保険だけは等級表を使わず賃金に直接料率を掛ける。**健康保険料率は都道府県支部ごとに異なるため、47 支部の率を values.healthInsurance.ratesByPrefecture に持ち、計算側が住所の県で引く**（本来は勤め先の所在地の支部。表に無い県は appDefault の県で概算）。介護保険料率と子ども・子育て支援金率は全国一律。等級表は全国共通（2026-09-14 に 1 支部の保険料額表から取り、2026-11-20 に 4 支部の表で同じことを確かめた）。令和8年度に料率を据え置いた支部があり、2027年度以降は上振れしうる（reference.unverified の healthInsuranceRateAfter2027）。育児休業等期間中の保険料免除、産前産後休業中の免除、賞与が年4回以上支給される場合の扱い（報酬に算入）は、この表では扱っていない。"
+  },
+  "values": {
+    "healthInsurance": {
+      "insurer": "協会けんぽ",
+      "fiscalYear": 2026,
+      "ratesByPrefecture": {
+        "01": 0.1028,
+        "02": 0.0985,
+        "03": 0.0951,
+        "04": 0.101,
+        "05": 0.1001,
+        "06": 0.0975,
+        "07": 0.095,
+        "08": 0.0952,
+        "09": 0.0982,
+        "10": 0.0968,
+        "11": 0.0967,
+        "12": 0.0973,
+        "13": 0.0985,
+        "14": 0.0992,
+        "15": 0.0921,
+        "16": 0.0959,
+        "17": 0.097,
+        "18": 0.0971,
+        "19": 0.0955,
+        "20": 0.0963,
+        "21": 0.098,
+        "22": 0.0961,
+        "23": 0.0993,
+        "24": 0.0977,
+        "25": 0.0988,
+        "26": 0.0989,
+        "27": 0.1013,
+        "28": 0.1012,
+        "29": 0.0991,
+        "30": 0.1006,
+        "31": 0.0986,
+        "32": 0.0994,
+        "33": 0.1005,
+        "34": 0.0978,
+        "35": 0.1015,
+        "36": 0.1024,
+        "37": 0.1002,
+        "38": 0.0998,
+        "39": 0.1005,
+        "40": 0.1011,
+        "41": 0.1055,
+        "42": 0.1006,
+        "43": 0.1008,
+        "44": 0.1008,
+        "45": 0.0977,
+        "46": 0.1013,
+        "47": 0.0944
+      },
+      "ratesByPrefectureCheckedAt": "2026-11-20",
+      "ratesByPrefectureNote": "2026-11-20 に、協会けんぽの『令和8年度都道府県単位保険料率』の表（meta.source）から 47 支部の健康保険料率（介護保険料率・子ども・子育て支援金を含まない率）を取った。47 支部の保険料額表 PDF の料率欄とも一致を確かめた。キーは都道府県コード（01 北海道〜47 沖縄県）。一般の被保険者は令和8年3月分（4月納付分）から適用。本来は勤め先（事業所）の所在地の支部の率が掛かるが、アプリは勤め先の場所を持たないので住所の県で引く（計算側の前提）。",
+      "appDefault": {
+        "fallbackPrefectureCode": "14",
+        "note": "制度の数値ではなくアプリの仮置き（2026-11-20）。ratesByPrefecture に無い県の住所（見本の架空のコードなど）は、この県の料率で概算する。国民健康保険の代わりの市（national-insurance.json の appDefault.fallbackMunicipalityCode）の県にそろえた（データの整合のテストで一致を確かめる）。"
+      },
+      "employeeShare": 0.5,
+      "effectiveFromMonth": "2026-03",
+      "longTermCareRate": 0.0162,
+      "longTermCareAgeFrom": 40,
+      "longTermCareAgeTo": 64,
+      "longTermCareEffectiveFromMonth": "2026-03",
+      "longTermCareNationwide": true,
+      "childRearingSupportRate": 0.0023,
+      "childRearingSupportEffectiveFromMonth": "2026-04",
+      "childRearingSupportEmployeeShare": 0.5,
+      "childRearingSupportNationwide": true,
+      "bonusCapPerFiscalYear": 5730000,
+      "bonusCapScope": "健康保険・介護保険・子ども・子育て支援金の合算。毎年4月1日から翌年3月31日までの標準賞与額の累計に対する上限",
+      "bonusRoundDownUnit": 1000,
+      "grades": [
+        { "grade": 1, "standardMonthly": 58000, "from": 0, "to": 63000 },
+        { "grade": 2, "standardMonthly": 68000, "from": 63000, "to": 73000 },
+        { "grade": 3, "standardMonthly": 78000, "from": 73000, "to": 83000 },
+        { "grade": 4, "standardMonthly": 88000, "from": 83000, "to": 93000 },
+        { "grade": 5, "standardMonthly": 98000, "from": 93000, "to": 101000 },
+        { "grade": 6, "standardMonthly": 104000, "from": 101000, "to": 107000 },
+        { "grade": 7, "standardMonthly": 110000, "from": 107000, "to": 114000 },
+        { "grade": 8, "standardMonthly": 118000, "from": 114000, "to": 122000 },
+        { "grade": 9, "standardMonthly": 126000, "from": 122000, "to": 130000 },
+        { "grade": 10, "standardMonthly": 134000, "from": 130000, "to": 138000 },
+        { "grade": 11, "standardMonthly": 142000, "from": 138000, "to": 146000 },
+        { "grade": 12, "standardMonthly": 150000, "from": 146000, "to": 155000 },
+        { "grade": 13, "standardMonthly": 160000, "from": 155000, "to": 165000 },
+        { "grade": 14, "standardMonthly": 170000, "from": 165000, "to": 175000 },
+        { "grade": 15, "standardMonthly": 180000, "from": 175000, "to": 185000 },
+        { "grade": 16, "standardMonthly": 190000, "from": 185000, "to": 195000 },
+        { "grade": 17, "standardMonthly": 200000, "from": 195000, "to": 210000 },
+        { "grade": 18, "standardMonthly": 220000, "from": 210000, "to": 230000 },
+        { "grade": 19, "standardMonthly": 240000, "from": 230000, "to": 250000 },
+        { "grade": 20, "standardMonthly": 260000, "from": 250000, "to": 270000 },
+        { "grade": 21, "standardMonthly": 280000, "from": 270000, "to": 290000 },
+        { "grade": 22, "standardMonthly": 300000, "from": 290000, "to": 310000 },
+        { "grade": 23, "standardMonthly": 320000, "from": 310000, "to": 330000 },
+        { "grade": 24, "standardMonthly": 340000, "from": 330000, "to": 350000 },
+        { "grade": 25, "standardMonthly": 360000, "from": 350000, "to": 370000 },
+        { "grade": 26, "standardMonthly": 380000, "from": 370000, "to": 395000 },
+        { "grade": 27, "standardMonthly": 410000, "from": 395000, "to": 425000 },
+        { "grade": 28, "standardMonthly": 440000, "from": 425000, "to": 455000 },
+        { "grade": 29, "standardMonthly": 470000, "from": 455000, "to": 485000 },
+        { "grade": 30, "standardMonthly": 500000, "from": 485000, "to": 515000 },
+        { "grade": 31, "standardMonthly": 530000, "from": 515000, "to": 545000 },
+        { "grade": 32, "standardMonthly": 560000, "from": 545000, "to": 575000 },
+        { "grade": 33, "standardMonthly": 590000, "from": 575000, "to": 605000 },
+        { "grade": 34, "standardMonthly": 620000, "from": 605000, "to": 635000 },
+        { "grade": 35, "standardMonthly": 650000, "from": 635000, "to": 665000 },
+        { "grade": 36, "standardMonthly": 680000, "from": 665000, "to": 695000 },
+        { "grade": 37, "standardMonthly": 710000, "from": 695000, "to": 730000 },
+        { "grade": 38, "standardMonthly": 750000, "from": 730000, "to": 770000 },
+        { "grade": 39, "standardMonthly": 790000, "from": 770000, "to": 810000 },
+        { "grade": 40, "standardMonthly": 830000, "from": 810000, "to": 855000 },
+        { "grade": 41, "standardMonthly": 880000, "from": 855000, "to": 905000 },
+        { "grade": 42, "standardMonthly": 930000, "from": 905000, "to": 955000 },
+        { "grade": 43, "standardMonthly": 980000, "from": 955000, "to": 1005000 },
+        { "grade": 44, "standardMonthly": 1030000, "from": 1005000, "to": 1055000 },
+        { "grade": 45, "standardMonthly": 1090000, "from": 1055000, "to": 1115000 },
+        { "grade": 46, "standardMonthly": 1150000, "from": 1115000, "to": 1175000 },
+        { "grade": 47, "standardMonthly": 1210000, "from": 1175000, "to": 1235000 },
+        { "grade": 48, "standardMonthly": 1270000, "from": 1235000, "to": 1295000 },
+        { "grade": 49, "standardMonthly": 1330000, "from": 1295000, "to": 1355000 },
+        { "grade": 50, "standardMonthly": 1390000, "from": 1355000, "to": null }
+      ],
+      "gradesNote": "第1級〜第50級。`from` は「円以上」、`to` は「円未満」。第1級は下限の記載が無いため 0、第50級は上限が無いため null。標準報酬月額・報酬月額の範囲は全国共通で、支部ごとに変わるのは料率だけ。保険料額は『標準報酬月額 × 料率』で、保険料額表に載っている全額・折半額もこの計算と一致する（例：第50級 1,390,000 × 9.92％ = 137,888.0、折半 68,944.0）。"
+    },
+    "pension": {
+      "name": "厚生年金保険",
+      "rate": 0.183,
+      "employeeShare": 0.5,
+      "rateFixedSinceMonth": "2017-09",
+      "bonusCapPerMonth": 1500000,
+      "bonusCapScope": "支給1回（同じ月に2回以上支給されたときは合算）につき150万円",
+      "bonusRoundDownUnit": 1000,
+      "grades": {
+        "schedule": [
+          {
+            "fromMonth": "2026-03",
+            "untilMonth": "2027-08",
+            "maxStandardMonthly": 650000,
+            "status": "verified",
+            "grades": [
+              { "grade": 1, "standardMonthly": 88000, "from": 0, "to": 93000 },
+              { "grade": 2, "standardMonthly": 98000, "from": 93000, "to": 101000 },
+              { "grade": 3, "standardMonthly": 104000, "from": 101000, "to": 107000 },
+              { "grade": 4, "standardMonthly": 110000, "from": 107000, "to": 114000 },
+              { "grade": 5, "standardMonthly": 118000, "from": 114000, "to": 122000 },
+              { "grade": 6, "standardMonthly": 126000, "from": 122000, "to": 130000 },
+              { "grade": 7, "standardMonthly": 134000, "from": 130000, "to": 138000 },
+              { "grade": 8, "standardMonthly": 142000, "from": 138000, "to": 146000 },
+              { "grade": 9, "standardMonthly": 150000, "from": 146000, "to": 155000 },
+              { "grade": 10, "standardMonthly": 160000, "from": 155000, "to": 165000 },
+              { "grade": 11, "standardMonthly": 170000, "from": 165000, "to": 175000 },
+              { "grade": 12, "standardMonthly": 180000, "from": 175000, "to": 185000 },
+              { "grade": 13, "standardMonthly": 190000, "from": 185000, "to": 195000 },
+              { "grade": 14, "standardMonthly": 200000, "from": 195000, "to": 210000 },
+              { "grade": 15, "standardMonthly": 220000, "from": 210000, "to": 230000 },
+              { "grade": 16, "standardMonthly": 240000, "from": 230000, "to": 250000 },
+              { "grade": 17, "standardMonthly": 260000, "from": 250000, "to": 270000 },
+              { "grade": 18, "standardMonthly": 280000, "from": 270000, "to": 290000 },
+              { "grade": 19, "standardMonthly": 300000, "from": 290000, "to": 310000 },
+              { "grade": 20, "standardMonthly": 320000, "from": 310000, "to": 330000 },
+              { "grade": 21, "standardMonthly": 340000, "from": 330000, "to": 350000 },
+              { "grade": 22, "standardMonthly": 360000, "from": 350000, "to": 370000 },
+              { "grade": 23, "standardMonthly": 380000, "from": 370000, "to": 395000 },
+              { "grade": 24, "standardMonthly": 410000, "from": 395000, "to": 425000 },
+              { "grade": 25, "standardMonthly": 440000, "from": 425000, "to": 455000 },
+              { "grade": 26, "standardMonthly": 470000, "from": 455000, "to": 485000 },
+              { "grade": 27, "standardMonthly": 500000, "from": 485000, "to": 515000 },
+              { "grade": 28, "standardMonthly": 530000, "from": 515000, "to": 545000 },
+              { "grade": 29, "standardMonthly": 560000, "from": 545000, "to": 575000 },
+              { "grade": 30, "standardMonthly": 590000, "from": 575000, "to": 605000 },
+              { "grade": 31, "standardMonthly": 620000, "from": 605000, "to": 635000 },
+              { "grade": 32, "standardMonthly": 650000, "from": 635000, "to": null }
+            ],
+            "note": "協会けんぽ令和8年度保険料額表（都道府県支部で共通）の等級欄の括弧内が厚生年金の等級。同表の注記により、第1級の報酬月額は「93,000円未満」、第32級は「635,000円以上」と読み替える（健康保険の第4級・第35級に対応するため、健保側の 83,000〜93,000 / 635,000〜665,000 とは範囲が異なる）。`untilMonth` の 2027-08 は、2027年9月に上限が引き上げられるため（upperLimitSchedule）。"
+          }
+        ]
+      },
+      "upperLimitSchedule": [
+        {
+          "fromMonth": "2027-09",
+          "maxStandardMonthly": 680000,
+          "status": "partially-verified",
+          "note": "上限額と時期は厚生労働省ページで確認済み。追加される等級の番号（第33級か）と報酬月額の範囲は政令で定められるため、2026-09-14 時点で公表されておらず未確認（reference.unverified の pensionGradesAfter2027 を参照）。"
+        },
+        {
+          "fromMonth": "2028-09",
+          "maxStandardMonthly": 710000,
+          "status": "partially-verified",
+          "note": "同上。"
+        },
+        {
+          "fromMonth": "2029-09",
+          "maxStandardMonthly": 750000,
+          "status": "partially-verified",
+          "note": "同上。引上げはここで完了し、上限は65万円→75万円になる。"
+        }
+      ]
+    },
+    "employmentInsurance": {
+      "schedule": [
+        {
+          "fiscalYear": 2025,
+          "businessType": "一般の事業",
+          "employeeRate": 0.0055,
+          "employerRate": 0.009,
+          "totalRate": 0.0145,
+          "fromMonth": "2025-04",
+          "untilMonth": "2026-03"
+        },
+        {
+          "fiscalYear": 2025,
+          "businessType": "農林水産・清酒製造の事業",
+          "employeeRate": 0.0065,
+          "employerRate": 0.01,
+          "totalRate": 0.0165,
+          "fromMonth": "2025-04",
+          "untilMonth": "2026-03"
+        },
+        {
+          "fiscalYear": 2025,
+          "businessType": "建設の事業",
+          "employeeRate": 0.0065,
+          "employerRate": 0.011,
+          "totalRate": 0.0175,
+          "fromMonth": "2025-04",
+          "untilMonth": "2026-03"
+        },
+        {
+          "fiscalYear": 2026,
+          "businessType": "一般の事業",
+          "employeeRate": 0.005,
+          "employerRate": 0.0085,
+          "totalRate": 0.0135,
+          "fromMonth": "2026-04",
+          "untilMonth": "2027-03"
+        },
+        {
+          "fiscalYear": 2026,
+          "businessType": "農林水産・清酒製造の事業",
+          "employeeRate": 0.006,
+          "employerRate": 0.0095,
+          "totalRate": 0.0155,
+          "fromMonth": "2026-04",
+          "untilMonth": "2027-03"
+        },
+        {
+          "fiscalYear": 2026,
+          "businessType": "建設の事業",
+          "employeeRate": 0.006,
+          "employerRate": 0.0105,
+          "totalRate": 0.0165,
+          "fromMonth": "2026-04",
+          "untilMonth": "2027-03"
+        }
+      ],
+      "defaultBusinessType": "一般の事業",
+      "note": "労働者負担（employeeRate）は失業等給付・育児休業給付の保険料率のみ。事業主負担（employerRate）はそれに雇用保険二事業の保険料率（一般の事業3.5/1,000、建設の事業4.5/1,000。労働者負担なし）を足した率。雇用保険料率は年度（4月1日〜翌年3月31日）で切り替わり、毎年度見直されるため2027年度以降は未確定。健康保険・厚生年金と違い標準報酬月額の等級表を使わず、賃金に直接料率を掛ける（算定基礎の詳細は reference.unverified の employmentInsuranceBase を参照）。"
+    },
+    "socialInsuranceDeduction": {
+      "fullAmountDeductible": true,
+      "coveredPremiums": [
+        "健康保険料（被保険者負担分）",
+        "厚生年金保険料（被保険者負担分）",
+        "介護保険料",
+        "雇用保険料（被保険者負担分の労働保険料）"
+      ],
+      "note": "本人が負担して給与から差し引かれた社会保険料は、その全額が所得税の社会保険料控除の対象になる（国税庁 No.1130）。所得税・住民税の課税所得を計算するときは、額面からこの表で求めた本人負担ぶんを差し引く。**子ども・子育て支援金（0.23％）が社会保険料控除の対象になるかは、この裏取りでは確認できていない**（reference.unverified の childRearingSupportDeductibility）。"
+    }
+  },
+  "reference": {
+    "sourceQuotes": {
+      "healthRateByPrefecture": {
+        "title": "令和8年度都道府県単位保険料率（協会けんぽ）の表と、全国一律の率",
+        "text": "40歳から64歳までの方（介護保険第2号被保険者）は、上記「健康保険料率」と「子ども・子育て支援金（0.23％）」に全国一律の介護保険料率（1.62％）が加わります。 ／ 令和8年4月分（5月納付分）からは、これに全国一律の子ども・子育て支援金（0.23％）が加わります。",
+        "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/rate_prefectures/r08/index.html",
+        "note": "2026-11-20 に HTML の生テキストから取った逐語（2 か所を ／ で並べた）。47 支部の健康保険料率は同じページの表『令和8年度都道府県単位保険料率』の各行（values.healthInsurance.ratesByPrefecture）。各支部の保険料額表 PDF の料率欄とも 47 支部すべて一致した。"
+      },
+      "effectiveMonths": {
+        "title": "令和8年度保険料額表（都道府県支部で共通の書き方）の適用開始月",
+        "text": "令和８年３月分（４月納付分）からの健康保険・厚生年金保険の保険料額表 ・健康保険料率：令和8年3月分～適用 ・厚生年金保険料率：平成29年9月分～適用 ・子ども・子育て支援金率：令和8年4月分（5月納付分）～適用",
+        "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html",
+        "note": "2026-11-20 に支部の保険料額表 PDF（北海道・東京・大阪）を pypdf で読んだ逐語（空白を詰めた）。料率を令和8年度に据え置いた支部の表だけは、健康保険料率が『令和7年3月分～適用』と書かれている（同じ率が続いているため。協会けんぽの料率の表の『→』の支部）。"
+      },
+      "bonusCap": {
+        "title": "令和8年度保険料額表（都道府県支部で共通）の賞与に関する注記",
+        "text": "賞与に係る保険料額は、賞与額から1,000円未満の端数を切り捨てた額（標準賞与額)に、保険料率を乗じた額となります。　　また、標準賞与額の上限は、健康保険、介護保険及び子ども・子育て支援金は年間573万円（毎年4月1日から翌年3月31日までの累計額。）となり、　　厚生年金保険と子ども・子育て拠出金は月間150万円となります。",
+        "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html",
+        "note": "支部の保険料額表 PDF の注記の逐語（2026-09-14 に 1 支部の表から取り、2026-11-20 に北海道・東京・神奈川・大阪の 4 支部の表で、空白を除いて同じ文であることを確かめた）。健康保険側の上限は年度累計573万円、厚生年金側は月間150万円。年度が4月1日始まりである点が明示されているため、年次モデルでも年度で累計を切る必要がある。"
+      },
+      "pensionGradeMapping": {
+        "title": "令和8年度保険料額表（都道府県支部で共通）の等級に関する注記",
+        "text": "◆等級欄の（　）内の数字は、厚生年金保険の標準報酬月額等級です。　4（1）等級の「報酬月額」欄は、厚生年金保険の場合「93,000円未満」と読み替えてください。　35（32）等級の「報酬月額」欄は、厚生年金保険の場合「635,000円以上」と読み替えてください。",
+        "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html",
+        "note": "支部の保険料額表 PDF の注記の逐語（確かめ方は bonusCap と同じ）。values.pension の第1級 from=0、第32級 to=null はこの注記による。"
+      },
+      "roundingRule": {
+        "title": "令和8年度保険料額表（都道府県支部で共通）の端数処理の注記",
+        "text": "①事業主が、給与から被保険者負担分を控除する場合、被保険者負担分の端数が50銭以下の場合は切り捨て、50銭を超える場合は切り上げて1円となります。　  ②被保険者が、被保険者負担分を事業主へ現金で支払う場合、被保険者負担分の端数が50銭未満の場合は切り捨て、50銭以上の場合は切り上げて1円となります。　  （注）①、②にかかわらず、事業主と被保険者間で特約がある場合には、特約に基づき端数処理をすることができます。",
+        "source": "https://www.kyoukaikenpo.or.jp/about/business/insurance_rate/premium_prefectures/r08/index.html",
+        "note": "支部の保険料額表 PDF の注記の逐語（確かめ方は bonusCap と同じ）。折半額に円未満の端数（50銭）が出る等級があるため。年次モデルでは1円単位の差は無視できるが、月額を画面に出すなら①の扱い（50銭以下切り捨て・超過切り上げ）に合わせる。"
+      },
+      "pensionRateFixed": {
+        "title": "厚生年金保険の保険料（日本年金機構）",
+        "text": "厚生年金保険の保険料は、毎月の給与（標準報酬月額）と賞与（標準賞与額）に共通の保険料率をかけて計算され、事業主と被保険者とが半分ずつ負担します。厚生年金保険の保険料率は、年金制度改正に基づき平成16年から段階的に引き上げられてきましたが、平成29年9月を最後に引上げが終了し、厚生年金保険料率は18.3％で固定されています。",
+        "source": "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html",
+        "note": "ページの HTML からタグを除去した生テキストの逐語。18.3％は年度で変わらないため schedule を持たせていない。"
+      },
+      "pensionGradeCount": {
+        "title": "厚生年金保険の標準報酬月額（日本年金機構）",
+        "text": "現在の標準報酬月額は、1等級（8万8千円）から32等級（65万円）までの32等級に分かれています。",
+        "source": "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html",
+        "note": "ページ更新日は2024年8月9日。協会けんぽの令和8年度保険料額表の括弧内等級（1〜32）と一致する。"
+      },
+      "pensionBonusCap": {
+        "title": "厚生年金保険の標準賞与額（日本年金機構）",
+        "text": "標準賞与額とは、実際の税引き前の賞与の額から1千円未満の端数を切り捨てたもので、支給1回（同じ月に2回以上支給されたときは合算）につき、150万円が上限となります。（150万円を超えるときは150万円とされます。）",
+        "source": "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html",
+        "note": "『1か月150万円』は正確には『支給1回につき150万円、同じ月に2回以上なら合算して150万円』。values.pension.bonusCapScope に同じ趣旨を書いている。"
+      },
+      "pensionStandardMonthlyDecision": {
+        "title": "標準報酬月額の決定（日本年金機構）",
+        "text": "また、毎年9月に、4月から6月の報酬月額を基に、標準報酬月額の改定が行われます（定時決定）。",
+        "source": "https://www.nenkin.go.jp/service/kounen/hokenryo/hoshu/20150515-01.html",
+        "note": "標準報酬月額は9月に切り替わり、翌年8月まで適用される。年次（1〜12月）で回すモデルでは、この9月の切替を無視して『その年の月給から求めた等級を12か月分』として近似することになる点に注意。"
+      },
+      "pensionUpperLimitRaise": {
+        "title": "厚生年金等の標準報酬月額の上限の段階的引上げについて（厚生労働省）",
+        "text": "令和7年５月16日、「社会経済の変化を踏まえた年金制度の機能強化のための国民年金法等の一部を改正する等の法律案」を第217回通常国会に提出し、衆議院で修正のうえ、６月13日に成立しました。（中略）賃金が上昇傾向にあることを踏まえ、今回の改正により、標準報酬月額の上限を65万円→75万円に引き上げます。（2027年９月に68万円、2028年９月に71万円、2029年９月に75万円と、段階的に引き上げ）",
+        "source": "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000147284_00024.html",
+        "note": "ページの HTML からタグを除去した生テキストの逐語（離れた2か所を（中略）でつないだ。各断片は原文の連続した部分文字列）。同ページには『全被保険者の標準報酬月額の平均をとった２倍が、現行の上限（現在は65万円）を超える状態が続くと、政令で新しい等級を追加することができる』とあり、**追加される等級の番号と報酬月額の範囲は政令で定められる**。2026-09-14 時点で政令の内容は確認できていない。"
+      },
+      "employmentInsuranceRate": {
+        "title": "令和8（2026）年度 雇用保険料率のご案内（厚生労働省）",
+        "text": "令和８ （2026 ）年４月１日から令和９ （2027 ）年３月 31 日までの雇用保険料率は以下のとおりです 。（中略）一般の事業 5/1,000 8.5/1,000 5/1,000 3.5/1,000 13.5/1,000 （令和７年度） 5.5/1,000 9/1,000 5.5/1,000 3.5/1,000 14.5/1,000（中略）失業等給付等の保険料率は、労働者負担・事業主負担ともに5/1,000に変更になります（農林水産・清酒製造の事業及び建設の事業は 6/1,000に変更になります。）。雇用保険二事業の保険料率（事業主のみ負担）は、引き続き3.5/1,000です（建設の事業は4.5/1,000です。）。",
+        "source": "https://www.mhlw.go.jp/content/001692566.pdf",
+        "note": "pypdf で抽出した生テキストの逐語（離れた箇所を（中略）でつないだ）。表の列は左から『①労働者負担（失業等給付・育児休業給付の保険料率のみ）』『事業主負担の合計』『事業主負担のうち失業等給付・育児休業給付の保険料率』『②雇用保険二事業の保険料率』『①＋②雇用保険料率』。労働者負担は一般の事業で5/1,000＝0.005（令和7年度は5.5/1,000＝0.0055）。"
+      },
+      "socialInsuranceDeduction": {
+        "title": "No.1130 社会保険料控除（国税庁）",
+        "text": "健康保険、国民年金、厚生年金保険および船員保険の保険料で被保険者として負担するもの（社会保険料控除の対象となる社会保険料の1つとして掲げられている）。控除できる金額は、その年に実際に支払った金額または給与や公的年金から差し引かれた金額の全額です。",
+        "source": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1130.htm",
+        "note": "**この text は WebFetch が返した要約であり、逐語ではない**（前半は箇条書きの1項目を説明的に言い換えている）。健康保険料・厚生年金保険料・介護保険料・雇用保険料の本人負担分が対象で、控除額は全額という事実の確認には足りるが、条文どおりの引用が要る場合は所得税法第74条を別途参照すること。"
+      },
+      "branch14SpecialTreatment": {
+        "title": "神奈川支部の令和８年度保険料率に係る特例的な取扱いについて（協会けんぽ神奈川支部）",
+        "text": "当支部の令和８年度保険料率は、9.96％（令和７年度9.92％）と算定されています。（資料１のとおり）今般、政府全体の方針を踏まえ、厚生労働省から協会本部に対して、平均保険料率0.1％の引下げにもかかわらず、令和８年度都道府県単位保険料率が上昇する支部に関して、特例的に、令和７年度保険料率と同率に据え置く方向で対応するよう極めて強い要請がありました。その際、本来の令和８年度都道府県単位保険料率との差分については、次年度以降、複数年度で調整して平準化を図る措置が検討されています。これらを踏まえ、当支部の令和８年度保険料率は、令和７年度保険料率と同率の9.92％に据え置くこととして支部評議会での議論を行いました。",
+        "source": "https://www.kyoukaikenpo.or.jp/shibu/kanagawa/assets/ryouritsutokurei08.pdf",
+        "note": "pypdf で抽出した生テキストの逐語（2026-09-14）。ratesByPrefecture の 14 の率の経緯。**2027年度以降、据え置いた差分の調整で料率が上がる可能性がある**ため、来年度の裏取りでは必ず再確認する。令和8年度に率を据え置いた支部はほかにもある（reference.unverified の healthInsuranceRateAfter2027）。"
+      }
+    },
+    "scope": {
+      "notIncluded": [
+        "子ども・子育て拠出金（拠出金率0.36％。事業主のみ負担で被保険者の負担はない）",
+        "任意継続被保険者の保険料（令和8年度の標準報酬月額の上限は320,000円）",
+        "育児休業等・産前産後休業中の保険料免除",
+        "厚生年金基金の加入員に適用される免除保険料率（2.4％〜5.0％）を控除した率",
+        "労災保険料（全額事業主負担）",
+        "40歳到達月・65歳到達月の介護保険料の徴収開始・終了の細かい扱い",
+        "短時間労働者の適用拡大（被保険者になるかどうかの判定）"
+      ],
+      "note": "いずれもこの表の目的（額面から本人負担の社会保険料を年次で概算する）には不要か、本人負担が生じないもの。任意継続・育休免除を扱うときは追加の裏取りが要る。"
+    },
+    "unverified": [
+      {
+        "key": "pensionGradesAfter2027",
+        "description": "2027年9月以降に追加される厚生年金の標準報酬月額等級の番号（第33級・第34級…）と、その報酬月額の範囲",
+        "reason": "厚生労働省ページは上限額（2027年9月に68万円、2028年9月に71万円、2029年9月に75万円）と『政令で新しい等級を追加することができる』ことまでしか書いておらず、2026-09-14 時点で該当の政令を確認できなかった。日本年金機構の保険料額表も現行の32等級までしか公表されていない。",
+        "impact": "月給が65万円を超える人の厚生年金保険料が、2027年9月以降 実際より少なく計算される（上限68万円なら本人負担で月あたり最大 (680000-650000)×0.183÷2＝2,745円の差）。values.pension.upperLimitSchedule に上限額だけを持たせてあるので、domain 側で『上限額まで等級を延長する』近似を置くか、政令公布後に等級表を差し替える。"
+      },
+      {
+        "key": "employmentInsuranceBase",
+        "description": "雇用保険料の算定基礎（賃金総額に直接料率を掛けること、上限が無いこと、賞与も算定基礎に含まれること）",
+        "reason": "厚生労働省の『令和8年度 雇用保険料率のご案内』は料率だけを示しており、算定基礎の定義は書かれていない。労働保険徴収法まで下りていない。",
+        "impact": "額面（月給＋賞与）に労働者負担率を掛ける実装で概ね合うはずだが、確認は取れていない。金額への影響は小さい（一般の事業で0.5％）。"
+      },
+      {
+        "key": "childRearingSupportDeductibility",
+        "description": "子ども・子育て支援金（0.23％）の被保険者負担分が、所得税の社会保険料控除の対象になるか",
+        "reason": "国税庁 No.1130 は健康保険・厚生年金・介護保険・雇用保険を挙げているが、2026年4月に始まった子ども・子育て支援金への言及が無く、協会けんぽの支援金率のページにも税の扱いは書かれていない。",
+        "impact": "控除対象なら課税所得がわずかに下がる。額面600万円なら支援金の本人負担は年約6,900円で、所得税・住民税への影響は千円台。"
+      },
+      {
+        "key": "healthInsuranceRateAfter2027",
+        "description": "2027年度（令和9年度）以降の協会けんぽの都道府県支部ごとの健康保険料率",
+        "reason": "支部別料率は毎年度改定され、翌年度分は公表されていない。令和8年度は 7 支部（02・05・06・09・14・32・47）が令和7年度と同じ率で、うち 14 は本来の率より低く据え置いた特例と支部が公表している（reference.sourceQuotes.branch14SpecialTreatment）。ほかの 6 支部に同じ特例があるかは確かめていない（2026-11-20）。",
+        "impact": "長期のシミュレーションでは各支部の料率を将来も令和8年度の率で固定することになる。据え置いた支部は上振れ方向の誤差になりやすい。"
+      },
+      {
+        "key": "longTermCareRateAfter2027",
+        "description": "2027年度以降の介護保険料率（全国一律）および雇用保険料率",
+        "reason": "いずれも年度ごとに決まり、2026年度分までしか公表されていない。",
+        "impact": "将来年度は2026年度の率を据え置いて計算することになる。"
+      },
+      {
+        "key": "standardMonthlyTimingInModel",
+        "description": "標準報酬月額が9月の定時決定（4〜6月の報酬が基準）で切り替わり翌年8月まで適用されることを、年次モデルがどう近似するか",
+        "reason": "制度の事実は日本年金機構ページで確認済みだが、年次（1〜12月）モデルへの落とし込み方は制度データではなく設計判断のため、この JSON では決めない。",
+        "impact": "昇給した年の保険料が実際とずれる（昇給が9月より後に反映されるため、モデルのほうが早く増える）。"
+      }
+    ]
+  }
+}

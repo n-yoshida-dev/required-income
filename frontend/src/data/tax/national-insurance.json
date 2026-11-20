@@ -1,0 +1,921 @@
+{
+  "meta": {
+    "name": "国民健康保険料（収録した市ごと）・国民年金保険料",
+    "source": "https://laws.e-gov.go.jp/law/333CO0000000362",
+    "sourceName": "国民健康保険法施行令（昭和三十三年政令第三百六十二号）第二十九条の七（市町村の保険料の賦課に関する基準）",
+    "additionalSources": [
+      {
+        "url": "https://laws.e-gov.go.jp/law/325AC0000000226",
+        "sourceName": "地方税法（昭和二十五年法律第二百二十六号）第三百十四条の二第二項",
+        "usedFor": "賦課基準額から引く住民税の基礎控除（43万／29万／15万／0円）。施行令第29条の7第2項第4号が引く条文（2026-11-20 に e-Gov 法令 API で取得）"
+      },
+      {
+        "url": "https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html",
+        "sourceName": "日本年金機構 国民年金保険料",
+        "usedFor": "令和8年度（2026年度）の国民年金保険料 月額17,920円・付加保険料 月額400円の確認"
+      },
+      {
+        "url": "https://www.mhlw.go.jp/content/12502000/001639615.pdf",
+        "sourceName": "厚生労働省 令和8年度の年金額改定についてお知らせします（令和8年1月23日 報道発表資料）",
+        "usedFor": "令和8年度17,920円・令和9年度18,290円（いずれも実際の保険料額）の確認。国民年金法第87条第3項により名目賃金の変動に応じて毎年度改定される旨も同資料"
+      }
+    ],
+    "checkedAt": "2026-09-14",
+    "effectiveFrom": "2026-04",
+    "note": "個人事業主（国民健康保険＋国民年金第1号被保険者）の社会保険料を年次で見積もるための制度データ。**国民健康保険料は令和8年度（2026年度）から「子ども・子育て支援納付金分（子ども分）」が加わり、医療分・支援分（後期高齢者支援金等分）・介護分・子ども分の4区分になった。** 全国共通の部分（4区分の構成・賦課基準・賦課限度額の上限・7・5・2割軽減の判定式・未就学児の5割・18歳未満の子ども分の均等割の全額軽減）は国民健康保険法施行令第29条の7（meta.source）にあり、料率（所得割・均等割・平等割・賦課限度額）は市ごとに byMunicipality に持つ（各行の source が市のページ）。**収録する市の選び方は、令和2年国勢調査の人口の多い市を上から取り、市民税に独自の減税がある市を除いた 7 市**（README の『収録した自治体』）。平等割（世帯別平等割）は市によってある区分と無い区分があり（hasPerHousehold と各区分の perHousehold）、低所得世帯の7・5・2割の軽減は平等割にも掛かる（施行令第29条の7第6項第1号・第3号）。所得割の課税標準は「前年の総所得金額等 － 住民税の基礎控除（合計所得2,400万円以下なら43万円）」（同条第2項第4号。市によって『賦課基準額』『基準総所得金額』『算定基礎所得金額』などと呼ぶ）。介護分は40歳から64歳（介護保険第2号被保険者）の加入者だけが対象。賦課限度額は区分ごとに世帯単位で頭打ちになる。子ども分の均等割は18歳未満（18歳に達する日以後の最初の3月31日以前の被保険者）が全額軽減され、その分を18歳以上の加入者が『18歳以上被保険者均等割額』として負担する。保険料の端数の処理は市の条例で決まり、確かめた市だけ各行の rounding に持つ。値に含めていない制度：産前産後期間の保険料軽減、非自発的失業による負担軽減措置、旧被扶養者減免、災害・所得減少等による減免、特定世帯・特定継続世帯の平等割の減額、市独自の減額・減免のうち表の型に入らない物（reference.scope）、国民年金の産前産後期間の保険料免除（平成31年4月から）・法定免除・納付猶予・前納割引。いずれも名称のみ記録し、年次モデルでは扱わない。"
+  },
+  "values": {
+    "nationalHealthInsurance": {
+      "fiscalYear": 2026,
+      "basicDeduction": 430000,
+      "basicDeductionSchedule": [
+        { "maxTotalIncome": 24000000, "amount": 430000 },
+        { "maxTotalIncome": 24500000, "amount": 290000 },
+        { "maxTotalIncome": 25000000, "amount": 150000 },
+        { "maxTotalIncome": null, "amount": 0 }
+      ],
+      "basicDeductionNote": "所得割の課税標準（賦課基準額）＝前年の総所得金額等 － 住民税（市町村民税）の基礎控除額（国民健康保険法施行令第29条の7第2項第4号『基礎控除後の総所得金額等』）。基礎控除額は前年の合計所得金額に応じて 43万／29万／15万／0円（地方税法第314条の2第2項。2026-11-20 に e-Gov 法令 API で現行版と同文であることを確かめた。reference.statute.nationalHealthInsuranceOrderArticle29_7Paragraph6 と同じ取得）。支援分・介護分・子ども分も同じ（同条第3項〜第5項の第4号）。maxTotalIncome は「その金額以下」の上限で、null は上限なし（2,500万円超）。",
+      "longTermCareAgeRange": { "from": 40, "to": 64 },
+      "longTermCareAgeRangeNote": "介護保険法第9条第2号『四十歳以上六十五歳未満の医療保険加入者（第二号被保険者）』と国民健康保険法施行令第29条の7第1項第3号（2026-11-20 に e-Gov で確認）。from 以上 to 以下。",
+      "appDefault": {
+        "fallbackMunicipalityCode": "14100",
+        "note": "制度の数値ではなくアプリの仮置き（2026-09-18。2026-11-20 に決め方を書き直した。値は同じ）。byMunicipality に料率が無い自治体に住む世帯は、このコードの自治体の料率で国保料を概算する。決め方は『収録した市のうち人口が最も多い市（令和2年国勢調査）』。国保には全国共通の標準料率が無いため、概算したことは計算結果の注意（nationalHealthInsuranceApproximated）で必ず利用者に知らせる。null にすると表に無い自治体は例外になる。他の自治体の料率に近い保証は無い。会社員の健康保険料率で表に無い県を概算するときも、この市の県を使う（social-insurance.json の appDefault）。"
+      },
+      "insuredAge": {
+        "under": 75,
+        "source": "https://laws.e-gov.go.jp/law/357AC0000000080",
+        "additionalSource": "https://laws.e-gov.go.jp/law/333AC0000000192",
+        "note": "国民健康保険の被保険者は原則75歳未満。75歳に達すると後期高齢者医療制度へ移る。根拠は高齢者の医療の確保に関する法律第50条第1号『後期高齢者医療広域連合の区域内に住所を有する七十五歳以上の者』と、国民健康保険法第6条（適用除外）第8号『高齢者の医療の確保に関する法律（昭和五十七年法律第八十号）の規定による被保険者』。2026-09-18 に e-Gov 法令検索 API（lawdata/357AC0000000080・lawdata/333AC0000000192）で取得した条文から起こした。同法第50条第2号の65歳以上75歳未満の障害認定による繰り上げ加入は扱わない。75歳到達年の月割も扱わない（reference.scope を参照）。"
+      },
+      "byMunicipality": {
+        "14130": {
+          "name": "川崎市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-09-14",
+          "source": "https://www.city.kawasaki.jp/350/page/0000187752.html",
+          "sourceName": "川崎市 令和8年度の国民健康保険料について（2026年5月29日公開／2026年6月16日更新）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.kawasaki.jp/350/page/0000187754.html",
+              "sourceName": "川崎市 令和8年度の所得の基準による国民健康保険料の軽減措置について",
+              "usedFor": "7割・5割・2割軽減の判定式と、軽減対象が均等割額であること（平等割が無い）の確認"
+            },
+            {
+              "url": "https://www.city.kawasaki.jp/350/page/0000187755.html",
+              "sourceName": "川崎市 令和8年度の未就学児の国民健康保険料の軽減措置について",
+              "usedFor": "未就学児の均等割5割減額と、所得基準による軽減との重複適用後の割合の確認"
+            },
+            {
+              "url": "https://www.city.kawasaki.jp/350/page/0000187756.html",
+              "sourceName": "川崎市 令和8年度の川崎市独自の国民健康保険料の軽減措置について",
+              "usedFor": "16歳未満33万円・16歳以上19歳未満12万円を賦課基準額から控除する独自の軽減措置の確認"
+            },
+            {
+              "url": "https://www.city.kawasaki.jp/350/page/0000187635.html",
+              "sourceName": "川崎市 令和8年度の国民健康保険料の料率について（告示・料率 PDF へのリンク）",
+              "usedFor": "料率の告示の所在の確認。PDF 2件は画像のみで本文テキストを抽出できなかったため、料率の値は上記 HTML ページから取得した（reference.unverified の kawasakiKokujiPdf）"
+            }
+          ],
+          "hasPerHousehold": false,
+          "medical": {
+            "label": "医療分保険料",
+            "incomeRate": 0.0826,
+            "perCapita": 43261,
+            "perHousehold": 0,
+            "cap": 670000
+          },
+          "support": {
+            "label": "後期高齢者支援金等分保険料",
+            "incomeRate": 0.0289,
+            "perCapita": 15306,
+            "perHousehold": 0,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護納付金分保険料",
+            "incomeRate": 0.0267,
+            "perCapita": 15828,
+            "perHousehold": 0,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども・子育て支援納付金分保険料",
+            "incomeRate": 0.0032,
+            "perCapita": 1665,
+            "perCapitaAge18Plus": 77,
+            "perHousehold": 0,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-09-18 に起こした。川崎市ページ（0000187752.html）の『こども（当該年度において18歳に達する日以後の最初の3月31日以前である被保険者）の均等割額は全額軽減されます』を年度末基準の年齢に直したもの。国民健康保険法施行令第29条の7も『十八歳に達する日以後の最初の三月三十一日以前である被保険者（…「十八歳未満被保険者」という。）』と定義している（e-Gov API lawdata/333CO0000000362 で確認）。年齢計算ニ関スル法律により誕生日の前日に加齢するため、この定義は『当該年度の3月31日時点の年齢が18歳以下』と一致する（4月1日生まれを含め境界がずれない）。",
+            "childAgeSource": "https://laws.e-gov.go.jp/law/333CO0000000362",
+            "note": "均等割額は加入者全員に1人1,665円。加えて18歳以上の加入者1人につき77円。こども（当該年度において18歳に達する日以後の最初の3月31日以前である被保険者）の均等割額は全額軽減され、その分を18歳以上の加入者が『18歳以上均等割額』として負担する。"
+          },
+          "municipalDeduction": {
+            "name": "川崎市独自の国民健康保険料の軽減措置",
+            "appliesTo": "賦課基準額（所得割の課税標準）からの控除",
+            "deductFrom": "highestBaseMember",
+            "deductFromNote": "2026-09-18 に起こした。計算側が引き先を判定するための項目で、同じ項目の note『同一世帯の国保加入者のうち最も賦課基準額が高い加入者から控除する』（川崎市ページ 0000187756.html）を値にしたもの。新しい裏取りではない。控除額がその加入者の賦課基準額を超えたときの扱いは reference.unverified の kawasakiMunicipalDeductionExcess を参照。",
+            "basisDate": "賦課期日（当該年度の4月1日。年度途中で国保加入した場合は加入日）",
+            "under16PerPerson": 330000,
+            "age16To18PerPerson": 120000,
+            "childIncomeLimit": 580000,
+            "ages": {
+              "under16BelowAge": 16,
+              "age16To18BelowAge": 19,
+              "asOf": "previousDecember31",
+              "note": "2026-09-18 に起こした。川崎市ページ（0000187756.html）の表は令和8年度について『令和7年12月31日現在で16歳未満の国保加入者 → 33万円 × 該当する人数』『令和7年12月31日現在で16歳以上19歳未満の国保加入者 → 12万円 × 該当する人数』と記載。令和7年12月31日＝当該年度の前年の12月31日なので asOf は previousDecember31。under16BelowAge は『その年齢未満』、age16To18BelowAge は『16歳以上その年齢未満』の上限を表す（いずれも未満）。※印の『前年中の合計所得金額が58万円以下であること』は childIncomeLimit で保持済み。"
+            },
+            "disabilityDeduction": "障害者控除相当の金額（金額は個人の申告内容により変動するため数値を持たない）",
+            "note": "(1)前年12月31日現在で16歳未満の国保加入者1人につき33万円、(2)同16歳以上19歳未満の国保加入者1人につき12万円を控除。いずれも『前年中の合計所得金額が58万円以下であること』が条件。(1)(2)は同一世帯の国保加入者のうち最も賦課基準額が高い加入者から控除する。(3)住民税申告に障害者控除がある加入者は障害者控除相当額を当該加入者から控除。非自発的失業の軽減にも該当する場合は低い方の賦課基準額を使う。"
+          }
+        },
+        "14100": {
+          "name": "横浜市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-09-14",
+          "source": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/r7hokennryouritu.html",
+          "sourceName": "横浜市 令和8年度保険料の料率等について（最終更新 2026年5月25日。令和8年度の保険料率は5月25日の告示により決定）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/04hokenryounituite.html",
+              "sourceName": "横浜市 保険料について",
+              "usedFor": "保険料の構成（被保険者均等割額・18歳以上被保険者均等割額・所得割額。平等割が無い）、介護分の対象年齢、低所得世帯の減額基準表、未就学児の5割減額、子どもがいる世帯の所得割額の減額の確認"
+            },
+            {
+              "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/kijyunsousyo.html",
+              "sourceName": "横浜市 保険料に関する用語説明",
+              "usedFor": "基準総所得金額＝総所得金額等－市民税の基礎控除額の確認"
+            }
+          ],
+          "hasPerHousehold": false,
+          "medical": {
+            "label": "医療分",
+            "incomeRate": 0.0833,
+            "perCapita": 40870,
+            "perHousehold": 0,
+            "cap": 670000
+          },
+          "support": {
+            "label": "支援分",
+            "incomeRate": 0.0262,
+            "perCapita": 13380,
+            "perHousehold": 0,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分",
+            "incomeRate": 0.0284,
+            "perCapita": 16200,
+            "perHousehold": 0,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども分（子ども・子育て支援納付金分）",
+            "incomeRate": 0.0034,
+            "perCapita": 1690,
+            "perCapitaAge18Plus": 80,
+            "perCapitaCombined": 1770,
+            "perHousehold": 0,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-09-18 に起こした。横浜市ページ（04hokenryounituite.html）は『(2) 18歳未満の被保険者は、子ども分均等割額が全額軽減されます。なお、その軽減分は18歳以上の被保険者で負担します（18歳以上被保険者均等割額）。』とだけ書き、基準日を示していない。法定の軽減であり、国民健康保険法施行令第29条の7が『十八歳に達する日以後の最初の三月三十一日以前である被保険者（…「十八歳未満被保険者」という。）』と定義しているため（e-Gov API lawdata/333CO0000000362 で確認）、年度末（3月31日）時点で18歳以下と解した。この市のページ単独では基準日を確認できていない点に注意。",
+            "childAgeSource": "https://laws.e-gov.go.jp/law/333CO0000000362",
+            "note": "料率表の均等割料率（額）1,770円は『被保険者均等割：1,690円』と『18歳以上被保険者均等割額：80円』の合算。18歳未満の被保険者は子ども分均等割額が全額軽減され、その軽減分を18歳以上の被保険者が負担する。"
+          },
+          "municipalDeduction": {
+            "name": "子どもがいる世帯の被保険者である世帯主に係る所得割額の減額（令和4年度から）",
+            "appliesTo": "世帯主の基準総所得金額からの控除（控除額は世帯主の基準総所得金額が限度）",
+            "deductFrom": "insuredHouseholder",
+            "deductFromNote": "2026-09-18 に起こした。計算側が引き先を判定するための項目で、同じ項目の name『子どもがいる世帯の被保険者である世帯主に係る所得割額の減額』と appliesTo『世帯主の基準総所得金額からの控除』（横浜市ページ 04hokenryounituite.html）を値にしたもの。新しい裏取りではない。世帯主が国保の被保険者でない世帯（擬制世帯主）には適用しない。",
+            "basisDate": "賦課期日（該当年度の4月1日。4月2日以降に資格取得したときは取得日）",
+            "under16PerPerson": 330000,
+            "age16To18PerPerson": 120000,
+            "childIncomeLimit": 580000,
+            "ages": {
+              "under16BelowAge": 16,
+              "age16To18BelowAge": 19,
+              "asOf": "previousDecember31",
+              "note": "2026-09-18 に起こした。横浜市ページ（04hokenryounituite.html）は対象被保険者の条件を『① 該当年度の前年度の12月末日時点で19歳未満である』『② 該当年度の前年の合計所得金額が58万円以下である』とし、控除額を『(1) 16歳未満の被保険者1人につき330,000円』『(2) 16歳以上19歳未満の被保険者1人につき120,000円』と記載。令和8年度では『前年度の12月末日』＝令和7年12月31日で、保険料の年度の前年の12月31日に当たるため asOf は previousDecember31 とした（年度基準の書き方だが指す日は同じ）。16歳の区分を判定する日はページに明示がないが、同じ条件一覧の続きであるため同日と解した。"
+            },
+            "note": "対象は『該当年度の前年度の12月末日時点で19歳未満』かつ『該当年度の前年の合計所得金額が58万円以下』の被保険者。16歳未満1人につき33万円、16歳以上19歳未満1人につき12万円を世帯主の基準総所得金額から控除する。基準総所得が0円の場合は対象外。所得割額が減額されても世帯の年間保険料が最高限度額に達するときは最高限度額となる。"
+          }
+        },
+        "27100": {
+          "name": "大阪市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-11-20",
+          "source": "https://www.city.osaka.lg.jp/fukushi/page/0000624098.html",
+          "sourceName": "大阪市 保険料の決め方（2026年4月2日。『令和8年度の国民健康保険料について』の料率表は画像。値は区役所のページの HTML の表と府の算定結果で照合）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.osaka.lg.jp/fukushima/page/0000624311.html",
+              "sourceName": "大阪市福島区 令和8年度大阪市国民健康保険料のお知らせ（2026年5月11日）",
+              "usedFor": "国保の料率表の HTML（4 区分の所得割率・均等割・平等割・最高限度額、18歳以上の 96円）"
+            },
+            {
+              "url": "https://www.city.osaka.lg.jp/fukushi/page/0000369751.html",
+              "sourceName": "大阪市 保険料の軽減・減免（2026年4月1日）",
+              "usedFor": "7・5・2割軽減が平等割に掛かること、未就学児の 5割、子ども分の 18歳未満 10割、独自控除が無いこと"
+            },
+            {
+              "url": "https://www.pref.osaka.lg.jp/documents/125887/r8ryouritsu.pdf",
+              "sourceName": "大阪府 令和８年度 市町村標準保険料率及び都道府県標準保険料率 算定結果（PDF）",
+              "usedFor": "府内統一の料率（市の値との照合）と、子ども分の均等割合計の内訳（1,745円＋96円）"
+            }
+          ],
+          "hasPerHousehold": true,
+          "medical": {
+            "label": "医療分",
+            "incomeRate": 0.095,
+            "perCapita": 34990,
+            "perHousehold": 33908,
+            "cap": 660000
+          },
+          "support": {
+            "label": "後期高齢者支援金分",
+            "incomeRate": 0.0306,
+            "perCapita": 11191,
+            "perHousehold": 10845,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分",
+            "incomeRate": 0.026,
+            "perCapita": 18682,
+            "perHousehold": 0,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども・子育て支援金分",
+            "incomeRate": 0.0028,
+            "perCapita": 1745,
+            "perCapitaAge18Plus": 96,
+            "perCapitaCombined": 1841,
+            "perHousehold": 0,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-11-20 に起こした。市のページ（0000369751.html）は子ども分の均等割 10 割軽減の対象を『令和8年3月31日時点で18歳未満の被保険者』と書く。令和8年3月31日に 18 歳未満の人は、令和8年度末（令和9年3月31日）に 18 歳以下で、国民健康保険法施行令第29条の7 の『十八歳に達する日以後の最初の三月三十一日以前である被保険者』と同じ人を指すと解して 18 とした。",
+            "childAgeSource": "https://laws.e-gov.go.jp/law/333CO0000000362",
+            "note": "均等割合計 1,841円は『均等割 1,745円』と『18歳以上の被保険者 1 人あたり 96円』の合算（区役所のページの表と府の算定結果の別紙）。18歳未満の被保険者は子ども分の均等割が 10 割軽減。府内で統一されているのは合計 1,841円だけで、内訳は市町村ごとに違う。"
+          },
+          "municipalDeduction": null,
+          "municipalDeductionNote": "2026-11-20 確認。市の『保険料の軽減・減免』のページに、子どもの人数等で所得割を減らす独自の控除の記載が無い（法定の 7・5・2割軽減・未就学児・子ども分の 18歳未満・産前産後・非自発的失業者の軽減と、所得減少・災害・旧被扶養者・拘禁の減免だけ）。",
+          "perHouseholdNote": "平等割は医療分・後期高齢者支援金分だけ。7割・5割・2割軽減は平等割・均等割に掛かる（市のページ）。未就学児の 5割軽減は均等割だけに掛かる。特定世帯・特定継続世帯の平等割の減額は計算に入れない（reference.scope）。",
+          "roundingNote": "保険料の端数の処理は確かめていない（市のページ・府の算定結果に記載が無い。条例は読んでいない）。rounding を持たないので、計算は円単位の四捨五入で概算する。",
+          "note": "賦課基準は『前年中総所得金額等－43万円（合計所得金額が2,400万円以下の場合に限る）』。府は府内の国保料を統一しており、医療分・支援分・介護分は府の市町村標準保険料率（統一保険料率）と同じ値。医療分の賦課限度額 660,000円は政令の上限（670,000円）より低い。"
+        },
+        "01100": {
+          "name": "札幌市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-11-20",
+          "source": "https://www.city.sapporo.jp/hoken-iryo/kokuho/fuka.html",
+          "sourceName": "札幌市 保険料の計算（国民健康保険料。更新日 2026年9月4日。『令和8年度国民健康保険料率が決まりました。』）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.sapporo.jp/hoken-iryo/kokuho/fuka-gengaku.html",
+              "sourceName": "札幌市 国民健康保険（保険料の減額）（更新日 2026年8月27日）",
+              "usedFor": "法定の 7・5・2 割軽減が平等割にも掛かること、未就学児の 5 割が平等割に掛からないこと、独自控除が無いこと"
+            },
+            {
+              "url": "https://www.city.sapporo.jp/ncms/reiki/d1w_reiki_nonframe/H336901010009/H336901010009_j.html",
+              "sourceName": "札幌市国民健康保険条例（札幌市例規集）",
+              "usedFor": "賦課限度額・端数処理（第12条第2項ほか）・平等割の構成・18歳未満被保険者の均等割の軽減（第19条の5）・低所得の軽減の平等割への適用（第19条）"
+            },
+            {
+              "url": "https://www.city.sapporo.jp/hoken-iryo/kokuho/documents/kokuhokanyusyanotebiki2026.pdf",
+              "sourceName": "札幌市 国保 加入者のてびき 令和8年度版（PDF）",
+              "usedFor": "国保の料率の突き合わせ、令和8年度の軽減基準"
+            }
+          ],
+          "hasPerHousehold": true,
+          "rounding": {
+            "incomeLevy": "perMemberFloor",
+            "segmentPremiumFloorUnit": 10
+          },
+          "medical": {
+            "label": "医療分",
+            "incomeRate": 0.0861,
+            "perCapita": 20550,
+            "perHousehold": 32540,
+            "cap": 670000
+          },
+          "support": {
+            "label": "支援金分",
+            "incomeRate": 0.0256,
+            "perCapita": 6330,
+            "perHousehold": 10010,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分",
+            "incomeRate": 0.0233,
+            "perCapita": 6020,
+            "perHousehold": 7550,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども支援分（子ども・子育て支援納付金賦課額）",
+            "incomeRate": 0.0029,
+            "perCapita": 1000,
+            "perCapitaAge18Plus": 100,
+            "perCapitaCombined": 1100,
+            "perHousehold": 1000,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-11-20 に起こした。市の計算ページは均等割を『1,100円※1×18歳以上※2の加入者数』『※1 均等割額1,000円、18歳以上均等割額100円』『※2 対象年度の4月1日での年齢』と書く。一方、市の国保条例第19条の5は対象を『18歳に達する日以後の最初の３月31日以前である被保険者』と定め、その被保険者均等割額を全額控除する。条例の定義は年度末（3月31日）時点で18歳以下と同じなので 18。ページの『4月1日での年齢』とは、4月1日が誕生日の人だけで食い違う可能性があるが、条例を正とした。",
+            "childAgeSource": "https://www.city.sapporo.jp/ncms/reiki/d1w_reiki_nonframe/H336901010009/H336901010009_j.html",
+            "note": "ページの均等割 1,100 円は『均等割額 1,000円』と『18歳以上均等割額 100円』の合算。18歳未満の加入者は 1,000 円の均等割が全額軽減され、100 円の 18歳以上均等割は 18 歳以上の加入者にだけ掛かる（条例第15条の7第1項）。低所得の 7・5・2 割軽減は 18歳以上均等割と平等割にも掛かる。料率は北海道が示す市町村標準保険料率をそのまま使う（条例第15条の9、令和8年度版加入者のてびき）。"
+          },
+          "municipalDeduction": null,
+          "municipalDeductionNote": "2026-11-20 に確かめた。市の保険料の計算・減額のページと国保条例（第12条〜第19条の5、第24条）に、子どもの人数に応じて所得割の賦課基準から控除する独自の仕組みは無い。所得割の基礎は『令和7年中の所得から基礎控除額を差し引いた金額』で、基礎控除額は『住民税の基礎控除額』。",
+          "perHouseholdNote": "4 区分とも平等割がある。7・5・2 割軽減は平等割にも掛かる（条例第19条）。未就学児の 5 割は均等割だけ（市の減額のページ）。賦課限度額は平等割を含む合計に掛かる（条例第12条第1項ただし書など）。特定世帯・特定継続世帯の平等割の減額は計算に入れない（reference.scope）。",
+          "roundingNote": "区分ごとに、所得割額（加入者ごとに小数点以下切捨て）＋均等割額＋平等割額を合算し、10円未満を切り捨てる（市の計算ページ『（10円未満切捨て。）』、条例第12条第2項・第15条の2の2第2項・第15条の3第2項・第15条の7第2項）。軽減額の端数の処理は確かめていない（rounding.reductionAmount を持たないので、計算は円単位の四捨五入）。",
+          "note": "北海道は全道統一保険料率を令和12年度から導入予定で、札幌市は令和7〜11年度に段階的に料率を近づける（条例附則第20条）。2027 年度以降の料率はこの行から変わる見込み。"
+        },
+        "40130": {
+          "name": "福岡市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-11-20",
+          "source": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/hp/seido/06-02.html",
+          "sourceName": "福岡市 国民健康保険料の計算方法（令和８年度国民健康保険料の保険料率。更新日 2026年6月15日）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/hp/seido/06-03.html",
+              "sourceName": "福岡市 国民健康保険料の減額（更新日 2026年6月15日）",
+              "usedFor": "7・5・2割軽減の判定式と、軽減が均等割と平等割に掛かること、未就学児の5割、18歳未満の子ども分均等割の全額減額と年齢の定義"
+            },
+            {
+              "url": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/hp/seido/06-05.html",
+              "sourceName": "福岡市 国民健康保険料の減免（更新日 2026年6月15日）",
+              "usedFor": "独自の所得割控除が無いことと、多子世帯の均等割の減免（計算に入れていない）の確認"
+            },
+            {
+              "url": "https://www.city.fukuoka.lg.jp/d1w_reiki/reiki_honbun/q003RG00000491.html",
+              "sourceName": "福岡市国民健康保険条例（例規集）",
+              "usedFor": "4区分の賦課額の構成、賦課限度額、端数処理（第11条第2項ほか・第12条第3項・第18条の2第2項）、平等割への軽減"
+            },
+            {
+              "url": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/shisei/documents/kaigisiryou.pdf",
+              "sourceName": "令和８年度第１回 福岡市国民健康保険運営協議会 会議資料",
+              "usedFor": "令和8年度の料率の告示日（令和8年6月1日）と、モデル保険料2件（1人世帯・介護該当・給与収入300万円で263,100円、108万円で23,300円）。単体テストで料率と端数処理から同じ額になることを確かめている"
+            }
+          ],
+          "hasPerHousehold": true,
+          "rounding": {
+            "incomeLevy": "floor",
+            "reductionAmount": "ceil",
+            "segmentPremiumFloorUnit": 100
+          },
+          "medical": {
+            "label": "基礎分",
+            "incomeRate": 0.0558,
+            "perCapita": 19807,
+            "perHousehold": 18664,
+            "cap": 670000
+          },
+          "support": {
+            "label": "支援分",
+            "incomeRate": 0.0314,
+            "perCapita": 10441,
+            "perHousehold": 9838,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分",
+            "incomeRate": 0.0261,
+            "perCapita": 10160,
+            "perHousehold": 7751,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども分",
+            "incomeRate": 0.0028,
+            "perCapita": 967,
+            "perCapitaAge18Plus": 72,
+            "perCapitaCombined": 1039,
+            "perHousehold": 911,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-11-20 に起こした。市の減額のページ（06-03.html）の『１８歳未満被保険者（１８歳に達する日以後最初の３月３１日以前である被保険者）については、子ども分保険料の均等割額を全額減額します』と、条例第18条の6の同じ定義を、年度末（3月31日）時点の年齢が18歳以下と読んだもの。",
+            "childAgeSource": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/hp/seido/06-03.html",
+            "note": "料率表の均等割は『1,039円（※注2）』で、注2に『子ども分においては、均等割額に18歳以上被保険者均等割額（１人あたり72円）を含みます』とある。perCapita 967円は 1,039円－72円 の引き算で起こした値（ページに967の数字そのものは無い）。平等割911円は18歳未満の軽減の対象外（軽減は均等割だけ）。"
+          },
+          "municipalDeduction": null,
+          "municipalDeductionNote": "所得割の課税標準から引く独自の控除は無い。代わりに均等割の『多子世帯』減免（中学生以下の第2子は半額、第3子以降は全額。申請不要）がある。今の型では表せないため値に入れていない（入れないと中学生以下の子が2人以上の世帯で保険料が高めに出る＝安全な側。TODO.md の「公開後」）。",
+          "perHouseholdNote": "4 区分とも平等割がある。7・5・2割の軽減は均等割と平等割の両方に掛かる（条例第18条の2第1項各号イ）。未就学児の5割と18歳未満の子ども分の全額減額は均等割だけ。特定世帯は平等割が1/2、特定継続世帯は3/4（計算に入れない。reference.scope）。",
+          "roundingNote": "区分ごとの賦課額は100円未満切捨て（条例第11条第2項ほか）、所得割額は1円未満切捨て（第12条第3項。加入者ごとか世帯の合計かは読み取っていないので、世帯の合計で切り捨てる）、軽減額は1円未満切上げ（第18条の2第2項。7・5・2 割の軽減額。未就学児の 5 割の軽減額の端数は確かめていないので、計算は円単位の四捨五入）。この処理で協議会資料のモデル保険料 2 件を料率から再計算して一致する（単体テスト）。",
+          "note": "所得割の算定基礎は『令和７年中（１月～１２月）の総所得金額等から基礎控除（４３万円）を除いた金額』。賦課割合は所得割50％・均等割30％・平等割20％。値に含めていない制度：多子世帯減免・所得減少/低所得の減免・旧被扶養者の減免・非自発的失業者の軽減・産前産後期間の減額。"
+        },
+        "28100": {
+          "name": "神戸市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-11-20",
+          "source": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gaku.html",
+          "sourceName": "神戸市：国民健康保険料の額（最終更新日 2026年8月18日。『2026年度の保険料率』の表）",
+          "additionalSources": [
+            {
+              "url": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gengaku.html",
+              "sourceName": "神戸市：保険料の減免・減額（申請をしなくても適用されるもの）（最終更新日 2026年8月18日）",
+              "usedFor": "法定減額（7・5・2 割）が均等割と平等割に掛かること、判定式、未就学児の 5 割軽減とその順序、特定世帯の平等割の軽減"
+            },
+            {
+              "url": "https://www.city.kobe.lg.jp/documents/60137/r8-1senmon_unkyoshiryo.pdf",
+              "sourceName": "神戸市国民健康保険事業の運営に関する協議会 令和8年度第1回専門部会 資料",
+              "usedFor": "独自控除の廃止と激変緩和の調整割合（67%）の裏付け、県内統一（2027 年度から標準保険料率、2030 年度に完全統一）"
+            }
+          ],
+          "hasPerHousehold": true,
+          "medical": {
+            "label": "医療分",
+            "incomeRate": 0.0738,
+            "perCapita": 33700,
+            "perHousehold": 21800,
+            "cap": 670000
+          },
+          "support": {
+            "label": "後期高齢者支援金分",
+            "incomeRate": 0.0297,
+            "perCapita": 13510,
+            "perHousehold": 8740,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分",
+            "incomeRate": 0.0278,
+            "perCapita": 13970,
+            "perHousehold": 6880,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子育て分（子ども子育て支援金分保険料）",
+            "incomeRate": 0.0026,
+            "perCapita": 1280,
+            "perCapitaAge18Plus": 50,
+            "perCapitaCombined": 1330,
+            "perHousehold": 830,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "2026-11-20 に起こした。市のページは『子育て分均等割は、18歳以上（18歳になる日以降の最初の3月31日以前のこどもを除く）の方は1,330円（1,280円＋50円）です。』『18歳未満の子育て分均等割は、全額軽減されます。』と書く。『18歳になる日以降の最初の3月31日以前』は年度末時点の年齢が 18 歳以下と同じ意味なので 18 とした。",
+            "childAgeSource": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gaku.html",
+            "note": "表は『全員 1,280円』『18歳以上 50円』の 2 段に分けて書いてあり、合算 1,330 円は本文の説明から。18 歳未満（年度末 18 歳以下）の子育て分均等割は全額軽減。"
+          },
+          "municipalDeduction": null,
+          "municipalDeductionNote": "市独自の所得控除（18 歳以下の子・ひとり親・寡婦・障害者）は 2024 年度を最後に見直し（廃止）。2025〜2030 年度は激変緩和措置（transitionalMitigation）があるが、控除額ではなく保険料の差額の割合で軽減する形のため、今の型には入れていない（入れないと 18 歳以下の子などがいる世帯の保険料が高めに出る＝安全な側。TODO.md の「公開後」）。",
+          "transitionalMitigation": {
+            "status": "documentedNotModeled",
+            "name": "神戸市独自控除の見直しに伴う緩和措置",
+            "formula": "（独自控除を適用せずに算定した保険料 − 独自控除を適用して算定した保険料）× 軽減割合 を保険料から差し引く",
+            "rateByFiscalYear": [
+              { "fiscalYear": 2025, "rate": 0.84 },
+              { "fiscalYear": 2026, "rate": 0.67 },
+              { "fiscalYear": 2027, "rate": 0.5 },
+              { "fiscalYear": 2028, "rate": 0.34 },
+              { "fiscalYear": 2029, "rate": 0.17 },
+              { "fiscalYear": 2030, "rate": 0 }
+            ],
+            "formerDeductionUntilFiscalYear2024": {
+              "childAge18OrUnderPerPerson": 330000,
+              "childAgeAsOf": "previousDecember31",
+              "disabledPerPerson": 260000,
+              "cohabitingSpeciallyDisabledPerPerson": 530000,
+              "singleParentOrWidow": 260000,
+              "nonTaxableDisabledOrSingleParentOrWidow": 920000
+            },
+            "note": "市のページの『2024年度末まで』の表と軽減割合の表から写した（2026-11-20）。旧控除をどの加入者の所得から引くか、子の所得の条件があるかはページに無い（reference.unverified の kobeTransitionalMitigation）。計算は読まない。"
+          },
+          "perHouseholdNote": "4 区分とも平等割がある。7・5・2 割の法定減額は均等割と平等割に掛かる（市の減額のページ）。未就学児の 5 割は医療分・支援分の均等割だけ。特定世帯・特定継続世帯の平等割の減額は計算に入れない（reference.scope）。",
+          "roundingNote": "保険料の端数の処理は確かめていない（市のページに記載が無い。条例は読んでいない）。rounding を持たないので、計算は円単位の四捨五入で概算する。",
+          "note": "所得割は基礎控除後所得方式（算定用所得額＝所得の合計－基礎控除額）。県は 2027 年度から県内統一の標準保険料率を示し、2030 年度に完全統一する予定（市の運営協議会の資料）。2027 年度以降の料率はこの行から変わる見込み。"
+        },
+        "26100": {
+          "name": "京都市",
+          "fiscalYear": 2026,
+          "checkedAt": "2026-11-20",
+          "source": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351039.html",
+          "sourceName": "京都市 2．令和8年度の保険料の計算方法について（ページ番号351039、2026年4月1日）",
+          "additionalSources": [
+            {
+              "url": "https://www2.city.kyoto.lg.jp/somu/bunsyo/kouhou/r0803/0331/0331_57.pdf",
+              "sourceName": "京都市公報 令和8年3月31日 京都市告示（国民健康保険料の保険料率。令和8年4月1日適用）",
+              "usedFor": "国保 4 区分の所得割・均等割・18歳以上均等割・世帯別平等割"
+            },
+            {
+              "url": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351043.html",
+              "sourceName": "京都市 保険料の法定減額について（令和8年度）",
+              "usedFor": "7・5・2 割の判定式が法定どおりか、平等割・18歳以上均等割にも掛かるか"
+            },
+            {
+              "url": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351040.html",
+              "sourceName": "京都市 保険料の減額制度について（令和8年度）",
+              "usedFor": "市独自の所得割控除が無いことの確認（減額制度の一覧）"
+            },
+            {
+              "url": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351046.html",
+              "sourceName": "京都市 未就学児がいる場合に受けられる減額（未就学児に係る均等割の軽減措置）について",
+              "usedFor": "未就学児の 5 割軽減の対象区分（医療分・後期高齢者支援分の均等割）"
+            }
+          ],
+          "hasPerHousehold": true,
+          "medical": {
+            "label": "医療分保険料",
+            "incomeRate": 0.0794,
+            "perCapita": 30080,
+            "perHousehold": 17930,
+            "cap": 670000
+          },
+          "support": {
+            "label": "後期高齢者支援分保険料",
+            "incomeRate": 0.0266,
+            "perCapita": 10360,
+            "perHousehold": 6180,
+            "cap": 260000
+          },
+          "longTermCare": {
+            "label": "介護分保険料",
+            "incomeRate": 0.0251,
+            "perCapita": 11090,
+            "perHousehold": 5370,
+            "cap": 170000,
+            "appliesToAges": { "from": 40, "to": 64 }
+          },
+          "childcare": {
+            "label": "子ども・子育て支援分保険料",
+            "incomeRate": 0.0028,
+            "perCapita": 1110,
+            "perCapitaAge18Plus": 60,
+            "perHousehold": 660,
+            "cap": 30000,
+            "childPerCapitaReduction": 1.0,
+            "childMaxAgeAtFiscalYearEnd": 18,
+            "childAgeNote": "市のページは『平成20年4月2日以降生まれの方の子ども・子育て支援分の均等割は全額減額されます。』と生年月日で書く。平成20年4月2日生まれは令和9年3月31日（年度末）に18歳なので、年度末時点で18歳以下＝18 と読んだ（2026-11-20）。18歳以上均等割の対象は『平成20年4月1日以前生まれの方』。",
+            "childAgeSource": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351039.html",
+            "note": "市は均等割 1,110円 と 18歳以上均等割 60円 を別の行で示している（合算の額はページに無い）。18歳以上均等割は子ども・子育て支援分のみに賦課される。"
+          },
+          "municipalDeduction": null,
+          "municipalDeductionNote": "2026-11-20 確認。市の『保険料の減額制度について（令和8年度）』の一覧に独自の所得割控除は無い（国保条例の本文は読んでいない。reference.unverified の kyotoOrdinance）。",
+          "perHouseholdNote": "平等割は 4 区分とも 1 世帯について（介護分は介護保険第2号被保険者がいる 1 世帯について）。法定減額（7・5・2 割）は平等割にも掛かる。未就学児の 5 割は医療分・後期高齢者支援分の均等割だけ。特定世帯・特定継続世帯の平等割の軽減は計算に入れない（reference.scope）。なお計算方法のページ 351039 の※1 に書かれた特定世帯の平等割の額は告示と合わない（前年度の値の残りと見られる）。告示の値を正とした。",
+          "roundingNote": "保険料の端数の処理は確かめていない（市のページに記載が無い。条例は読んでいない）。rounding を持たないので、計算は円単位の四捨五入で概算する。",
+          "note": "所得割は世帯員各々の『令和7年中の総所得金額等－基礎控除43万円』の合計に掛ける。限度額は区分ごとに適用。料率は令和8年3月31日の市告示（令和8年4月1日適用）。"
+        }
+      },
+      "reduction": {
+        "appliesTo": "被保険者均等割額・18歳以上被保険者均等割額・世帯別平等割額（平等割を課さない市町村では均等割額だけ）。医療分・支援分・介護分・子ども分のそれぞれに適用（国民健康保険法施行令第29条の7第6項第1号・第3号）",
+        "schedule": [
+          {
+            "fiscalYear": 2026,
+            "base": 430000,
+            "salaryEarnerAddition": 100000,
+            "seventy": { "base": 430000, "perMember": 0, "rate": 0.7 },
+            "fifty": { "base": 430000, "perMember": 310000, "rate": 0.5 },
+            "twenty": { "base": 430000, "perMember": 570000, "rate": 0.2 }
+          }
+        ],
+        "formula": "判定所得（世帯主＋国保加入者＋特定同一世帯所属者の前年の総所得金額等の合算額） ≦ base ＋ perMember × 被保険者数（特定同一世帯所属者を含む） ＋ salaryEarnerAddition ×（給与所得者等の数 － 1）",
+        "salaryEarnerDefinition": "給与収入が55万円を超える方、公的年金等の収入が60万円を超える65歳未満の方、又は公的年金等の収入が125万円を超える65歳以上の方。salaryEarnerAddition の項は給与所得者等の数が2人以上の場合のみ計算する。",
+        "salaryEarnerThresholds": {
+          "employmentRevenueOver": 550000,
+          "pensionRevenueOverUnder65": 600000,
+          "pensionRevenueOverAge65Plus": 1250000,
+          "pensionAgeBoundary": 65,
+          "note": "2026-09-18 に起こした（salaryEarnerDefinition の文言を計算用の数値に直したもの）。2026-11-20 に国民健康保険法施行令第29条の7第6項第1号（給与等の収入金額が五十五万円を超える者／公的年金等の収入金額が六十五歳未満は六十万円を超える者）と附則第5条（当分の間、六十五歳以上の『百十万円』を『百二十五万円』と読み替える）で確かめた（e-Gov 法令 API）。いずれも『この額を超える』が条件（ちょうどの額は当たらない）。pensionAgeBoundary は『65歳未満／65歳以上』の境目。"
+        },
+        "onlyMunicipalitiesUsingSeventyFiftyTwenty": true,
+        "onlyMunicipalitiesUsingSeventyFiftyTwentyNote": "軽減の割合は7・5・2割が基準（施行令第29条の7第6項第3号）だが、同項第4号・第5号により6・4割または5・3割を選ぶ市町村もありうる。このファイルは7・5・2割の市だけを収録し、収録する市ごとに市の軽減のページで7・5・2割であることを確かめた（各行の additionalSources）。収録した市の判定式（43万円／31万円／57万円／10万円）も法定どおりだった。",
+        "source": "https://laws.e-gov.go.jp/law/333CO0000000362",
+        "sourceName": "国民健康保険法施行令 第二十九条の七第六項第一号・第三号（令和8年政令第2号による改正後。同政令附則第4項により令和8年度分から適用）",
+        "checkedAt": "2026-11-20",
+        "note": "国民健康保険法施行令第29条の7第6項に基づく法定軽減で、令和8年度の判定式は全国共通（43万円／＋31万円×加入者数／＋57万円×加入者数、給与所得者等が2人以上なら＋10万円×（人数－1））。base の 43万円は『地方税法第三百十四条の二第二項第一号に定める金額』。軽減の割合は7・5・2割が基準で、同項第4号・第5号により6・4割または5・3割を選ぶ市町村もありうるため、収録する市ごとに7・5・2割であることを確かめる（onlyMunicipalitiesUsingSeventyFiftyTwenty）。軽減は均等割と平等割（世帯別平等割額）に同じ割合で掛かる。判定に使う総所得金額等は所得割の算定に使うものと異なり、分離課税の譲渡所得は特別控除適用前、65歳以上の公的年金等雑所得から一律15万円を控除（施行令附則第5条）、雑損失の繰越控除を適用、青色事業専従者給与は給与収入に含めない等の調整がある（計算側は単純な合算で近似する）。",
+        "preschoolPerCapitaReduction": 0.5,
+        "preschoolNote": "未就学児の均等割額は5割減額（令和4年度から）。所得の基準による軽減に該当する世帯は、その適用後の均等割額をさらに5割減額するため、合計の軽減割合は7割軽減世帯で8.5割、5割軽減世帯で7.5割、2割軽減世帯で6割、軽減なし世帯で5割になる（国民健康保険法施行令第29条の7第6項第6号・第7号。対象は未就学児の被保険者均等割額だけで、世帯別平等割額には掛からない）。",
+        "preschoolMaxAgeAtFiscalYearEnd": 6,
+        "preschoolAgeNote": "2026-09-18 に起こし、2026-11-20 に書き直した。国民健康保険法施行令第29条の7第6項第6号の『世帯に六歳に達する日以後の最初の三月三十一日以前である被保険者がある場合においては…被保険者均等割額…を減額する』を年度末基準の年齢に直したもの（e-Gov API lawdata/333CO0000000362 で確認）。年齢計算ニ関スル法律により誕生日の前日に加齢するため『年度末（3月31日）時点の年齢が6歳以下』と一致する。収録した市のページの定義（例：令和8年度は令和2年4月2日以降生まれ）とも合う。",
+        "preschoolAgeSource": "https://laws.e-gov.go.jp/law/333CO0000000362",
+        "preschoolCombinedRates": [
+          { "incomeBasedReduction": 0.7, "preschoolTotalReduction": 0.85 },
+          { "incomeBasedReduction": 0.5, "preschoolTotalReduction": 0.75 },
+          { "incomeBasedReduction": 0.2, "preschoolTotalReduction": 0.6 },
+          { "incomeBasedReduction": 0, "preschoolTotalReduction": 0.5 }
+        ]
+      }
+    },
+    "nationalPension": {
+      "schedule": [
+        { "fiscalYear": 2026, "monthly": 17920, "status": "verified" },
+        { "fiscalYear": 2027, "monthly": 18290, "status": "verified" }
+      ],
+      "insuredAge": {
+        "from": 20,
+        "under": 60,
+        "source": "https://laws.e-gov.go.jp/law/334AC0000000141",
+        "note": "第1号被保険者の年齢範囲。国民年金法第7条第1項第1号『日本国内に住所を有する二十歳以上六十歳未満の者であつて次号及び第三号のいずれにも該当しないもの（…以下「第一号被保険者」という。）』。2026-09-18 に e-Gov 法令検索 API（lawdata/334AC0000000141）で取得した条文から起こした。from は以上、under は未満。60歳以上65歳未満の任意加入被保険者（同法附則第5条）や海外居住者の任意加入は扱わない。"
+      },
+      "additionalPremiumMonthly": 400,
+      "statutoryLevelMonthly": 17000,
+      "source": "https://www.nenkin.go.jp/service/kokunen/hokenryo/hokenryo.html",
+      "additionalSource": "https://www.mhlw.go.jp/content/12502000/001639615.pdf",
+      "note": "第1号被保険者1人あたりの定額保険料（月額）。加入者数ぶんを乗じて世帯の負担にする。令和8年度17,920円（前年度比＋410円、令和7年度は17,510円）、令和9年度18,290円（＋370円）。法律に規定された保険料額（平成16年度水準）は両年度とも17,000円で、実際の額は国民年金法第87条第3項により名目賃金の変動に応じて毎年度改定される。additionalPremiumMonthly は任意加入の付加保険料（月額400円）で、既定では加算しない。2028年度（令和10年度）以降の額は未公表。"
+    }
+  },
+  "reference": {
+    "sourceText": {
+      "nationalPensionMhlw": {
+        "title": "厚生労働省 令和8年度の年金額改定についてお知らせします（令和8年1月23日）",
+        "text": "実際の保険料額は、平成16年度水準を維持するため、国民年金法第87条第３項の規定により、名目賃金の変動に応じて毎年度改定され、令和９年度の保険料額は以下の通りとなります。 ／ 令和８年度／令和９年度 法律に規定された保険料額（平成16年度水準） 17,000円／17,000円 実際の保険料額（前年度の保険料額との比較） 17,920円（＋410円）※令和７年度は17,510円／18,290円（＋370円）",
+        "source": "https://www.mhlw.go.jp/content/12502000/001639615.pdf",
+        "note": "pypdf で PDF から抽出した逐語（改行と字間の空白のみ詰めた）。日本年金機構『国民年金保険料』ページの令和8年度 月額17,920円・付加保険料 月額400円と一致する。"
+      }
+    },
+    "statute": {
+      "nationalPensionArticle7": {
+        "lawName": "国民年金法（昭和三十四年法律第百四十一号）第七条第一項",
+        "lawId": "334AC0000000141",
+        "text": "次の各号のいずれかに該当する者は、国民年金の被保険者とする。 一 日本国内に住所を有する二十歳以上六十歳未満の者であつて次号及び第三号のいずれにも該当しないもの（厚生年金保険法（昭和二十九年法律第百十五号）に基づく老齢を支給事由とする年金たる保険給付その他の老齢又は退職を支給事由とする給付であつて政令で定めるもの（以下「厚生年金保険法に基づく老齢給付等」という。）を受けることができる者その他この法律の適用を除外すべき特別の理由がある者として厚生労働省令で定める者を除く。以下「第一号被保険者」という。） 二 厚生年金保険の被保険者（以下「第二号被保険者」という。）",
+        "source": "https://laws.e-gov.go.jp/law/334AC0000000141",
+        "note": "2026-09-18 に e-Gov 法令検索 API（https://laws.e-gov.go.jp/api/1/lawdata/334AC0000000141）から取得した XML の逐語（改行と字下げの空白のみ詰めた）。第三号は省略した。nationalPension.insuredAge（20歳以上60歳未満）の根拠。"
+      },
+      "elderlyMedicalCareArticle50": {
+        "lawName": "高齢者の医療の確保に関する法律（昭和五十七年法律第八十号）第五十条",
+        "lawId": "357AC0000000080",
+        "text": "（被保険者）第五十条 次の各号のいずれかに該当する者は、後期高齢者医療広域連合が行う後期高齢者医療の被保険者とする。 一 後期高齢者医療広域連合の区域内に住所を有する七十五歳以上の者 二 後期高齢者医療広域連合の区域内に住所を有する六十五歳以上七十五歳未満の者であつて、厚生労働省令で定めるところにより、政令で定める程度の障害の状態にある旨の当該後期高齢者医療広域連合の認定を受けたもの",
+        "source": "https://laws.e-gov.go.jp/law/357AC0000000080",
+        "note": "2026-09-18 に e-Gov 法令検索 API から取得した XML の逐語。nationalHealthInsurance.insuredAge.under = 75 の根拠。第二号の障害認定による65歳以上75歳未満の繰り上げ加入は本 JSON では扱わない。"
+      },
+      "nationalHealthInsuranceArticle6": {
+        "lawName": "国民健康保険法（昭和三十三年法律第百九十二号）第六条（適用除外）",
+        "lawId": "333AC0000000192",
+        "text": "前条の規定にかかわらず、次の各号のいずれかに該当する者は、都道府県が当該都道府県内の市町村とともに行う国民健康保険（以下「都道府県等が行う国民健康保険」という。）の被保険者としない。 …（第一号から第七号まで省略）… 八 高齢者の医療の確保に関する法律（昭和五十七年法律第八十号）の規定による被保険者 九 生活保護法（昭和二十五年法律第百四十四号）による保護を受けている世帯（その保護を停止されている世帯を除く。）に属する者 十 国民健康保険組合の被保険者 十一 その他特別の理由がある者で厚生労働省令で定めるもの",
+        "source": "https://laws.e-gov.go.jp/law/333AC0000000192",
+        "note": "2026-09-18 に e-Gov 法令検索 API から取得した XML の逐語。省略箇所は「…（第一号から第七号まで省略）…」と明示した（第一号から第七号は健康保険・船員保険・共済組合等の被保険者と被扶養者）。第八号により、75歳以上（後期高齢者医療の被保険者）は国保の被保険者から除かれる。"
+      },
+      "nationalHealthInsuranceOrderArticle29_7": {
+        "lawName": "国民健康保険法施行令（昭和三十三年政令第三百六十二号）第二十九条の七",
+        "lawId": "333CO0000000362",
+        "text": "世帯に十八歳に達する日以後の最初の三月三十一日以前である被保険者（以下この号において「十八歳未満被保険者」という。）がある場合においては、当該世帯の世帯主に対して賦課する被保険者均等割額（十八歳未満被保険者につき前項第六号の規定に基づき算定した被保険者均等割額（前各号に規定する基準に従い当該被保険者均等割額を減額するものとした場合にあつては、その減額後の被保険者均等割額）に限る。次号において同じ。）を減額するものであること。 ／ 世帯に六歳に達する日以後の最初の三月三十一日以前である被保険者がある場合においては、当該世帯の世帯主に対して賦課する被保険者均等割額（当該世帯に属する六歳に達する日以後の最初の三月三十一日以前である被保険者につき第二項、第三項及び前項の規定に基づき算定した被保険者均等割額（前各号に規定する基準に従い当該被保険者均等割額を減額するものとした場合にあつては、その減額後の被保険者均等割額）に限る。次号において同じ。）を減額するものであること。",
+        "source": "https://laws.e-gov.go.jp/law/333CO0000000362",
+        "note": "2026-09-18 に e-Gov 法令検索 API から取得した XML の逐語。同条のうち「十八歳未満被保険者」を定義する号と、未就学児（六歳に達する日以後の最初の三月三十一日以前）の均等割減額を定める号の2つを ／ で並べた（条文中の位置が離れているため、項・号の番号までは特定していない）。childcare.childMaxAgeAtFiscalYearEnd = 18 と reduction.preschoolMaxAgeAtFiscalYearEnd = 6 の根拠。"
+      },
+      "nationalHealthInsuranceOrderArticle29_7Paragraph6": {
+        "lawName": "国民健康保険法施行令（昭和三十三年政令第三百六十二号）第二十九条の七第六項第一号・第三号・第六号",
+        "lawId": "333CO0000000362",
+        "text": "（第6項第1号の結び）当該世帯主に対して賦課する被保険者均等割額及び十八歳以上被保険者均等割額並びに世帯別平等割額（世帯別平等割額を賦課しない市町村においては、被保険者均等割額及び十八歳以上被保険者均等割額）を減額するものであること。 ／ （同第3号）前二号の規定に基づき減額する額は、当該市町村の当該年度分の保険料に係る当該被保険者均等割額及び十八歳以上被保険者均等割額又は世帯別平等割額にイからハまでに掲げる世帯の区分に応じ、それぞれイからハまでに定める割合を乗じて得た額であること。 ／ （同第6号）世帯に六歳に達する日以後の最初の三月三十一日以前である被保険者がある場合においては、当該世帯の世帯主に対して賦課する被保険者均等割額（当該世帯に属する六歳に達する日以後の最初の三月三十一日以前である被保険者につき第二項、第三項及び前項の規定に基づき算定した被保険者均等割額（中略）に限る。次号において同じ。）を減額するものであること。",
+        "source": "https://laws.e-gov.go.jp/law/333CO0000000362",
+        "checkedAt": "2026-11-20",
+        "note": "2026-11-20 に e-Gov 法令検索 API（v1 lawdata・v2 law_data）の生 XML から取った逐語（改行・字下げ・字間の空白だけを詰めた。（中略）は原文の連続部分をつないだ箇所、（第6項第1号の結び）などの丸括弧は位置を示す補い）。第29条の7 は 2026-04-01 版（令和8年政令第2号）・現行版（333CO0000000362_20260801_508CO0000000240）・未施行の 2027-08-01 版で一字も違わない。**7・5・2 割の軽減は世帯別平等割額にも同じ割合で掛かり、未就学児の 5 割と 18 歳未満の子ども分の全額軽減（第10号・第11号）は被保険者均等割額だけに掛かる**（計算 `nationalInsurance.ts` の根拠）。平等割は区分ごとに定められ、区分ごとの賦課限度額の中に入る（第2項第3号・第9号）。特定世帯の 2 分の 1・特定継続世帯の 4 分の 3（第2項第8号ロ・ハなど）は扱わない。端数の処理は政令に無く、市の条例による（各行の rounding）。"
+      }
+    },
+    "municipalityQuotes": {
+      "note": "収録した市の行の根拠の一部（市のページ・条例・告示の生テキストからの逐語。表のセルは | で区切った）。値ごとの全部の根拠は各行の source・additionalSources。14130・14100 は 2026-09-14〜18、ほかの市は 2026-11-20 に curl で取得した HTML・PDF から取った。",
+      "14130": [
+        {
+          "field": "構成（所得割・均等割。平等割なし）と賦課基準額",
+          "url": "https://www.city.kawasaki.jp/350/page/0000187752.html",
+          "text": "国民健康保険料は、「医療分保険料」、「後期高齢者支援金等分保険料」、「介護納付金分保険料」及び「子ども・子育て支援納付金分保険料」の合計額となっています。また、それぞれ、加入者の賦課基準額(*1)に応じて計算される「所得割額」、加入者の人数に応じて計算される「均等割額」で構成されています。 ／ *1 賦課基準額：令和7年中の総所得金額等から住民税の基礎控除（合計所得金額が2,400万円以下の方は43万円）を差し引いた額をいいます。"
+        },
+        {
+          "field": "medical・support・longTermCare・childcare",
+          "url": "https://www.city.kawasaki.jp/350/page/0000187752.html",
+          "text": "医療分保険料：所得割額＝国保加入者全員の賦課基準額の合計×8.26％／均等割額＝国保加入者人数×43,261円 ／ 後期高齢者支援金等分保険料：所得割額＝国保加入者全員の賦課基準額の合計×2.89％／均等割額＝国保加入者人数×15,306円 ／ 介護納付金分保険料：所得割額＝国保加入の40歳〜64歳の方の賦課基準額の合計×2.67％／均等割額＝国保加入の40歳〜64歳の方の人数×15,828円 ／ 子ども・子育て支援納付金分保険料：所得割額＝国保加入者全員の賦課基準額の合計×0.32％／均等割額＝国保加入全員の人数×1,665円／18歳以上均等割額＝18歳以上の方の人数×77円 ／ 年間保険料は、次のとおり最高限度額が定められています。医療分保険料 670,000円／後期高齢者支援金等分保険料 260,000円／介護納付金分保険料 170,000円／子ども・子育て支援納付金分保険料 30,000円",
+          "note": "本文の逐語を区分ごとに1行にまとめたもの（原文の語順・数値はそのまま）。"
+        },
+        {
+          "field": "（確かめだけ）7・5・2 割の軽減の判定式",
+          "url": "https://www.city.kawasaki.jp/350/page/0000187754.html",
+          "text": "令和7年中の所得が次の基準に概当する世帯は、国民健康保険法施行令に基づき令和8年度の保険料（均等割額）が軽減されます。 ／ 総所得金額等 ≦ 43万円＋（給与所得者等の数－1）×10万円 → 7割 ／ 総所得金額等 ≦ 43万円＋（給与所得者等の数－1）×10万円＋31万円×国保加入者数 → 5割 ／ 総所得金額等 ≦ 43万円＋（給与所得者等の数－1）×10万円＋57万円×国保加入者数 → 2割 ／ （※2）給与所得者等：給与収入が55万円を超える方、公的年金等の収入が60万円を超える65歳未満の方又は公的年金等の収入が125万円を超える65歳以上の方",
+          "note": "原文の表を「基準 → 軽減割合」の形に並べ直した逐語（数値・語句はそのまま。原文の誤字『概当』も原文どおり）。"
+        },
+        {
+          "field": "（確かめだけ）未就学児の軽減",
+          "url": "https://www.city.kawasaki.jp/350/page/0000187755.html",
+          "text": "子育て世帯の経済的負担を軽減するため、未就学児(※)の保険料の「均等割額」について5割を減額します。所得の基準による保険料の軽減措置に該当する世帯の場合は、その適用後の均等割額を更に5割減額しますので、例えば7割軽減世帯の未就学児の方は、残りの3割について5割を減額するため、合わせて8.5割の軽減になります。※　令和9年3月31日時点で0〜6歳の被保険者の方（令和2年（2020年）4月2日以降生まれの方） ／ 7割軽減世帯：未就学児以外7割・未就学児8.5割／5割軽減世帯：5割・7.5割／2割軽減世帯：2割・6割／軽減なし世帯：軽減なし・5割"
+        },
+        {
+          "field": "municipalDeduction（ages・deductFrom）",
+          "url": "https://www.city.kawasaki.jp/350/page/0000187756.html",
+          "text": "保険料の負担を軽減するため、川崎市では独自の軽減措置として、当分の間、賦課期日（当該年度の4月1日。年度途中で国保加入した場合は、国保に加入した日）時点において、次の基準に該当する国保加入者が世帯にいる場合、賦課基準額から一定金額を控除して所得割額を算定します（(1)及び(2)については、同一世帯の国保加入者のうち「最も賦課基準額が高い国保加入者」から、(3)については、「当該控除を有する国保加入者」から控除します。） ／ 基準／控除する金額 ： (1) 令和7年12月31日現在で16歳未満の国保加入者(※) ／ 33万円 × 該当する人数 ： (2) 令和7年12月31日現在で16歳以上19歳未満の国保加入者(※) ／ 12万円 × 該当する人数 ： (3) 令和8年度の住民税の申告に「障害者控除」がある国保加入者 ／ 障害者控除相当の金額 ： ※前年中の合計所得金額が58万円以下であること。",
+          "note": "表のセル区切りを ／、行区切りを ： に置き換えた。ページ全文を確認したが、控除額が最も賦課基準額が高い加入者の賦課基準額を超えた場合の扱いは書かれていない（reference.unverified の kawasakiMunicipalDeductionExcess）。"
+        }
+      ],
+      "14100": [
+        {
+          "field": "medical・support・longTermCare・childcare",
+          "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/r7hokennryouritu.html",
+          "text": "令和８年度の保険料率は、５月25日の告示により次のとおり決定しました。 区分／所得割料率／均等割料率（額）／賦課限度額 ： 医療分 8.33% 40,870円 670,000円 ／ 支援分 2.62% 13,380円 260,000円 ／ 介護分 2.84% 16,200円 170,000円 ／ 子ども分 0.34% 1,770円※ 30,000円 ／ ※子ども分の均等割料率（額）は、「被保険者均等割：1,690円」と「18歳以上被保険者均等割額：80円」の合算額になります。",
+          "note": "表はスラッシュ区切りに整形した。"
+        },
+        {
+          "field": "構成（均等割・18歳以上均等割・所得割。平等割なし）・介護分・子ども分",
+          "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/04hokenryounituite.html",
+          "text": "保険料は「被保険者均等割額」、「18歳以上被保険者均等割額（子ども分のみ）」及び「所得割額」の合計額となります。「被保険者均等割額」及び「18歳以上被保険者均等割額」は被保険者の人数に応じて、保険料率を合計します。「所得割額」は被保険者ごとの基準総所得金額に保険料率を乗じて計算します。 ／ 介護分保険料について (1)　40歳から64歳（介護保険第２号被保険者）の方は、国民健康保険料の中で介護分保険料を計算します。 ／ 子ども分保険料について (1)　令和８年度から創設された子育て支援施策の財源に充てるための保険料です。(2)　18歳未満の被保険者は、子ども分均等割額が全額軽減されます。なお、その軽減分は18歳以上の被保険者で負担します（18歳以上被保険者均等割額）。"
+        },
+        {
+          "field": "（確かめだけ）基準総所得金額",
+          "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/kijyunsousyo.html",
+          "text": "基準総所得金額＝総所得金額等－市民税の基礎控除額（※） ※前年の合計所得金額に応じて下記の通りとなります。 2,400万円以下・・・43万円／2,400万円超2,450万円以下・・・29万円／2,450万円超2,500万円以下・・・15万円／2,500万円超・・・0円 ／ 基準総所得金額とは、保険料の計算のもとになる所得金額のことで、総所得金額等から市民税の基礎控除額を控除した金額です。総所得金額等とは地方税法第314条の２第１項などで規定される総所得金額等で、次の１〜１８の所得金額の合計となります。なお、退職所得は含みません。"
+        },
+        {
+          "field": "（確かめだけ）7・5・2 割の軽減の判定式",
+          "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/04hokenryounituite.html",
+          "text": "保険料額を算定する際、法令により定められた所得基準を下回る世帯については、医療分、支援分、介護分及び子ども分のそれぞれにつき、被保険者均等割額及び18歳以上被保険者均等割額（以下、「均等割額」という。）の７割、５割又は２割を減額します。 ／ ４３０,０００円＋１００,０００円×（給与所得者等の数－１） → 均等割額の７割 ／ ４３０,０００円＋（３１０,０００円×被保険者数と世帯に属する特定同一世帯所属者の合算数）＋１００,０００円×（給与所得者等の数－１） → 均等割額の５割 ／ ４３０,０００円＋（５７０,０００円×被保険者数と世帯に属する特定同一世帯所属者の合算数）＋１００,０００円×（給与所得者等の数－１） → 均等割額の２割 ／ （注)　表の太字部分は給与所得者等の数が２人以上の場合のみ計算します。"
+        },
+        {
+          "field": "municipalDeduction（ages・deductFrom）",
+          "url": "https://www.city.yokohama.lg.jp/kurashi/koseki-zei-hoken/kokuho/hokenryo/04hokenryounituite.html",
+          "text": "19歳未満の被保険者がいる世帯に対し、被保険者である世帯主の国民健康保険料の軽減を実施します。 【対象者】 賦課期日（※１）現在において国民健康保険に加入している世帯主であって、所得が58万円以下である19歳未満の被保険者（※２）が同一の世帯に属している方 ※１ 該当年度の４月１日。ただし、該当年度の４月２日以降に国民健康保険の資格を取得したときは、その資格取得日 ※２ 次のいずれの条件にも該当する被保険者 ① 該当年度の前年度の12月末日時点で19歳未満である ② 該当年度の前年の合計所得金額が58万円以下である 【軽減内容】 次の金額を世帯主の基準総所得金額から控除して保険料の所得割額を算定します。なお、控除する金額は、世帯主の基準総所得金額を限度とします。また、所得割額が減額されてもなお世帯の年間保険料額が最高限度額に達するときは、最高限度額が保険料額となります。 (1) 16歳未満の被保険者１人につき330,000円 (2) 16歳以上19歳未満の被保険者１人につき120,000円 ※基準総所得が０円の場合は軽減対象になりません。"
+        }
+      ],
+      "27100": [
+        {
+          "field": "medical・support・longTermCare・childcare",
+          "url": "https://www.city.osaka.lg.jp/fukushima/page/0000624311.html",
+          "text": "平等割 (世帯当たり) | 33,908円 | 10,845円 | ー | ー / 均等割 (被保険者当たり) | 被保険者数×34,990円 | 被保険者数×11,191円 | 介護保険 第2号被保険者数×18,682円 | 被保険者数×1,745円 + 18歳以上の被保険者数×96円"
+        },
+        {
+          "field": "*.cap",
+          "url": "https://www.city.osaka.lg.jp/fukushima/page/0000624311.html",
+          "text": "最高限度額 | 660,000円 | 260,000円 | 170,000円 | 30,000円"
+        },
+        {
+          "field": "perHouseholdNote（軽減）",
+          "url": "https://www.city.osaka.lg.jp/fukushi/page/0000369751.html",
+          "text": "世帯全員の所得の合計が基準額以下の世帯について、医療分、後期高齢者支援金分、介護分、子ども・子育て支援金分保険料の平等割、均等割を軽減します。"
+        }
+      ],
+      "01100": [
+        {
+          "field": "medical",
+          "url": "https://www.city.sapporo.jp/hoken-iryo/kokuho/fuka.html",
+          "text": "（1）所得割額・・・令和7年中の所得から基礎控除額を差し引いた金額（注）×8.61％ （2）均等割額（人数割額）・・・20,550円×加入者数 （3）平等割額（世帯割額）・・・32,540円（一世帯あたり） （1）＋（2）＋（3）の合計額が1年間の医療分保険料 最高限度額・・・670,000円"
+        },
+        {
+          "field": "roundingNote",
+          "url": "https://www.city.sapporo.jp/ncms/reiki/d1w_reiki_nonframe/H336901010009/H336901010009_j.html",
+          "text": "２ 前項の規定により算定した納付義務者から徴収する基礎賦課額に10円未満の端数が生じたときは、その端数は納めることを要しない。"
+        },
+        {
+          "field": "perHouseholdNote（軽減）",
+          "url": "https://www.city.sapporo.jp/hoken-iryo/kokuho/fuka-gengaku.html",
+          "text": "※減額は未就学児の方の均等割額にのみ適用され、同じ世帯のその他の加入者の均等割額や、世帯にかかる平等割額には適用されません。"
+        }
+      ],
+      "40130": [
+        {
+          "field": "medical・support・longTermCare・childcare",
+          "url": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/hp/seido/06-02.html",
+          "text": "（ア）所得割 | 算定基礎となる所得 （※注1） | ×5.58％ | ×3.14％ | ×2.61％ | ×０.２８％ | （イ）均等割 | １人につき | 19,807円 | 10,441円 | 10,160円 | 1,039円（※注2） | （ウ）平等割 | １世帯につき | 18,664円 | 9,838円 | 7,751円 | 911円 | 賦課限度額 | １世帯につき | ６７万円 | 26万円 | 17万円 | ３万円 |"
+        },
+        {
+          "field": "roundingNote",
+          "url": "https://www.city.fukuoka.lg.jp/d1w_reiki/reiki_honbun/q003RG00000491.html",
+          "text": "第11条　保険料の賦課額のうち基礎賦課額は、同一世帯に属する被保険者につき算定した所得割額、被保険者均等割額及び世帯別平等割額の合算額とする。 2　前項の基礎賦課額に100円未満の端数があるときは、これを切り捨てるものとする。 / 2　前項各号ア及びイに掲げる額に1円未満の端数があるときは、これを切り上げるものとする。"
+        },
+        {
+          "field": "rounding（公式の計算例）",
+          "url": "https://www.city.fukuoka.lg.jp/hofuku/kokuho/shisei/documents/kaigisiryou.pdf",
+          "text": "■所得割保険料がかからない世帯（給与収入１０８万円）１人世帯（介護該当者）… 福岡 23,300 / ■所得割保険料がかかる世帯（給与収入３００万円）１人世帯（介護該当者）… 福岡 263,100"
+        }
+      ],
+      "28100": [
+        {
+          "field": "medical・support・longTermCare・childcare",
+          "url": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gaku.html",
+          "text": "医療分 | 7.38％ | 33,700円 | 21,800円 | 670,000円 / 後期高齢者支援金分 | 2.97％ | 13,510円 | 8,740円 | 260,000円 / 介護分 | 2.78％ | 13,970円 | 6,880円 | 170,000円 / 子育て分 | 0.26% | 全員　1,280円 | 830円 | 30,000円 | 18歳以上　50円"
+        },
+        {
+          "field": "perHouseholdNote（軽減）",
+          "url": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gengaku.html",
+          "text": "前年中の所得の世帯全員分（加入者でない世帯主及び特定同一世帯所属者を含む）の合計額が、国の定める所得基準を下回る世帯については、保険料（均等割額と平等割額）を下表のとおり減額します。"
+        },
+        {
+          "field": "municipalDeduction・transitionalMitigation",
+          "url": "https://www.city.kobe.lg.jp/a52670/kurashi/support/insurance/gaku.html",
+          "text": "兵庫県が示す県内統一の標準保険料率にするため、神戸市独自の所得控除（18歳以下の子どもに対する扶養控除、ひとり親・寡婦控除、障害者控除）は2024年度を最後に見直しました。"
+        }
+      ],
+      "26100": [
+        {
+          "field": "medical",
+          "url": "https://www2.city.kyoto.lg.jp/somu/bunsyo/kouhou/r0803/0331/0331_57.pdf",
+          "text": "１ 第１４条第１項に規定する保険料率（基礎賦課額） ⑴ 所 得 割 １００分の７．９４ ⑵ 被保険者均等割 ３０，０８０円 ⑶ 世帯別平等割 ア イ又はウに掲げる世帯以外の世帯 １７，９３０円"
+        },
+        {
+          "field": "childcare",
+          "url": "https://www2.city.kyoto.lg.jp/somu/bunsyo/kouhou/r0803/0331/0331_57.pdf",
+          "text": "⑵ 被保険者均等割 １，１１０円 ⑶ １８歳以上被保険者均等割 ６０円 ⑷ 世帯別平等割 ア イ又はウに掲げる世帯以外の世帯 ６６０円"
+        },
+        {
+          "field": "perHouseholdNote（軽減）",
+          "url": "https://www.city.kyoto.lg.jp/hokenfukushi/page/0000351043.html",
+          "text": "世帯全員の令和7年中の所得（※1）の合計額が、下表の基準以下の場合は、保険料の平等割と均等割（18歳以上均等割を含みます。）が減額されます。"
+        }
+      ]
+    },
+    "scope": {
+      "notIncluded": [
+        "産前産後期間の保険料軽減（国民健康保険法施行令による。収録した市のページにも記載がある）",
+        "特定世帯・特定継続世帯（後期高齢者医療へ移った人がいて国保の被保険者が 1 人になった世帯）の平等割の減額（2 分の 1・4 分の 3。施行令第29条の7第2項第8号ロ・ハなど）。平等割のある市で保険料が高めに出る",
+        "市独自の減額・減免のうち表の型に入らない物：多子世帯の均等割の減免（40130。中学生以下の第2子は半額・第3子以降は全額）、独自控除を見直した後の激変緩和（28100。旧控除で算定した保険料との差額の 67%〔2026 年度〕を引く。行の transitionalMitigation に記録だけ）。いずれも入れないと保険料が高めに出る（安全な側）",
+        "非自発的失業による負担軽減措置（雇用保険の特定受給資格者・特定理由離職者）",
+        "旧被扶養者減免（後期高齢者医療制度の創設に伴う減免）",
+        "災害・所得減少・低所得・給付制限による減免（申請制）",
+        "国民年金の産前産後期間の保険料免除（平成31年4月から）・法定免除・申請免除・納付猶予・学生納付特例",
+        "国民年金保険料の前納割引（6か月・1年・2年前納、口座振替の早割）",
+        "保険料の月割（年度途中の加入・脱退、40歳到達・75歳到達による再算定）",
+        "特定同一世帯所属者による軽減判定の継続（国保から後期高齢者医療制度へ移行した世帯員の扱い）"
+      ],
+      "note": "いずれも年次の世帯収支モデルでは扱わない。産前産後軽減と非自発的失業の軽減は該当年に実額が下がるため、必要になった時点で別途データ化する。"
+    },
+    "unverified": [
+      {
+        "key": "kawasakiKokujiPdf",
+        "description": "川崎市告示第335号（R08kokuzi.pdf）および令和8年度国民健康保険料率（R08ryoritsu.pdf）の本文",
+        "status": "unverified",
+        "reason": "2件とも PDF のページが画像 XObject のみで構成されており、pypdf でテキストを抽出すると空文字になる（スキャン画像の PDF）。OCR は行っていない。",
+        "impact": "料率の値そのものは川崎市の HTML ページ（0000187752.html／0000187754.html 等）で確認済みで、この JSON の値はすべてそこから取っている。告示番号レベルの逐語確認だけが未了。"
+      },
+      {
+        "key": "fiscalYear2027Rates",
+        "description": "2027年度（令和9年度）以降の国民健康保険料率・均等割額・賦課限度額",
+        "status": "unverified",
+        "reason": "料率は各市の各年度の告示（例年 3〜6 月ごろ）で決まるため、2026-09-14 時点では未公表。",
+        "impact": "2027年度以降の年次シミュレーションは2026年度の料率を据え置いて計算することになる。賦課限度額は国の政令改正でほぼ毎年引き上げられているため、将来年度は過小評価になりやすい。"
+      },
+      {
+        "key": "reductionScheduleFuture",
+        "description": "2027年度以降の7割・5割・2割軽減の判定式（被保険者数に乗じる31万円・57万円の額）",
+        "status": "unverified",
+        "reason": "国民健康保険法施行令の改正で毎年度見直されるため、2026年度分しか確認できない（2026年度は31万円／57万円で、前年度から引き上げられている）。",
+        "impact": "reduction.schedule は fiscalYear 2026 の1件のみ。将来年度は最新のエントリを流用する前提で domain 側を書く必要がある。"
+      },
+      {
+        "key": "nationalPension2028",
+        "description": "2028年度（令和10年度）以降の国民年金保険料の月額",
+        "status": "unverified",
+        "reason": "実際の保険料額は国民年金法第87条第3項により名目賃金の変動に応じて毎年度改定され、翌々年度分は公表されていない（令和8年1月23日の公表で令和9年度分まで）。",
+        "impact": "2028年度以降は18,290円を据え置くか、賃金上昇率で伸ばすかを domain 側の前提として決める必要がある。"
+      },
+      {
+        "key": "kawasakiMunicipalDeductionExcess",
+        "description": "川崎市独自の軽減措置で、16歳未満33万円・16歳以上19歳未満12万円の控除額が「最も賦課基準額が高い国保加入者」の賦課基準額を超えたとき、控除しきれない残額を次に賦課基準額が高い加入者へ回すのかどうか",
+        "status": "unverified",
+        "reason": "川崎市のページ（0000187756.html）を 2026-09-18 に curl で取得して全文を確認したが、記載は『(1)及び(2)については、同一世帯の国保加入者のうち「最も賦課基準額が高い国保加入者」から…控除します』だけで、控除額がその加入者の賦課基準額を超えた場合の扱い（超過分の切捨てか、次の加入者への繰越か）に触れていない。条例・施行規則までは追っていない。",
+        "impact": "子が2人以上いて世帯の所得が低い年（控除額の合計66万円超に対し最高額の加入者の賦課基準額がそれ未満）に、この市の所得割額が過小評価または過大評価になる。domain 側では「その加入者の賦課基準額を限度として切捨て（繰越なし）」を暫定の前提に置き、この項目が確定するまで excessCarriesToNextMember は持たせない。"
+      },
+      {
+        "key": "capRoundingAndOrder",
+        "description": "賦課限度額の適用順（軽減適用後に限度額を判定するのか、限度額適用後に軽減するのか）と、保険料の端数処理（100円未満の扱い）の詳細",
+        "status": "unverified",
+        "reason": "収録した市のページに『未就学児の均等割額が減額されてもなお世帯の年間保険料額が最高限度額に達するときは、最高限度額が保険料額となります』との記載がある（軽減の後に限度額）。区分ごとの端数処理は政令に無く市の条例で決まる。2026-11-20 に 01100・40130 の条例を確かめて各行の rounding に入れた。14130・14100・27100・28100・26100 は条例まで下りていない。",
+        "impact": "rounding の無い市は円単位の四捨五入で概算する。年額で数百円程度の誤差（区分ごとの 10 円・100 円未満の切り捨てが無いぶん、わずかに高く出やすい）。年次モデルの粒度では影響は小さい。"
+      },
+      {
+        "key": "kobeTransitionalMitigation",
+        "description": "28100 の独自控除の見直しに伴う緩和措置（旧独自控除で算定した保険料との差額の 67%〔2026 年度〕を引く）を計算に入れる方法",
+        "status": "unverified",
+        "reason": "旧控除をどの加入者の所得から引くか（世帯主か、所得の最も高い加入者か）、子の所得の条件があるかが市のページ・運営協議会の資料に無い（2026-11-20）。控除の形でもないため今の型に入らない。",
+        "impact": "18 歳以下の子・障害者・ひとり親のいる世帯は保険料が実際より高めに出る（安全な側）。緩和は 2030 年度に 0 になる。",
+        "howToResolve": "市の国保条例の附則（緩和措置の規定）を例規集で読む。組み込むなら『差額×割合』を返す別の型が要る（TODO.md の「公開後」）。"
+      },
+      {
+        "key": "fukuokaMultiChildReduction",
+        "description": "40130 の多子世帯の均等割の減免（中学生以下の第2子は半額・第3子以降は全額）の区分ごとの掛かり方と数え方",
+        "status": "unverified",
+        "reason": "4 区分のどの均等割に掛かるか、7・5・2 割・未就学児・18 歳未満の軽減との重なり方、『第2子』の数え方がページに無い（2026-11-20）。今の型（所得割の控除）に入らない。",
+        "impact": "中学生以下の子が 2 人以上いる世帯の保険料が高めに出る（安全な側）。",
+        "howToResolve": "市の減免取扱要綱を入手するか区役所に問い合わせる。入れるなら均等割の減免を表す項目を型に足す（TODO.md の「公開後」）。"
+      },
+      {
+        "key": "kyotoOrdinance",
+        "description": "26100 の国保条例の本文で、独自の所得割控除が無いこと",
+        "status": "unverified",
+        "reason": "市の減額制度の一覧（351040）に独自の所得割控除は無いが、条例の本文は読んでいない（2026-11-20）。",
+        "impact": "一覧に無い控除があれば、子のいる世帯などで保険料が高めに出る（安全な側）。"
+      },
+      {
+        "key": "addedMunicipalityNotices",
+        "description": "2026-11-20 に足した市の料率の告示・条例の原文",
+        "status": "unverified",
+        "reason": "27100・01100・40130・28100 は市の案内ページ（と府の算定結果・加入者のてびき・運営協議会の資料）で値の一致を確かめ、告示の原文までは見ていない。26100 は告示（市公報）で確かめた。40130 は運営協議会の資料のモデル保険料 2 件を料率から再計算して一致する。",
+        "impact": "案内ページは市の公式サイトなので一次ソースとしては足りる。値の差は想定していない。"
+      },
+      {
+        "key": "fiscalYear2027UnifiedRates",
+        "description": "都道府県内の保険料の統一の進み（01100・28100 は 2027 年度以降に料率が変わる見込み。27100 は府内統一済み）",
+        "status": "unverified",
+        "reason": "北海道は令和12年度から全道統一保険料率、兵庫県は 2027 年度から県内統一の標準保険料率（2030 年度に完全統一）の予定と市が公表している（2026-11-20）。将来の料率は未公表。",
+        "impact": "2027 年度以降は 2026 年度の料率を延ばす前提（fiscalYear2027Rates と同じ）。"
+      }
+    ]
+  }
+}

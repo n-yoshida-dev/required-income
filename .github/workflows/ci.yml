@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# 同じブランチで新しい push があったら、走っている古いジョブを止める
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: frontend (lint / typecheck / test / build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          # ローカルの .nvmrc と同じ版を使う（Vitest 4 は Node 22 以上が要る）
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 依存をインストール
+        run: npm ci
+
+      - name: フォーマット崩れがないか
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: 型チェック
+        run: npm run typecheck
+
+      - name: 単体テスト
+        run: npm run test
+
+      - name: ビルド
+        run: npm run build
+
+  e2e:
+    name: e2e (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 依存をインストール
+        run: npm ci
+
+      - name: ブラウザ（Chromium）を入れる
+        run: npx playwright install --with-deps chromium
+
+      - name: ビルド
+        run: npm run build
+
+      # ビルド済みを `vite preview` で出して通す（playwright.config.ts の webServer）
+      - name: 通しテスト
+        run: npm run e2e
+
+      - name: 落ちたときだけレポートを上げる
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 7
+
+  no-private-data:
+    name: 実データが混入していないか
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 追跡対象に個人データが含まれていないことを確認
+        run: |
+          # .gitignore は git add -f で貫通できるため、CI でも独立して検査する
+          HITS=$(git ls-files | grep -E '(^|/)(PRIVATE\.md|CLAUDE\.local\.md|\.env(\..+)?)$|\.local\.(json|md)$|(^|/)data/private/' || true)
+          if [ -n "$HITS" ]; then
+            echo "::error::個人データがリポジトリに含まれています"
+            echo "$HITS"
+            exit 1
+          fi
+          echo "個人データの混入なし"

@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "name": "アプリの既定値（仮置きの値）",
+    "source": "SPEC.md §6・§8（制度の数値ではない。Claude が置いた値で、★ は画面ができたら本人に見せる）",
+    "sourceName": "life-plan-simulator SPEC 第 2 版",
+    "checkedAt": "2026-11-18",
+    "effectiveFrom": "2026-11",
+    "note": "公的な出典を持たないアプリの既定値。各項目の basis に根拠を 1 行で書く。見本の世帯は sample-household.json。前提の住宅ローン金利はここに持たず、data/housing/flat35-rate.json の最頻金利を data/appData.ts が既定値にする（毎月変わる値を二重に持たない）。大学資金の目標額は data/education/university-cost.json から組み立て、ここには学部のキーだけを置く。子の費用の統計（学校・習い事）と制度（保育の無償化・就学支援金）の数値はここに写さず、data/education・data/childcare・data/benefit の JSON から取る"
+  },
+  "values": {
+    "adult": {
+      "raiseRate": {
+        "value": 0,
+        "basis": "見込みを入れるまでは今の年収のまま、とする。上がる前提を勝手に置かない"
+      },
+      "sideMonthlyProfit": {
+        "value": 0,
+        "basis": "SPEC §2 の既定 0（副業なし）"
+      },
+      "retirementAge": {
+        "value": 65,
+        "basis": "★ SPEC §2・§8 の 3 の既定 65。制度の値ではなく、本人が直す前の目安"
+      }
+    },
+    "assumptions": {
+      "investmentReturnRate": {
+        "value": 0.03,
+        "basis": "★ 長期の積立で控えめに置かれることの多い値。「見直す」で動かせる（SPEC §3.7）"
+      },
+      "inflationRate": {
+        "value": 0,
+        "basis": "★ SPEC §8 の 1・§3.4。年収の目標を今の物価で読めるようにする"
+      }
+    },
+    "steps": {
+      "changeRatio": {
+        "value": 0.03,
+        "basis": "★ SPEC §3.5・§8 の 2。給与明細で気づく程度の変化だけを段にする。金額の条件と両方を超えたとき新しい段"
+      },
+      "changeYen": {
+        "value": 120000,
+        "basis": "★ SPEC §3.5・§8 の 2。月 1 万円ぶん。割合の条件と両方を超えたとき新しい段"
+      },
+      "maxCauses": {
+        "value": 3,
+        "basis": "SPEC §3.5 の 3。段の理由は金額の大きい順に 3 つまで"
+      }
+    },
+    "taxBridge": {
+      "bonusShare": {
+        "value": 0,
+        "basis": "年収は賞与込みの 1 つの数字で聞く（SPEC §2）。聞いていない賞与の割合を置かず、全額を月給として社会保険料を出す。向き：月給が標準報酬月額の上限を超える人は保険料が頭打ちになるので、賞与がある場合より要る年収が低く出る側"
+      },
+      "bonusPaymentCount": {
+        "value": 2,
+        "basis": "賞与の割合が 0 のあいだは使わない。割合を入れたときに年 2 回の支給とみなす"
+      },
+      "selfEmployedFilingType": {
+        "value": "white",
+        "basis": "自営業の申告方式は聞いていないので、青色申告特別控除を見込まない控えめな置き方にする（要る年収が低く出ない側）"
+      },
+      "lifeExpectancy": {
+        "value": 100,
+        "basis": "税の計算が「その年に生きているか」を見るためだけの値。階段は退職の前年で切れるので、それより長ければ答えは変わらない"
+      }
+    },
+    "search": {
+      "sideMonthlyStep": {
+        "value": 1000,
+        "basis": "副業の月額を 1,000 円刻みで探す。本業の年額の刻み（1 万円。tax/requiredGross.ts の既定）と同じくらいの細かさ"
+      }
+    },
+    "notices": {
+      "onceSoonMonths": {
+        "value": 12,
+        "basis": "SPEC §3.7・§3.9。使う月まで 12 か月を切った一度きりの出費を知らせる"
+      }
+    },
+    "home": {
+      "closingCostRate": {
+        "value": 0.06,
+        "basis": "★ SPEC §3.2・§8 の 5。家の諸費用（登記・ローンの手数料と保証料・仲介手数料など）を価格の 6% とする。新築で 3〜7%、中古で 6〜10% と言われることの多い幅の間を取った目安で、本人が直す前提"
+      },
+      "loanToIncomeLimit": {
+        "value": 7,
+        "basis": "★ SPEC §3.7・§8 の 6。借りる額が買う年の見込みの世帯年収の 7 倍を超えたら知らせる。金融機関の審査で借りられる上限としてよく言われる「年収の 7 倍前後」に合わせた目安で、超えても計算は止めない"
+      }
+    },
+    "car": {
+      "resaleRate": {
+        "value": 0.25,
+        "basis": "★ SPEC §3.2・§8 の 5。車を買い替えるときの下取りの額を価格の 25% とする。7 年ほど乗った車の下取りは新車の価格の 2〜3 割と言われることの多い幅の間を取った Claude の目安（公的な統計ではない）。次の車の積立は 価格 × 75% ÷ 買い替えまでの月数になる"
+      },
+      "loanRate": {
+        "value": 0.03,
+        "basis": "★ SPEC §3.2・§8 の 13。車のローンの金利（年）を 3% とする。銀行のマイカーローンが年 2〜4% 台、販売店のローンがそれより高いと言われることの多い中で、銀行の側に寄せた Claude の目安（公的な統計ではない）。住宅ローンの金利（フラット35）は流用しない"
+      }
+    },
+    "templates": {
+      "adult": {
+        "value": { "ageAtBase": 35, "workStyle": "notWorking", "annualIncome": 0 },
+        "basis": "★ もう 1 人を足したとき。働いていない・年収 0 から始め、本人が直す。収入を勝手に置かない"
+      },
+      "child": {
+        "value": { "ageAtBase": 0 },
+        "basis": "★ 子を足したとき。今月生まれとして入り、本人が生まれ年月を直す"
+      },
+      "customMonthly": {
+        "value": {
+          "expenseName": "毎月の支出",
+          "incomeName": "毎月の収入",
+          "amount": 10000,
+          "years": 10
+        },
+        "basis": "★ 自由入力の毎月の雛形。月 1 万円・今月から 10 年後の 1 月の前まで。金額と期間は本人が直す前提の目安"
+      },
+      "customOnce": {
+        "value": { "name": "一度きりの支出", "amount": 500000, "atYearsLater": 3 },
+        "basis": "★ 自由入力の一度きりの雛形。3 年後の 1 月に 50 万円。金額と時期は本人が直す前提の目安"
+      },
+      "home": {
+        "value": {
+          "purchaseYearsLater": 5,
+          "price": 40000000,
+          "downPayment": 4000000,
+          "loanYears": 35,
+          "monthlyUpkeep": 30000
+        },
+        "basis": "★ SPEC §2.1・§8 の 5・12。家のカードの雛形。5 年後に 4,000 万円、頭金は価格の 1 割（前提の金利がフラット35 の「借入が価格の 9 割以下」の値なので揃えた）、ローン 35 年（SPEC §2.1 の既定）、毎月の維持費（修繕の積立・管理費・固定資産税・保険を月にならした額）3 万円。どれも本人が直す前提の目安"
+      },
+      "car": {
+        "value": {
+          "purchaseYearsLater": 3,
+          "price": 3000000,
+          "monthlyUpkeep": 20000,
+          "replaceEveryYears": 7,
+          "loanYears": 5
+        },
+        "basis": "★ SPEC §2.1・§8 の 5・12。車のカードの雛形。3 年後に 300 万円を現金で（SPEC §2.1 の既定）、毎月の維持費（税・保険・車検・燃料を月にならした額。駐車場代は住まいで大きく違うので入れていない）2 万円、7 年ごとに買い替える（SPEC §2.1 の既定）。ローンに替えたときの年数は 5 年。どれも本人が直す前提の目安"
+      },
+      "childCost": {
+        "value": {
+          "schools": { "elementary": "public", "juniorHigh": "public", "highSchool": "public" },
+          "lessonsMonthly": null,
+          "childcareMonthly": null,
+          "cramSchool": { "fromGrade": 10, "toGrade": 12, "monthly": 20000 }
+        },
+        "basis": "子の費用のカードの雛形。進路はすべて公立、塾なし、習い事は null（統計の平均を data/education/school-cost.json から使う）、保育は null（保育園に通わない）は SPEC §2.1 の既定。塾の行を足すときの雛形（高 1〜高 3 に月 2 万円）は ★ SPEC §8 の 14。本人が直す前提の目安で、統計の値ではない"
+      },
+      "university": {
+        "value": {
+          "course": "privateScience",
+          "allocateChildAllowance": true,
+          "vehicle": "childNisa",
+          "targetRoundTo": 10000
+        },
+        "basis": "大学資金のカードの雛形。児童手当を回す・子の名義の NISA は SPEC §2.1 の既定。進路は選べ（私立理系・私立文系・国立）、選んだ進路の 4 年ぶん（初年度の納付金 ＋ 2 年目からの年額 × 3）を data/education/university-cost.json から組み立てて目標額にする（数値をここに写さない）。targetRoundTo（1 万円）単位に四捨五入して入れる（入れる欄は万円なので、小数の付いた額で入らないように）。既定の進路を重い方（私立理系）に倒すのは本人の決定（D37）。額を表から出すこと（600 万円ちょうどにしない）と国立を選択肢に入れることは Claude の判断で、本人は未確認。自宅外の仕送りは入れない。貯まっている額は 0 で入る"
+      },
+      "retirement": {
+        "value": { "targetAmount": 20000000, "vehicle": "nisa" },
+        "basis": "★ SPEC §8 の 4。老後資金のカードの雛形。目標額 2,000 万円は、よく引かれる目安として置いた、Claude の仮の値。公的な出典で確かめていない。世帯ごとに大きく違うので、本人が直す前提。期限は年上の大人が退職する年（SPEC §2.1）、置き場は NISA（SPEC §2.1）。貯まっている額は 0 で入る"
+      }
+    }
+  }
+}

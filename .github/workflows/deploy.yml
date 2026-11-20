@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages
+
+# frontend/ をビルドして GitHub Pages に出す。
+# Private のリポジトリでは、ジョブごと skip になる（Pages を有効にしていないので、動くと失敗するため）。
+# Public のリポジトリで Settings → Pages の Source を「GitHub Actions」にしてあれば、
+# main への push か Actions の画面の「Run workflow」で動く。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 出すのに要る権限だけ
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 出す作業は 1 つずつ。途中の出す作業は止めず、後から来た物を待たせる（公式の例と同じ）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build
+    # Private のリポジトリでは動かさない。workflow_dispatch の payload にも repository があり、private が取れる
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          # ローカルの .nvmrc と同じ版を使う（ci.yml と同じ書き方）
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 依存をインストール
+        run: npm ci
+
+      # vite.config.ts の base が './' なので、サブパス（/required-income/）の下でもそのまま開ける
+      - name: ビルド
+        run: npm run build
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: frontend/dist
+
+  deploy:
+    name: deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Pages に出す
+        id: deployment
+        uses: actions/deploy-pages@v5

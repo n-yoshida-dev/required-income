@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "name": "見本の世帯（はじめて開いたときに入っている架空の世帯）",
+    "source": "SPEC.md §4.1・§6・§8 の 8（制度の数値ではない。Claude が置いた架空の世帯で、画面ができたら本人に見せる）",
+    "sourceName": "life-plan-simulator SPEC 第 2 版",
+    "checkedAt": "2026-11-17",
+    "effectiveFrom": "2026-11",
+    "note": "すべて架空のダミー値（.claude/rules/dummy-values.md）。年月は起点からの相対（ageAtBase は起点の年で何歳、*YearsLater は起点の年から何年後の 1 月）で持ち、いつ開いても同じ形の階段が出る。種類のカードができるまでは、自由入力のカード（名前が「見本：」で始まる）で階段を作る。家のカード（homeGoals。purchaseYearsLater 年後の 1 月に買う）は T7 で自由入力の「見本：住み替えの上乗せ」と置き換えた。家の金額も架空の値。車のカード（carGoals。payment は cash か loan）は T8 で自由入力の「見本：車の費用」と置き換えた。車の金額も架空の値。子の費用のカード（childCostGoals。子ごとに 1 枚。塾の学年は小 1 = 1 〜 高 3 = 12）は T9 で自由入力の「見本：子の教育費」と置き換えた。塾・習い事の金額も架空の値（学校の費用と就学支援金は制度・統計の JSON から出る）。大学資金・老後資金のカードは T10 で足す"
+  },
+  "values": {
+    "basis": "★ SPEC §8 の 8。架空の共働き世帯（大人 2・子 2）。世帯年収 900 万円と、車・家を買う年で段が上がる形は PLAN.md の見本に合わせた",
+    "adults": [
+      { "id": "adult-1", "ageAtBase": 46, "workStyle": "employee", "annualIncome": 5300000 },
+      { "id": "adult-2", "ageAtBase": 44, "workStyle": "employee", "annualIncome": 3700000 }
+    ],
+    "children": [
+      { "id": "child-1", "ageAtBase": 16, "birthMonth": 6 },
+      { "id": "child-2", "ageAtBase": 14, "birthMonth": 11 }
+    ],
+    "municipality": "99001",
+    "living": { "monthlyLivingCost": 260000, "monthlyRent": 95000 },
+    "customGoals": [
+      {
+        "id": "goal-pet",
+        "name": "見本：ペットの費用",
+        "direction": "expense",
+        "amountType": "monthly",
+        "amount": 7500,
+        "fromYearsLater": 0,
+        "toYearsLater": 12
+      },
+      {
+        "id": "goal-trip",
+        "name": "見本：家族旅行",
+        "direction": "expense",
+        "amountType": "once",
+        "amount": 186000,
+        "atYearsLater": 3,
+        "saved": 0
+      }
+    ],
+    "homeGoals": [
+      {
+        "id": "goal-home",
+        "purchaseYearsLater": 6,
+        "price": 48600000,
+        "downPayment": 3900000,
+        "loanYears": 35,
+        "monthlyUpkeep": 27300,
+        "saved": 6320000
+      }
+    ],
+    "carGoals": [
+      {
+        "id": "goal-car",
+        "purchaseYearsLater": 3,
+        "price": 2860000,
+        "payment": "loan",
+        "loanYears": 6,
+        "monthlyUpkeep": 21400,
+        "replaceEveryYears": 7,
+        "saved": 0
+      }
+    ],
+    "childCostGoals": [
+      {
+        "id": "goal-child-1",
+        "childId": "child-1",
+        "schools": { "elementary": "public", "juniorHigh": "public", "highSchool": "public" },
+        "cramSchools": [{ "fromGrade": 10, "toGrade": 12, "monthly": 33800 }],
+        "lessonsMonthly": null,
+        "childcareMonthly": null
+      },
+      {
+        "id": "goal-child-2",
+        "childId": "child-2",
+        "schools": { "elementary": "public", "juniorHigh": "public", "highSchool": "public" },
+        "cramSchools": [
+          { "fromGrade": 7, "toGrade": 9, "monthly": 27300 },
+          { "fromGrade": 10, "toGrade": 12, "monthly": 24900 }
+        ],
+        "lessonsMonthly": 8600,
+        "childcareMonthly": null
+      }
+    ],
+    "universityGoals": [
+      {
+        "id": "goal-university-2",
+        "childId": "child-2",
+        "targetAmount": 4180000,
+        "allocateChildAllowance": true,
+        "vehicle": "childNisa",
+        "saved": 2460000
+      }
+    ],
+    "retirementGoals": [
+      {
+        "id": "goal-retirement",
+        "targetAmount": 26400000,
+        "byYearsLater": 19,
+        "vehicle": "nisa",
+        "saved": 3460000
+      }
+    ]
+  }
+}

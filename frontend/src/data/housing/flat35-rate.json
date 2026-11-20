@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "name": "住宅ローン金利の目安（【フラット３５】買取型の借入金利）",
+    "source": "https://www.simulation.jhf.go.jp/flat35/kinri/index.php/rates/top",
+    "sourceName": "住宅金融支援機構 最新の金利情報：長期固定住宅ローン【フラット３５】",
+    "checkedAt": "2026-11-17",
+    "effectiveFrom": "2026-11",
+    "note": "ページの表「新機構団信付きの【フラット３５】等の借入金利水準（2026年11月） <取扱金融機関が提供する金利の範囲と最も多い金利>」から転記（2026-11-17 に curl で生の HTML を取得して確認）。https://www.flat35.com/kinri/index.php/rates/top はこの URL へ 301 で移る。「2026年11月 資金受取分」の金利で、毎月第1営業日の正午ごろに更新される。ページ注5に「【フラット３５（保証型）】は含みません」とあり、買取型の値。注6のとおり取扱金融機関の報告に基づく集計で、各金融機関が決める金利。金利は割合の小数（0.0381 = 年3.810％）。直近12か月の最頻金利の推移は、公式の「【フラット３５】借入金利の推移」（https://www.flat35.com/kinri/kinri_suii.html 、令和5年4月以降の PDF https://www.flat35.com/files/topics/6008_ext_99_0.pdf ）が最低〜最高のグラフだけで数値の表を持たず、最頻金利も載っていないため、持たせていない。"
+  },
+  "values": {
+    "flat35": {
+      "status": "verified",
+      "conditions": {
+        "product": "【フラット３５】（買取型）",
+        "rateType": "全期間固定",
+        "loanTermYears": { "min": 21, "max": 35 },
+        "loanToValue": "9割以下",
+        "groupCreditLifeInsurance": "新機構団信付き"
+      },
+      "appliesTo": "2026-11",
+      "appliesToLabel": "2026年11月 資金受取分",
+      "mostCommonRate": 0.0381,
+      "rateRange": { "min": 0.0381, "max": 0.0573 }
+    },
+    "groupCreditLifeInsuranceAdjustment": {
+      "note": "ページ注2。加入する団信の種類で借入金利が変わる（掲載の金利への上乗せ）",
+      "duetPairAddRate": 0.0018,
+      "threeMajorDiseasesAddRate": 0.0024
+    },
+    "history": {
+      "status": "unverified",
+      "note": "公式の推移資料はグラフの PDF のみで、月別の最頻金利の数値が取れなかった。二次情報のサイトの値では埋めない。"
+    }
+  }
+}
