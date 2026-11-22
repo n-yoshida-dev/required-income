@@ -4,6 +4,7 @@ import {
   evaluatePlan,
   openAndEvaluate,
   openPlanSession,
+  returnToSample,
   startOwnPlan,
   todayYearMonth,
 } from '../../src/app/planSession'
@@ -15,15 +16,19 @@ import {
   PLAN_STORAGE_V2_KEY,
   savePlanV2,
   type PlanStorageV2,
+  type PlanStorageV2Remover,
 } from '../../src/storage/planStorageV2'
 
-/** テスト用の保存先 */
-function memoryStorage(initial: Record<string, string> = {}): PlanStorageV2 {
+/** テスト用の保存先（消す口も持つ。見本の世帯に戻すテストで使う） */
+function memoryStorage(initial: Record<string, string> = {}): PlanStorageV2 & PlanStorageV2Remover {
   const items = new Map(Object.entries(initial))
   return {
     getItem: (key) => items.get(key) ?? null,
     setItem: (key, value) => {
       items.set(key, value)
+    },
+    removeItem: (key) => {
+      items.delete(key)
     },
   }
 }
@@ -334,6 +339,50 @@ describe('startOwnPlan（T6）', () => {
     const sample = openPlanSession(memoryStorage(), today)
     const own = startOwnPlan({ ...sample, plan: { ...sample.plan, children: [] } })
     expect(own.plan.goals).toEqual([])
+  })
+})
+
+describe('returnToSample（T23）', () => {
+  /** 自分の計画を始めて直し、保存した端末を作る */
+  function storageWithOwnPlan() {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    const edited = { ...own.plan, living: { ...own.plan.living, monthlyRent: 70000 } }
+    const committed = commitPlan(edited, ['living.monthlyRent'], storage)
+    if (!committed.ok || !committed.saved) throw new Error('自分の計画を保存できなかった')
+    return storage
+  }
+
+  it('保存を消し、はじめて開いたときと同じ見本の世帯にして計算する', () => {
+    const storage = storageWithOwnPlan()
+    const returned = returnToSample(storage, today)
+    if (!returned.ok) throw new Error('見本に戻せなかった')
+
+    const fresh = openAndEvaluate(memoryStorage(), today)
+    expect(returned.session).toEqual(fresh.session)
+    expect(returned.result).toEqual(fresh.result)
+    expect(returned.session.origin).toBe('sample')
+    expect(returned.session.touched).toEqual([])
+    expect(returned.session.storageProblem).toBeNull()
+  })
+
+  it('開き直しても見本のまま（保存が残っていない）', () => {
+    const storage = storageWithOwnPlan()
+    returnToSample(storage, today)
+    expect(storage.getItem(PLAN_STORAGE_V2_KEY)).toBeNull()
+    expect(openPlanSession(storage, today).origin).toBe('sample')
+  })
+
+  it('保存を消せなければ見本にしない（ok: false。保存は残り、開き直すと自分の計画のまま）', () => {
+    const storage = storageWithOwnPlan()
+    const failing = {
+      ...storage,
+      removeItem: () => {
+        throw new Error('保存を禁じた設定')
+      },
+    }
+    expect(returnToSample(failing, today)).toEqual({ ok: false })
+    expect(openPlanSession(storage, today).origin).toBe('saved')
   })
 })
 

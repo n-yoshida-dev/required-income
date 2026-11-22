@@ -25,6 +25,9 @@ const FORMAT_VERSION = 2
 /** 保存先の最小限の契約。ブラウザの `localStorage` がこれを満たす */
 export type PlanStorageV2 = Pick<Storage, 'getItem' | 'setItem'>
 
+/** 保存を消すときに要る保存先の契約（見本の世帯に戻すとき。SPEC §4.2）。ブラウザの `localStorage` がこれを満たす */
+export type PlanStorageV2Remover = Pick<Storage, 'removeItem'>
+
 /** 保存する計画。起点の年月を除いた `LifePlan` */
 export type StoredPlan = Omit<LifePlan, 'baseYearMonth'>
 
@@ -202,6 +205,20 @@ export function savePlanV2(
     return true
   } catch (error) {
     console.error('計画をブラウザに保存できませんでした', error)
+    return false
+  }
+}
+
+/**
+ * 保存した計画を消す（見本の世帯に戻すとき）。このキーだけを消し、前の版の保存（`…v1`）には触らない（D35）。
+ * 保存先が投げて消せなければ false（呼び出し側が利用者に知らせる。`savePlanV2` と同じ返し方）
+ */
+export function clearPlanV2(storage: PlanStorageV2Remover): boolean {
+  try {
+    storage.removeItem(PLAN_STORAGE_V2_KEY)
+    return true
+  } catch (error) {
+    console.error('ブラウザに保存した計画を消せませんでした', error)
     return false
   }
 }

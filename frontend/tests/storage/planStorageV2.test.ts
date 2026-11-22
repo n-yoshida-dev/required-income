@@ -3,10 +3,12 @@ import { appDefaults, sampleHousehold } from '../../src/data/appData'
 import { sampleLifePlan } from '../../src/domain/plan/defaults'
 import { yearMonth } from '../../src/domain/plan/yearMonth'
 import {
+  clearPlanV2,
   loadPlanV2,
   PLAN_STORAGE_V2_KEY,
   savePlanV2,
   type PlanStorageV2,
+  type PlanStorageV2Remover,
 } from '../../src/storage/planStorageV2'
 
 /** テスト用の保存先。中身を覗けるように Map で持つ */
@@ -148,5 +150,47 @@ describe('savePlanV2・loadPlanV2', () => {
       setItem: () => {},
     }
     expect(loadPlanV2(storage).kind).toBe('broken')
+  })
+})
+
+describe('clearPlanV2（T23）', () => {
+  /** 消す口も持つテスト用の保存先 */
+  function removableStorage(initial: Record<string, string> = {}) {
+    const { storage, items } = memoryStorage(initial)
+    const remover: PlanStorageV2Remover = { removeItem: (key) => void items.delete(key) }
+    return { storage: { ...storage, ...remover }, items }
+  }
+
+  it('保存した計画を消し、消したあとは empty で読める', () => {
+    const { storage } = removableStorage()
+    savePlanV2(plan, ['living.monthlyRent'], storage)
+    expect(clearPlanV2(storage)).toBe(true)
+    expect(loadPlanV2(storage)).toEqual({ kind: 'empty' })
+  })
+
+  it('保存が無くても true（消す物が無いのは失敗ではない）', () => {
+    const { storage } = removableStorage()
+    expect(clearPlanV2(storage)).toBe(true)
+  })
+
+  it('前の版の保存（v1）とほかのキーには触らない（D35）', () => {
+    const { storage, items } = removableStorage({
+      'life-plan-simulator.plan.v1': '{"old":true}',
+      other: 'x',
+    })
+    savePlanV2(plan, [], storage)
+    clearPlanV2(storage)
+    expect(items.has(PLAN_STORAGE_V2_KEY)).toBe(false)
+    expect(items.get('life-plan-simulator.plan.v1')).toBe('{"old":true}')
+    expect(items.get('other')).toBe('x')
+  })
+
+  it('保存先が投げれば false（握りつぶさずに呼び出し側へ返す）', () => {
+    const storage: PlanStorageV2Remover = {
+      removeItem: () => {
+        throw new Error('保存を禁じた設定')
+      },
+    }
+    expect(clearPlanV2(storage)).toBe(false)
   })
 })

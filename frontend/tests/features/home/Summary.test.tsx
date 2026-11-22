@@ -2,7 +2,11 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import type { ComponentProps } from 'react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { StepOutlook } from '../../../src/domain/plan/stepReading'
+import {
+  enoughUntilYear,
+  stepOutlook,
+  type StepOutlook,
+} from '../../../src/domain/plan/stepReading'
 import type { Step } from '../../../src/domain/plan/types'
 import { Summary } from '../../../src/features/home/Summary'
 
@@ -85,6 +89,27 @@ describe('Summary（概要の枠）', () => {
     expect(visibleText(region().querySelector('.summary__sentence'))).toBe(
       'やりたいことを全部やるには、2030年から年収1,050万円が要りますあと3年2か月',
     )
+  })
+
+  it('見出しの文の前の部分と箇条書きの文は、決めた位置で改行せず、文節のかたまりの間にだけ折り返せる所を置く（T22）', () => {
+    renderSummary()
+    const sentence = region().querySelector('.summary__sentence')
+    // 前の部分は 1 つの流れ（行ごとの箱に分けない）。かたまりの間に <wbr> が 1 つ
+    expect(sentence?.querySelectorAll('.summary__lead')).toHaveLength(1)
+    expect(sentence?.querySelectorAll('.summary__line')).toHaveLength(0)
+    expect(sentence?.querySelector('.summary__lead')?.querySelectorAll('wbr')).toHaveLength(1)
+    // 金額と「が要ります」は同じ行の組に入れる
+    expect(sentence?.querySelector('.summary__claim')?.textContent).toBe('1,050万円が要ります')
+    // 1 つ目の箇条書きの 1 つ目の文：「今の年収 」「900万円より 」「150万円」「多い」「金額です。」の間に 4 つ
+    const firstSaid = region().querySelector('.summary__said')
+    expect(firstSaid?.querySelectorAll('wbr')).toHaveLength(4)
+  })
+
+  it('「2030年に変わること」の下の理由の行は、外の箇条書きの中の入れ子の箇条書き（T22）', () => {
+    renderSummary()
+    const nested = region().querySelector('.summary__points > li > ul.summary__causes')
+    expect(nested).not.toBeNull()
+    expect(nested?.querySelectorAll(':scope > li')).toHaveLength(1)
   })
 
   it('「年収」の注を 1 回だけ出す。「世帯年収」の字は出さない', () => {
@@ -217,5 +242,91 @@ describe('Summary（概要の枠）', () => {
     expect(region().textContent).toBe(
       '大人がみな退職の年齢を過ぎているので、要る年収を出す年がありません',
     )
+  })
+})
+
+/**
+ * 段の並びから、判定（`stepOutlook`・`enoughUntilYear`）を通して画面の文まで確かめる（PR #100 の受け入れレビューの指摘）。
+ * 判定の結果だけでなく、概要の箇条書きに出る文までを 1 本で見る
+ */
+describe('Summary（段の並びから概要の文まで通す。金額はダミー）', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
+  /** 段の並びを作る（終わりの年は次の段の前の年。最後は 2044 年まで） */
+  const stepsOf = (rows: [number, number | null, Step['causes']?][]): Step[] =>
+    rows.map(([fromYear, requiredGross, causes = []], index) =>
+      step({
+        fromYear,
+        toYear: (rows[index + 1]?.[0] ?? 2045) - 1,
+        peakYear: fromYear,
+        requiredGross,
+        causes,
+      }),
+    )
+
+  /** 画面（`HomePage`）と同じ手順で、次の段から判定して概要の枠を描く */
+  const renderFlow = (steps: Step[], nextFromYear: number) => {
+    const next = steps.find((s) => s.fromYear === nextFromYear) ?? null
+    render(
+      <Summary
+        step={next}
+        stepCount={steps.length}
+        currentGross={9000000}
+        base={base}
+        enoughUntil={enoughUntilYear(steps, next)}
+        outlook={stepOutlook(steps, next)}
+      />,
+    )
+  }
+
+  it('最後の段がいちばん高い段と同じ高さ：早い段を「いちばん高い」と言い、最後の段は「◯年からは ◯万円です」', () => {
+    renderFlow(
+      stepsOf([
+        [2026, 8520000],
+        [2029, 9310000],
+        [2032, 9870000],
+        [2035, 9140000],
+        [2038, 9870000],
+      ]),
+      2029,
+    )
+    expect(points()[0]).toBe(
+      '今の年収 900万円より 31万円多い金額です。2028年までは今の年収で足ります',
+    )
+    expect(points().at(-1)).toBe('いちばん高いのは 2032年からの 987万円。2038年からは 987万円です')
+  })
+
+  it('届かない段が 2 つ：早いほうを「いちばん高い」とし、どちらも「年収をいくら上げても届きません」', () => {
+    renderFlow(
+      stepsOf([
+        [2026, 8520000],
+        [2029, 9310000],
+        [2032, null],
+        [2036, null],
+      ]),
+      2029,
+    )
+    expect(points().at(-1)).toBe(
+      '2032年からは、年収をいくら上げても届きません。2036年からは、年収をいくら上げても届きません',
+    )
+  })
+
+  it('次の段が届かない段で、最後の段も届かない：見出しは「届かない」、流れは最後の段だけ', () => {
+    renderFlow(
+      stepsOf([
+        [2026, 8520000],
+        [2029, null],
+        [2033, 9640000],
+        [2037, null],
+      ]),
+      2029,
+    )
+    expect(visibleText(region().querySelector('.summary__sentence'))).toBe(
+      'やりたいことを全部やると、2029年からは、年収をいくら上げても届かないあと2年2か月',
+    )
+    expect(points()[0]).toBe('今の年収は 900万円です。2028年までは今の年収で足ります')
+    expect(points().at(-1)).toBe('2037年からは、年収をいくら上げても届きません')
   })
 })

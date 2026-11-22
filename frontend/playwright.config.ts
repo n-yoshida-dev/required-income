@@ -29,7 +29,14 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  // 同じ通しテストを、スマホの幅（既定の 390×844）と PC の幅（1280px）の 2 つで回す。CI の `npm run e2e` がそのまま両方を回す
+  projects: [
+    { name: 'chromium', use: { browserName: 'chromium' } },
+    {
+      name: 'chromium-desktop',
+      use: { browserName: 'chromium', viewport: { width: 1280, height: 800 } },
+    },
+  ],
   webServer: {
     command: isCI ? preview : `npm run build && ${preview}`,
     url: BASE_URL,

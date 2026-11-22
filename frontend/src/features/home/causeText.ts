@@ -48,9 +48,25 @@ export function causeSubject(cause: Pick<StepCause, 'label' | 'change' | 'monthl
   return money ? cause.label : `${cause.label}の費用`
 }
 
+/**
+ * 理由 1 つの言い回しを、文節のかたまりの並びで返す（「学校（1人目）の」「費用が」「終わる」。T22）。
+ * 画面はかたまりの間だけで折り返す（概要の箇条書きの文と同じ作り）。帯の名前は利用者が付けることもあるので、名前の中では切らない。
+ * 添える言葉（「の費用」「の受け取り」）は `causeSubject` と同じ決まりで付ける
+ */
+export function causePhraseChunks(
+  cause: Pick<StepCause, 'label' | 'change' | 'monthlyDelta'>,
+): string[] {
+  const verb = CHANGE_WORDS[cause.change]
+  const subject = causeSubject(cause)
+  if (subject === cause.label) return [`${cause.label}が`, verb]
+  // 名前のあとに添えた言葉（「費用」「受け取り」）を、名前と分けたかたまりにする
+  const added = subject.slice(cause.label.length + 'の'.length)
+  return [`${cause.label}の`, `${added}が`, verb]
+}
+
 /** 理由 1 つの言い回し（「車のローンの返済が始まる」「学校（1人目）の費用が終わる」）。月額は画面が横に添える */
 export function causePhrase(cause: Pick<StepCause, 'label' | 'change' | 'monthlyDelta'>): string {
-  return `${causeSubject(cause)}が${CHANGE_WORDS[cause.change]}`
+  return causePhraseChunks(cause).join('')
 }
 
 /** 次の段の理由の見出し（「2029年に変わること」） */

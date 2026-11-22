@@ -27,17 +27,19 @@ export const REQUIRED_VERB = 'が要ります'
 export const UNREACHABLE_WORD = '届かない'
 
 /**
- * いちばん上の文の、金額の前の行（行ごとに折り返す）。
- * 届く段：「やりたいことを全部やるには、」「2029年から年収」。解けない段：「やりたいことを全部やると、」「2029年からは、年収をいくら上げても」
+ * いちばん上の文の、金額の前の部分（文節のかたまりの並び。`Sentence` と同じく、画面は入りきる幅では 1 行で出し、
+ * 入りきらないときだけかたまりの間で折り返す。T22）。
+ * 届く段：「やりたいことを全部やるには、」「2029年から年収」。解けない段：「やりたいことを全部やると、」「2029年からは、」「年収をいくら上げても」
  */
 export function requiredLead(fromYear: Year, reachable: boolean): string[] {
   return reachable
     ? ['やりたいことを全部やるには、', `${fromYear}年から年収`]
-    : ['やりたいことを全部やると、', `${fromYear}年からは、年収をいくら上げても`]
+    : ['やりたいことを全部やると、', `${fromYear}年からは、`, '年収をいくら上げても']
 }
 
 /**
- * 箇条書きの文 1 つ。文節のかたまりの並びで、画面はかたまりの中では折り返さない（「多い／金額です」と割らない）。
+ * 箇条書きの文 1 つ。文節のかたまりの並びで、画面はかたまりの間だけで折り返す（かたまりの中では割らない。
+ * 数字と単位「48万円」は同じかたまりに入れる）。入りきる幅では 1 行に詰めて出す（T22）。
  * かたまりの終わりの空白は、次のかたまりとの間の空白（行の頭に来たら消える）。つなぐと文になる
  */
 export type Sentence = readonly string[]
@@ -66,15 +68,15 @@ export function sentenceText(said: readonly Sentence[]): string {
  */
 export function gapText(current: Yen, required: Yen | null): Sentence {
   const now = manNumber(current)
-  if (required === null) return [`今の年収は ${now}万円です`]
+  if (required === null) return ['今の年収は ', `${now}万円です`]
   const gap = required - current
-  if (gap <= 0) return [`今の年収 ${now}万円と`, 'ほぼ同じ金額です']
-  return [`今の年収 ${now}万円より `, `${manNumber(gap)}万円多い金額です`]
+  if (gap <= 0) return ['今の年収 ', `${now}万円と`, 'ほぼ同じ', '金額です']
+  return ['今の年収 ', `${now}万円より `, `${manNumber(gap)}万円`, '多い', '金額です']
 }
 
 /** 概要の 1 つ目の箇条書きの後半（「2028年までは今の年収で足ります」）。次の段の前の年 */
 export function enoughUntilText(year: Year): Sentence {
-  return [`${year}年までは`, '今の年収で足ります']
+  return [`${year}年までは`, '今の年収で', '足ります']
 }
 
 /**
@@ -94,13 +96,13 @@ function amountOf(gross: Yen): string {
 /** 最後の段の文（「2035年からは、」「車のローンの返済が」「終わるので 」「938万円に下がります」） */
 function lastSentence(last: NonNullable<StepOutlook['last']>): Sentence {
   const from = `${last.fromYear}年からは`
-  if (last.requiredGross === null) return [`${from}、`, '年収をいくら上げても', '届きません']
+  if (last.requiredGross === null) return [`${from}、`, '年収を', 'いくら上げても', '届きません']
   const amount = amountOf(last.requiredGross)
   if (last.fall === null) return [`${from} `, `${amount}です`]
   const reason = fallReason(last.fall)
-  if (reason === null) return [`${from} `, `${amount}に下がります`]
+  if (reason === null) return [`${from} `, `${amount}に`, '下がります']
   const [subject, verb] = reason
-  return [`${from}、`, subject, `${verb} `, `${amount}に下がります`]
+  return [`${from}、`, subject, `${verb} `, `${amount}に`, '下がります']
 }
 
 /**
@@ -115,14 +117,14 @@ export function outlookText(outlook: StepOutlook | null): Sentence[] | null {
   const parts: Sentence[] = []
   if (peak !== null) {
     if (peak.requiredGross === null) {
-      parts.push([`${peak.fromYear}年からは、`, '年収をいくら上げても', '届きません'])
+      parts.push([`${peak.fromYear}年からは、`, '年収を', 'いくら上げても', '届きません'])
     } else {
-      // 年と金額は 1 つのかたまり（幅 375px で「998万円。」だけが次の行に落ちないように）
-      const when = `${peak.fromYear}年からの ${amountOf(peak.requiredGross)}`
+      const from = `${peak.fromYear}年からの `
+      const amount = amountOf(peak.requiredGross)
       parts.push(
         peakIsLast
-          ? ['いちばん高いのは ', `${when}で、`, `${peak.toYear}年まで続きます`]
-          : ['いちばん高いのは ', when],
+          ? ['いちばん', '高いのは ', from, `${amount}で、`, `${peak.toYear}年まで`, '続きます']
+          : ['いちばん', '高いのは ', from, amount],
       )
     }
   }

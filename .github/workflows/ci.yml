@@ -89,6 +89,23 @@ jobs:
             frontend/test-results/
           retention-days: 7
 
+  scripts:
+    name: scripts (node --test)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
+      # 公開の側へ写す道具と、実データの数値の集め方のテスト（Node の標準のテスト。依存は無い）。
+      # この ci.yml は公開の側にも写るが、公開の側には scripts/ が無いので、手順ごと飛ぶ
+      - name: 単体テスト
+        if: ${{ hashFiles('scripts/tests/*.test.mjs') != '' }}
+        run: node --test "scripts/tests/*.test.mjs"
+
   no-private-data:
     name: 実データが混入していないか
     runs-on: ubuntu-latest

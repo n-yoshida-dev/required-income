@@ -203,6 +203,47 @@ describe('stepOutlook（次の段より先の流れ：いちばん高い段と�
     expect(stepOutlook(peakUnsolved, { fromYear: 2026 })?.peak?.requiredGross).toBeNull()
   })
 
+  it('最後の段がいちばん高い段と同じ高さなら、早い段をいちばん高いとし、最後の段も別に出す（前の段より上がるので fall は null）', () => {
+    const steps = flow([
+      [2026, 8520000],
+      [2029, 9310000],
+      [2032, 9870000, [cause('返済', 176000, 'start')]],
+      [2035, 9140000, [cause('車の返済', -41000, 'end')]],
+      [2038, 9870000, [cause('介護', 52000, 'start')]],
+    ])
+    expect(stepOutlook(steps, { fromYear: 2029 })).toEqual({
+      peak: { fromYear: 2032, toYear: 2034, requiredGross: 9870000 },
+      peakIsLast: false,
+      last: { fromYear: 2038, toYear: 2044, requiredGross: 9870000, fall: null },
+    })
+  })
+
+  it('届かない段（null）が 2 つあれば、早いほうをいちばん高いとし、遅いほうを最後の段として出す（届かない段どうしは下がらない）', () => {
+    const steps = flow([
+      [2026, 8520000],
+      [2029, 9310000],
+      [2032, null, [cause('返済', 176000, 'start')]],
+      [2036, null, [cause('介護', 52000, 'start')]],
+    ])
+    expect(stepOutlook(steps, { fromYear: 2029 })).toEqual({
+      peak: { fromYear: 2032, toYear: 2035, requiredGross: null },
+      peakIsLast: false,
+      last: { fromYear: 2036, toYear: 2044, requiredGross: null, fall: null },
+    })
+    // 次の段が届かない段なら、次の段がいちばん高い（peak は null）。最後の届かない段だけを出す
+    const nextUnsolved = flow([
+      [2026, 8520000],
+      [2029, null],
+      [2033, 9640000, [cause('塾', -23000, 'end')]],
+      [2037, null, [cause('介護', 52000, 'start')]],
+    ])
+    expect(stepOutlook(nextUnsolved, { fromYear: 2029 })).toEqual({
+      peak: null,
+      peakIsLast: false,
+      last: { fromYear: 2037, toYear: 2044, requiredGross: null, fall: null },
+    })
+  })
+
   it('次の段が無い・次の段が最後の段・見つからないときは null（箇条書きを出さない）', () => {
     const steps = flow([
       [2026, 9000000],

@@ -20,6 +20,7 @@ import {
   type AdoptResult,
   commitPlan,
   openAndEvaluate,
+  returnToSample,
   startOwnPlan,
   todayYearMonth,
   type EvaluationResult,
@@ -119,6 +120,23 @@ export function AppRouter() {
     edit(own.plan, own.touched, own)
   }
 
+  /**
+   * 自分の計画の保存を消して、はじめて開いたときと同じ見本の世帯に戻す（SPEC §4.2「見本の世帯に戻す」）。
+   * 保存を消せなかったら何も変えずに false を返す（「計画」が知らせる）
+   */
+  const backToSample = (): boolean => {
+    const returned = returnToSample(storage, todayYearMonth(new Date()))
+    if (!returned.ok) return false
+    setState({
+      session: returned.session,
+      result: returned.result,
+      draft: { plan: returned.session.plan, touched: returned.session.touched },
+      commitError: null,
+      saveFailed: false,
+    })
+    return true
+  }
+
   const issues = planIssues(state.draft.plan)
 
   return (
@@ -148,6 +166,7 @@ export function AppRouter() {
                   saveFailed={state.saveFailed}
                   onEdit={(plan, touched) => edit(plan, touched)}
                   onStartOwn={startOwn}
+                  onBackToSample={backToSample}
                 />
               }
             />

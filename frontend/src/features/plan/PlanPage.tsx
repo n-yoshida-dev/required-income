@@ -3,15 +3,17 @@
  *
  * 計画を持つのは呼び出し側（`app/router.tsx`）。ここは入力を並べ、直した計画の次の形を `onEdit` で渡すだけ。
  * 見本の世帯のままのときは入力を止め、「自分の数字にする」を 1 つだけ出す（押すと目標カードの無い自分の計画が始まる）。
+ * 自分の計画のあいだは、いちばん下に「見本の世帯に戻す」を出す（2 回押し。押すと保存を消して「ながめる」へ移る）。
  * 「ながめる」の目標の一覧から `?goal=<id>` で来たら、そのカードを開いて見える所まで送る。
  */
 
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import type { StorageProblem } from '../../app/planSession'
 import { appDefaults, mortgageRateLabel } from '../../data/appData'
 import { formatPercent } from '../shared/format'
 import type { LifePlan, Notice, PeakGross } from '../../domain/plan/types'
+import { ConfirmButton } from '../shared/ConfirmButton'
 import { MoneyField, RateField } from '../shared/fields/Fields'
 import { StartOwnButton, StorageProblemAlert } from '../shared/StartOwn'
 import { FamilySection } from './FamilySection'
@@ -44,6 +46,8 @@ type Props = {
   onEdit: (plan: LifePlan, touched: string[]) => void
   /** 見本の世帯から自分の計画を始める */
   onStartOwn: () => void
+  /** 自分の計画の保存を消して見本の世帯に戻す。保存を消せず、戻せなかったら false */
+  onBackToSample: () => boolean
 }
 
 /** 計画の画面 */
@@ -60,7 +64,11 @@ export function PlanPage({
   saveFailed,
   onEdit,
   onStartOwn,
+  onBackToSample,
 }: Props) {
+  const navigate = useNavigate()
+  // 見本の世帯に戻そうとして、保存を消せなかった（自分の計画のまま）
+  const [backFailed, setBackFailed] = useState(false)
   // カードの重さ（「外すと −◯万円」）は、階段の計算と保存のあとから出す（入力の反応を止めない。useGoalImpacts.ts）
   const impacts = useGoalImpacts(evaluatedPlan)
   const [searchParams] = useSearchParams()
@@ -99,6 +107,16 @@ export function PlanPage({
       ),
   }
   const isSample = origin === 'sample'
+
+  /** 見本の世帯に戻して、「ながめる」の先頭へ移る。戻せなければここに留まって知らせる */
+  const backToSample = () => {
+    if (!onBackToSample()) {
+      setBackFailed(true)
+      return
+    }
+    void navigate('/')
+    window.scrollTo({ top: 0 })
+  }
 
   return (
     <div className="plan">
@@ -220,6 +238,23 @@ export function PlanPage({
           />
         </section>
       </fieldset>
+
+      {/* 自分の計画のあいだだけ、いちばん下に控えめに置く（T23・D46 の 1）。入れた数字が消えるので 2 回押し */}
+      {isSample ? null : (
+        <div className="plan__back">
+          {backFailed ? (
+            <p className="plan__alert" role="alert">
+              この端末の保存を消せなかったので、見本に戻していません
+            </p>
+          ) : null}
+          <ConfirmButton
+            className="plan__remove"
+            label="見本の世帯に戻す"
+            confirmLabel="入れた数字を消して戻す"
+            onConfirm={backToSample}
+          />
+        </div>
+      )}
     </div>
   )
 }

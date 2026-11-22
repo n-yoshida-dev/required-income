@@ -247,6 +247,63 @@ describe('計画（T6）', () => {
     expect(screen.queryByText('見本')).toBeNull()
   })
 
+  it('見本の世帯に戻す（T23）：見本のあいだは出ず、自分の計画では 2 回押しで保存を消して「ながめる」の見本に戻り、開き直しても見本のまま', () => {
+    // jsdom は window.scrollTo を持たない（呼ぶと「未実装」を出す）ので、先頭へ送ったことだけを見る
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+    try {
+      window.location.hash = '#/plan'
+      render(<AppRouter />)
+      expect(screen.queryByRole('button', { name: '見本の世帯に戻す' })).toBeNull()
+
+      fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+      fireEvent.change(field('生活費'), { target: { value: '31' } })
+      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
+
+      // 1 回目は確かめの言葉に変わるだけで、何も消さない
+      fireEvent.click(screen.getByRole('button', { name: '見本の世帯に戻す' }))
+      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
+      fireEvent.click(screen.getByRole('button', { name: '入れた数字を消して戻す' }))
+
+      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBeNull()
+      expect(window.location.hash).toBe('#/')
+      expect(scrollTo).toHaveBeenCalled()
+      expect(screen.getByText('見本')).toBeTruthy()
+      expect(screen.getByRole('button', { name: '自分の数字にする' })).toBeTruthy()
+
+      cleanup()
+      window.location.hash = '#/plan'
+      render(<AppRouter />)
+      expect(screen.getByText('見本')).toBeTruthy()
+      expect(field('生活費').matches(':disabled')).toBe(true)
+    } finally {
+      scrollTo.mockRestore()
+    }
+  })
+
+  it('見本の世帯に戻そうとして保存を消せなければ、自分の計画のまま「計画」に留まって知らせる（T23）', () => {
+    const removeItem = vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+      throw new Error('保存を禁じた設定')
+    })
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    try {
+      render(<AppRouter />)
+      fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+      const before = localStorage.getItem(PLAN_STORAGE_V2_KEY)
+
+      fireEvent.click(screen.getByRole('button', { name: '見本の世帯に戻す' }))
+      fireEvent.click(screen.getByRole('button', { name: '入れた数字を消して戻す' }))
+
+      expect(screen.getByRole('alert').textContent).toContain('見本に戻していません')
+      expect(window.location.hash).toBe('#/plan')
+      expect(screen.queryByText('見本')).toBeNull()
+      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBe(before)
+      expect(consoleError).toHaveBeenCalled()
+    } finally {
+      removeItem.mockRestore()
+      consoleError.mockRestore()
+    }
+  })
+
   it('市区町村は、名前が 1 件にだけ合えばコードで保存し、合わなければ保存せずに候補を選ぶよう出す', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))

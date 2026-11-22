@@ -11,7 +11,13 @@ import { sampleLifePlan, syncChildCostGoals } from '../domain/plan/defaults'
 import { evaluate } from '../domain/plan/evaluate'
 import type { Evaluation, LifePlan, YearMonth } from '../domain/plan/types'
 import { yearMonth } from '../domain/plan/yearMonth'
-import { loadPlanV2, savePlanV2, type PlanStorageV2 } from '../storage/planStorageV2'
+import {
+  clearPlanV2,
+  loadPlanV2,
+  savePlanV2,
+  type PlanStorageV2,
+  type PlanStorageV2Remover,
+} from '../storage/planStorageV2'
 
 /** 開いた計画。どこから来たかと、保存を読めなかった理由（あれば）を持つ */
 export type PlanSession = {
@@ -51,14 +57,14 @@ export function todayYearMonth(now: Date): YearMonth {
  * ブラウザの保存先。`localStorage` に触るだけで投げるブラウザ（保存を禁じた設定など）では、
  * 読むたびにその例外を投げる保存先を返し、`loadPlanV2` が「読めなかった」として扱う（握りつぶさない）
  */
-export function browserStorage(): PlanStorageV2 {
+export function browserStorage(): PlanStorageV2 & PlanStorageV2Remover {
   try {
     return window.localStorage
   } catch (error) {
     const fail = (): never => {
       throw error
     }
-    return { getItem: fail, setItem: fail }
+    return { getItem: fail, setItem: fail, removeItem: fail }
   }
 }
 
@@ -166,6 +172,22 @@ export function startOwnPlan(session: PlanSession): PlanSession {
     touched: [],
     storageProblem: null,
   }
+}
+
+/**
+ * 自分の計画をやめて、見本の世帯に戻す（SPEC §4.2「見本の世帯に戻す」。T23・D46 の 1）。
+ *
+ * 保存した自分の計画を消し、保存の無い端末ではじめて開いたときと同じ見本の世帯（`openAndEvaluate` の見本の道）にして計算する。
+ * 保存を消せなかったときは見本にしない（`ok: false`）。見本にすると、開き直したときに消せなかった自分の計画が出て食い違うため。
+ * 画面はそのことを知らせ、自分の計画のままにする
+ */
+export function returnToSample(
+  storage: PlanStorageV2Remover,
+  today: YearMonth,
+): { ok: true; session: PlanSession; result: EvaluationResult } | { ok: false } {
+  if (!clearPlanV2(storage)) return { ok: false }
+  const session = sampleSession(today, null)
+  return { ok: true, session, result: evaluatePlan(session.plan) }
 }
 
 /**

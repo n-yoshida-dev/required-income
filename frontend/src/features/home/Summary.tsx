@@ -1,9 +1,10 @@
 /**
  * 概要の枠（SPEC §4.1 の 1。D42）。「ながめる」の先頭に、ここだけを「文で読む所」として置き、下の図は図だけで見せる。
  *
- * - 見出しの文：「やりたいことを全部やるには、」「2029年から年収」→ いちばん大きい字の「948万円」→「が要ります」。同じ行の右に「あと2年2か月」
+ * - 見出しの文：「やりたいことを全部やるには、2029年から年収」→ いちばん大きい字の「948万円」に続けて「が要ります」。右に「あと2年2か月」
+ *   （前の部分は入りきる幅では 1 行、入りきらないときだけ文節の切れ目で折り返す。T22）
  * - 「年収」の注を 1 回だけ
- * - 箇条書き 3 つ：今の年収との差と「◯年までは今の年収で足ります」／「◯年に変わること」と理由の行／その先の流れ（いちばん高い段と最後の段）
+ * - 箇条書き 3 つ：今の年収との差と「◯年までは今の年収で足ります」／「◯年に変わること」と、その下に字下げした印付きの理由の行／その先の流れ（いちばん高い段と最後の段）
  *
  * 次の段が無い（どの段も今の年収で足りる）ときは「やりたいことを全部やっても、今の年収 ◯万円で足ります」と注だけ。
  * 段が 1 つも無い（働く大人が全員もう退職の年齢）ときは、要る年収を出す年が無いことだけを出す。
@@ -17,7 +18,7 @@ import { monthsBetween, startOfYear } from '../../domain/plan/yearMonth'
 import { formatDuration, manNumber } from '../shared/format'
 import { roundMan } from '../shared/displayMan'
 import { NumText } from '../shared/NumText'
-import { causeHeading, causePhrase } from './causeText'
+import { causeHeading, causePhraseChunks } from './causeText'
 import {
   enoughLines,
   gapPoint,
@@ -57,20 +58,26 @@ function IncomeNote() {
 }
 
 /**
- * 箇条書きの文を描く。文ごとに行を改め、文の中は文節のかたまり（`inline-block`）の間だけで折り返す。
- * かたまりの終わりの空白はかたまりの外に出す（行の頭に来たら消える）
+ * 文節のかたまりを 1 つの流れの字として描き、かたまりの間にだけ折り返してよい所（`<wbr>`）を置く（T22）。
+ * 包む側の CSS（`word-break: keep-all`）が、空白と `<wbr>` のほかでは折り返さないので、入りきる幅では 1 行で出て、
+ * 入りきらない幅ではかたまりの間（文節の切れ目）で折り返す。「48万円」のように数字と単位は同じかたまりにあるので割れない。
+ * `<wbr>` は字を持たないので、読み上げとテストの字は文のまま。
+ * `plain` のときは数字も本文の字のまま出す（見出しの文の前の部分。年を数字の字にしない）
  */
+function Phrases({ chunks, plain = false }: { chunks: Sentence; plain?: boolean }) {
+  return chunks.map((chunk, at) => (
+    <Fragment key={at}>
+      {at === 0 ? null : <wbr />}
+      {plain ? chunk : <NumText text={chunk} />}
+    </Fragment>
+  ))
+}
+
+/** 箇条書きの文を描く。文ごとに行を改め、文の中は文節のかたまりの間だけで折り返す（`Phrases`） */
 function Said({ sentences }: { sentences: readonly Sentence[] }) {
   return sentences.map((sentence, index) => (
     <span key={index} className="summary__said">
-      {sentence.map((chunk, at) => (
-        <Fragment key={at}>
-          <span className="summary__chunk">
-            <NumText text={chunk.trimEnd()} />
-          </span>
-          {chunk.endsWith(' ') ? ' ' : null}
-        </Fragment>
-      ))}
+      <Phrases chunks={sentence} />
     </span>
   ))
 }
@@ -119,34 +126,33 @@ export function Summary({ step, stepCount, currentGross, base, enoughUntil, outl
 
   return (
     <section className={long ? 'summary is-long' : 'summary'} aria-label="概要">
-      {/* 見出しの文：前の行 → 大きい金額 → 「が要ります」で 1 つの文として読む（W19） */}
+      {/* 見出しの文：前の部分 → 大きい金額 → 「が要ります」で 1 つの文として読む（W19）。
+          前の部分は入りきる幅では 1 行、入りきらないときだけ文節の切れ目で折り返す（T22） */}
       <p className="summary__sentence">
-        {requiredLead(step.fromYear, reachable).map((line) => (
-          <span key={line} className="summary__line">
-            {line}
-          </span>
-        ))}
-        {step.requiredGross === null ? (
-          <span className="summary__amount">{amount}</span>
-        ) : (
-          <span className="summary__amount num">
-            {amount}
-            <span className="summary__unit">万円</span>
-          </span>
-        )}
-        {/* 「が要ります」の行。解けない段で今年から始まるときは、どちらも無いので行ごと出さない */}
-        {!reachable && when === null ? null : (
-          <span className="summary__verb">
-            {reachable ? <span>{REQUIRED_VERB}</span> : null}
-            {when === null ? null : (
-              <>
-                {/* 文の後ろに置く（文の邪魔をしない）。読み上げでは文と切る */}
-                <span className="visually-hidden">。</span>
-                <span className="summary__left">{when}</span>
-              </>
+        <span className="summary__lead">
+          <Phrases chunks={requiredLead(step.fromYear, reachable)} plain />
+        </span>
+        <span className="summary__main">
+          {/* 金額と「が要ります」は同じ行に続けて読む。入りきらないときだけ「が要ります」が次の行に落ちる */}
+          <span className="summary__claim">
+            {step.requiredGross === null ? (
+              <span className="summary__amount">{amount}</span>
+            ) : (
+              <span className="summary__amount num">
+                {amount}
+                <span className="summary__unit">万円</span>
+              </span>
             )}
+            {reachable ? <span className="summary__verb">{REQUIRED_VERB}</span> : null}
           </span>
-        )}
+          {when === null ? null : (
+            <>
+              {/* 文の後ろに置く（文の邪魔をしない）。読み上げでは文と切る */}
+              <span className="visually-hidden">。</span>
+              <span className="summary__left">{when}</span>
+            </>
+          )}
+        </span>
       </p>
       <IncomeNote />
       <ul className="summary__points">
@@ -159,10 +165,15 @@ export function Summary({ step, stepCount, currentGross, base, enoughUntil, outl
             <ul className="summary__causes">
               {causes.map((cause) => (
                 <li key={`${cause.goalId}:${cause.label}`}>
-                  <span className="summary__cause-name">{causePhrase(cause)}</span>
-                  <span className="summary__cause-amt">
-                    月<span className="num">{manNumber(cause.monthly, { digits: 1 })}</span>
-                    万円
+                  {/* 行の印（::marker）を残すため、li は list-item のままにし、言い回しと月額の左右の並びは中の span で組む（T22） */}
+                  <span className="summary__cause">
+                    <span className="summary__cause-name">
+                      <Phrases chunks={causePhraseChunks(cause)} plain />
+                    </span>
+                    <span className="summary__cause-amt">
+                      月<span className="num">{manNumber(cause.monthly, { digits: 1 })}</span>
+                      万円
+                    </span>
                   </span>
                 </li>
               ))}

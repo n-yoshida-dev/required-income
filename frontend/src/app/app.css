@@ -55,6 +55,12 @@
   --gutter: 1rem;
   --gap-section: 1.75rem;
   --gap-row: 0.5rem;
+  /* 概要の「◯年に変わること」の下の理由の行の字下げ（白丸の印が上の行の字の頭の下に来る幅。T22） */
+  --indent-nested: 0.75rem;
+  /* 理由の行の、言い回しと月額の間の最小（月額は右にそろうので、ふだんはもっと空く） */
+  --gap-cause-amount: 0.25rem;
+  /* 概要の金額の行の下に落ちた「あと◯年◯か月」の引き上げ（金額の数字の下の空きを詰める。T22） */
+  --pull-after-hero: -0.5625rem;
   --content-max: 40rem;
   --tabs-height: 3.5rem;
   --tap-min: 2.75rem;
@@ -272,14 +278,14 @@ button {
  * 枠は地と分ける最小の形（区切りの細い線 1 本の角丸。面の色・影・左の色帯は使わない）。
  *
  *  ┌──────────────────────────────┐
- *  │ やりたいことを全部やるには、 │
+ *  │ やりたいことを全部やるには、 │  ← 入りきる幅では 1 行（T22）
  *  │ 2029年から年収               │
- *  │ 948万円                      │
- *  │ が要ります      あと2年2か月 │
+ *  │ 948万円 が要ります           │
+ *  │                 あと2年2か月 │
  *  │ 年収：家族の年収の合計。…    │
  *  │ ・今の年収 900万円より …     │
  *  │ ・2029年に変わること         │
- *  │   車のローンの返済が始まる  月4.3万円 │
+ *  │   ◦ 車のローンの返済が始まる  月4.3万円 │
  *  │ ・いちばん高いのは …         │
  *  └──────────────────────────────┘
  */
@@ -291,41 +297,69 @@ button {
   border-radius: var(--radius);
 }
 
-/* 前の行・金額・「が要ります」の行を縦に並べる。行の中は文節で折り返す（1〜2 字だけ次の行に落とさない） */
-.summary__line,
-.summary__verb {
+/* 足りているときの 2 行（「やりたいことを全部やっても、」「今の年収 900万円で足ります」）。行の中は文節で折り返す */
+.summary__line {
   display: block;
   font-size: var(--size-lead);
   line-height: 1.5;
   word-break: auto-phrase;
 }
 
-/* 「が要ります」と「あと◯年◯か月」：文の終わりを左、残りの時間を右に（文の邪魔をしない） */
-.summary__verb {
+/*
+ * 見出しの文の、金額の前の部分（T22）。決めた位置で改行せず、入りきる幅では 1 行で出す。
+ * 折り返すのは空白と、かたまりの間に置いた <wbr> だけ（keep-all は字と字の間で割らない。Safari でも効く）。
+ * 1 つのかたまりが幅を超えるときだけ、最後の手として字の間で割る（anywhere）
+ */
+.summary__lead {
+  display: block;
+  font-size: var(--size-lead);
+  line-height: 1.5;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  /* 折り返すときは行の長さをそろえる（箇条書きの文と同じ） */
+  text-wrap: balance;
+}
+
+/* 金額と「が要ります」を左、「あと◯年◯か月」を右に（文の邪魔をしない）。右が入らない幅では次の行の右に落ちる */
+.summary__main {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   gap: 0 0.75rem;
-  /* 金額の字の下（数字に下がりが無く、行の箱の下が空く）と「が要ります」の字の間を、上の行と金額の字の間と同じくらいに詰める。
-     幅 390px の字のインクで、上の行と金額の間 10px・金額と「が要ります」の間 10px（詰める前は 21px。PR #99 の見た目の点検） */
-  margin-top: -0.6875rem;
 }
 
-/* 4 桁の金額（カンマの下が線の下へ出る）と「届かない」（字が箱の下まである）は引き上げない。
-   引き上げるとカンマが「が要ります」の「要」に触れ、「届かない」の右下に「あと◯年◯か月」が付いて見えた（PR #100 の見た目の点検）。
-   幅 375・390・1280px の字のインクで、カンマと「が要ります」の間 9・10・12px、「届かない」と「あと…」の間 8・7・9px */
-.summary.is-long .summary__verb {
+/* 金額に続けて「が要ります」（「948万円 が要ります」で 1 つの文の終わりに読む）。字の下の線（baseline）でそろう */
+.summary__verb {
+  display: inline-block;
+  margin-left: 0.25rem;
+  font-size: var(--size-lead);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/*
+ * 「あと◯年◯か月」。金額の行に入らず次の行に落ちたとき（スマホの幅はどれも）、金額の数字には下がりが無く行の箱の下が空くので、
+ * 上の行と金額の間と同じくらいまで引き上げる。金額と同じ行に入るとき（広い幅）は字の下の線（baseline）でそろうので、引き上げは見た目に効かない
+ */
+.summary__left {
+  margin-top: var(--pull-after-hero);
+  margin-left: auto;
+  font-size: var(--size-lead);
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/*
+ * 4 桁の金額と「届かない」（1 段小さい字）は引き上げない。字が小さく行の下の空きが少ないので、引き上げると
+ * 「あと◯年◯か月」が「が要ります」の真下に付き、「届かない」では字の下の線が重なって 1 つの行に読めた（T22 で撮って確かめた）
+ */
+.summary.is-long .summary__left {
   margin-top: 0;
 }
 
-.summary__left {
-  margin-left: auto;
-  font-weight: 700;
-}
-
 .summary__amount {
-  display: block;
   margin-left: -0.125rem;
   font-size: var(--size-hero);
   font-weight: 700;
@@ -378,34 +412,49 @@ button {
   font-size: var(--size-num);
 }
 
-/* 箇条書きの文：文ごとに行を改める。文の中は文節のかたまりの間だけで折り返す（「多い／金額です」と割らない） */
+/*
+ * 箇条書きの文：文ごとに行を改める。文の中は入りきる幅では 1 行に詰め、入りきらないときだけ
+ * 空白と文節のかたまりの間（<wbr>）で折り返す（T22。見出しの前の部分と同じ作り）
+ */
 .summary__said {
   display: block;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  /* 折り返すときは行の長さをそろえ、最後の行に 1 かたまりだけ残さない（効かないブラウザでは詰めて折り返すだけ） */
+  text-wrap: balance;
 }
 
-/* 文節のかたまり。幅に入らない長いかたまり（長い名前）だけ、中で文節に割る */
-.summary__chunk {
-  display: inline-block;
-  max-width: 100%;
-}
-
-/* 「2029年に変わること」と、その下の名前と動きの言い回し・月額（右にそろえる） */
+/*
+ * 「2029年に変わること」の下の理由の行：上の行の中の箇条書きだと見て分かるように、
+ * 1 段字下げして、外の黒丸（disc）と形の違う白丸（circle）の印を付ける（T22）
+ */
 .summary__causes {
   display: grid;
   gap: 0.125rem;
   margin-top: 0.125rem;
+  padding-left: var(--indent-nested);
+  list-style: circle;
 }
 
-.summary__causes li {
+.summary__causes > li::marker {
+  color: var(--ink-soft);
+}
+
+/* 名前と動きの言い回しを左、月額を右にそろえる。間の最小は狭くする（幅 375px で「学校（1人目）の費用が終わる」と月額を 1 行に入れる。T22） */
+.summary__cause {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 0.5rem;
+  gap: var(--gap-cause-amount);
 }
 
-/* 言い回しは文節で折り返す（「学校（1人目）の費用が」「終わる」）。1 文節が幅を超えるときだけ字の間で割る */
+/*
+ * 言い回しも箇条書きの文と同じ作り：文節のかたまりの間（<wbr>）だけで折り返す（「学校（1人目）の費用が」「終わる」。T22）。
+ * 1 つのかたまり（長い名前）が幅を超えるときだけ字の間で割る
+ */
 .summary__cause-name {
   min-width: 0;
+  word-break: keep-all;
   overflow-wrap: anywhere;
 }
 
@@ -1166,6 +1215,13 @@ button {
 
 .plan__add {
   justify-self: start;
+}
+
+/* 見本の世帯に戻す（自分の計画のあいだだけ、いちばん下）。線のボタンをそのまま使い、左に寄せる */
+.plan__back {
+  display: grid;
+  gap: var(--gap-row);
+  justify-items: start;
 }
 
 /* 目標カード */
