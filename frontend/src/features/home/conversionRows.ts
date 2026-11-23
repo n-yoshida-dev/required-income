@@ -1,11 +1,13 @@
 /**
  * 段の内訳の「埋め方の換算」の行（SPEC §3.6・§4.1 の 2）。`evaluate` の換算を、画面に出す文字に直すだけで、計算はしない。
  *
- * 3 つ（本業・副業・もう 1 人）は同じ形の行にし、並びは SPEC の順のまま。どれかを目立たせない（D31）。
+ * 3 つ（本業・副業・パートナー）は同じ形の行にし、並びは SPEC の順のまま。どれかを目立たせない（D31）。
  * 届かない・動かせる人がいない換算（`null`）は行を出さない。
+ * 2 人目の大人の呼び方は `shared/adultNames.ts`（T21。前は「もう 1 人」）
  */
 
 import type { IncomeConversion, StepConversions } from '../../domain/plan/types'
+import { PARTNER_NAME } from '../shared/adultNames'
 import { formatMan, manNumber } from '../shared/format'
 import { roundMan } from '../shared/displayMan'
 
@@ -33,7 +35,7 @@ export function conversionRows(conversions: StepConversions | null): ConversionR
   const rows: (ConversionRow | null)[] = [
     row('mainJob', '本業を上げるなら', '年', conversions.mainJob, 0, null),
     row('sideJob', '副業なら', '月', conversions.sideJob, 1, SIDE_JOB_NOTE),
-    row('otherAdult', 'もう 1 人の収入を上げるなら', '年', conversions.otherAdult, 0, null),
+    row('otherAdult', `${PARTNER_NAME}の収入を上げるなら`, '年', conversions.otherAdult, 0, null),
   ]
   return rows.filter((entry): entry is ConversionRow => entry !== null)
 }

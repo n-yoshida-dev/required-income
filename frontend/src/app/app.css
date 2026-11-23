@@ -43,12 +43,12 @@
   --size-hero-unit: 1.375rem;
   --size-lead: 1.0625rem;
   --size-body: 1rem;
-  --size-title: 1.375rem; /* 「計画」の題（今は読み上げだけの見出し。「見直す」は使わない） */
+  --size-title: 1.375rem; /* 「計画」の区分の題（T21。「見直す」は使わない） */
   --size-num: 1.0625rem; /* 本文の中の数字 */
   --size-num-mid: 1.1875rem; /* 目標の金額・換算の金額 */
   --size-num-large: 1.625rem; /* 内訳の要る年収・今の年収で足りているときの金額 */
   --size-mid: 0.875rem; /* 内訳の行・埋め方の名前・ボタン・「計画」の添える字（判断に使う数字なので 14px） */
-  --size-small: 0.8125rem; /* 「ながめる」の添える字 */
+  --size-small: 0.8125rem; /* 「ながめる」の添える字・「計画」の保存の注 */
   --size-tiny: 0.75rem; /* 断り書き・範囲・タブ。これより小さくしない */
 
   /* 間隔と幅 */
@@ -64,6 +64,8 @@
   --content-max: 40rem;
   --tabs-height: 3.5rem;
   --tap-min: 2.75rem;
+  /* 家族の行の「外す」の幅（--size-mid の 2 字＋左右の余白＋線）。「外す」の無い行でも列を残し、欄の右端をそろえる */
+  --person-remove-width: 3.6875rem;
   --radius: 0.75rem; /* 選んだ段の柱の上・内訳の下・概要の枠 */
   --radius-small: 0.25rem; /* 見本の印・入れる欄 */
   /* 入力欄の幅 */
@@ -1107,8 +1109,193 @@ button {
   gap: var(--gap-section);
 }
 
-.plan h1 {
+/*
+ * 区分の帯（T21）：「1 家族」「2 収入」「3 暮らし」「4 目標」。どの区分へもいつでも飛べる。
+ * 今いる区分は墨の太字と上の墨の線（下のタブの「今いる」と同じ合図）。ほかは上の線を区切りの色に、字を添える字に
+ */
+.plan-nav__list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--gap-row);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: var(--tap-min);
+  border-top: 2px solid var(--rule);
+  color: var(--ink-soft);
+  font-size: var(--size-mid);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.plan-nav__link[aria-current='step'] {
+  border-top-color: var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* 済んだ区分の印（案内のあいだだけ） */
+.plan-nav__done {
+  margin-left: 0.125rem;
+}
+
+/* 知らせの束（「次へ」で止めたとき、欄の無い誤りはここへフォーカスを移す）。中身が無ければ場所を取らない */
+.plan__alerts {
+  display: grid;
+  gap: var(--gap-row);
+}
+
+.plan__alerts:empty {
+  display: none;
+}
+
+/* 区分のページ：題と注 → 中身 */
+.plan__page {
+  display: grid;
+  gap: var(--gutter);
+  min-width: 0;
+}
+
+.plan__head {
+  display: grid;
+  gap: var(--gap-row);
+}
+
+/* 題は文節の切れ目で折り返し、行の長さをそろえる（幅 375px で「う」だけが次の行に落ちないように） */
+.plan__title {
   font-size: var(--size-title);
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: auto-phrase;
+  text-wrap: balance;
+}
+
+/* 題へのフォーカスは読み上げのために移す物で、押せる物ではないので枠を出さない（開き直した直後に題が枠で囲まれないように） */
+.plan__title:focus {
+  outline: none;
+}
+
+/* 題の下の注（年収の数え方・仮の値の意味など）。文節で折り返す */
+.plan__note {
+  color: var(--ink-soft);
+  font-size: var(--size-mid);
+  word-break: auto-phrase;
+}
+
+/* 区分の中の小見出し（「子」「本人」「パートナー」） */
+.plan__subhead {
+  margin: 0;
+  font-size: var(--size-body);
+  font-weight: 700;
+}
+
+/*
+ * 家族の 1 人 1 行（T21）：欄を左の列、「外す」を右の列に置き、行をまたいで欄の右端をそろえる。
+ * 行（.plan__person）は並びの中に溶かし（display: contents）、欄は毎回 1 列目から新しい行に置く
+ */
+.plan__people {
+  display: grid;
+  /* 右の列は「外す」が 1 つも無くても幅を残す（大人が 1 人のとき、本人の欄が子の欄より右へずれないように）。2 回押しの長い字のときは広がる */
+  grid-template-columns: minmax(0, 1fr) minmax(var(--person-remove-width), auto);
+  column-gap: var(--gap-row);
+  align-items: center;
+}
+
+.plan__person {
+  display: contents;
+}
+
+.plan__person > .field {
+  grid-column: 1;
+}
+
+.plan__person > .plan__remove {
+  grid-column: 2;
+}
+
+.plan__people > .plan__add {
+  grid-column: 1 / -1;
+  margin-top: var(--gap-row);
+}
+
+/* 畳み（「この先の収入・副業・退職」「前提を確かめる」）。開閉の印は目標カードと同じ。線・枠は足さない */
+.fold__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-row);
+  min-height: var(--tap-min);
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold__summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold__summary::before {
+  content: '▸';
+  color: var(--ink-soft);
+}
+
+.fold[open] > .fold__summary::before {
+  content: '▾';
+}
+
+.fold__body {
+  display: grid;
+  min-width: 0;
+}
+
+/* 「戻る」「次へ」：中身の下に 1 行。左に線の「戻る」、右に塗りの「次へ」（残りの幅いっぱい） */
+.plan__steps {
+  display: grid;
+  gap: var(--gap-row);
+}
+
+.plan__step-buttons {
+  display: flex;
+  gap: var(--gap-row);
+}
+
+.plan__prev,
+.plan__next {
+  min-height: var(--tap-min);
+  padding: 0 1.125rem;
+  border-radius: calc(var(--tap-min) / 2);
+  font-size: var(--size-mid);
+  cursor: pointer;
+}
+
+.plan__prev {
+  border: 1.5px solid var(--ink);
+  background: none;
+}
+
+.plan__next {
+  flex: 1;
+  border: 1.5px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+/* 自分で足した目標が無いときの最後のボタン（「目標はあとで足す」）：塗りにせず線で */
+.plan__next.is-later {
+  background: none;
+  color: var(--ink);
+}
+
+/* 案内のあいだだけ、「次へ」の下に小さく保存の注 */
+.plan__privacy {
+  color: var(--ink-soft);
+  font-size: var(--size-small);
+  word-break: auto-phrase;
 }
 
 .plan__form {
@@ -1134,17 +1321,6 @@ button {
 .plan__block {
   display: grid;
   min-width: 0;
-}
-
-.plan__block h3 {
-  margin: 0;
-  font-size: var(--size-body);
-}
-
-.plan__block-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 /* 足す・外すの並ぶ行（子・見込み） */

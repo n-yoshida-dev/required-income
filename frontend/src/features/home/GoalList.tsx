@@ -22,7 +22,7 @@ export function GoalList({ goals }: Props) {
         <li key={goal.id} className={goal.enabled ? undefined : 'is-off'}>
           <Link
             className="goals__row"
-            to={{ pathname: '/plan', search: `?goal=${encodeURIComponent(goal.id)}` }}
+            to={{ pathname: '/plan/goals', search: `?goal=${encodeURIComponent(goal.id)}` }}
           >
             <span className="goals__name">{goal.name}</span>
             {goal.amount === null ? null : (

@@ -53,6 +53,17 @@ function isTouchedRow(input: HTMLElement): boolean {
   return input.closest('[data-touched]')?.getAttribute('data-touched') === 'true'
 }
 
+/** 区分の帯から区分へ移る（T21。帯の字は「1 家族」「4 目標」。済んだ区分には読み上げの「済み」が付く） */
+function showSection(label: '家族' | '収入' | '暮らし' | '目標'): void {
+  const nav = screen.getByRole('navigation', { name: '計画の区分' })
+  fireEvent.click(within(nav).getByRole('link', { name: new RegExp(`^\\d ${label}`) }))
+}
+
+/** 家族の区分のページ（題で探す） */
+function familyPage(): HTMLElement {
+  return screen.getByRole('region', { name: '家族の生まれ年を入れましょう' })
+}
+
 describe('計画（T6）', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -63,7 +74,7 @@ describe('計画（T6）', () => {
   })
 
   it('見本のままでは入力が止まっていて、「自分の数字にする」だけを押せる', () => {
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/living'
     render(<AppRouter />)
     // 見本のままは入力の束（fieldset）ごと止める（jsdom では disabled の属性でなく :disabled で見る）
     expect(field('生活費').matches(':disabled')).toBe(true)
@@ -80,6 +91,7 @@ describe('計画（T6）', () => {
     expect(screen.queryByText('見本')).toBeNull()
     expect(goalKinds()).toEqual(['childCost', 'childCost'])
     expect(stored().touched).toEqual([])
+    showSection('暮らし')
     const living = field('生活費')
     expect(living.matches(':disabled')).toBe(false)
     expect(isTouchedRow(living)).toBe(false)
@@ -90,6 +102,7 @@ describe('計画（T6）', () => {
     expect(isTouchedRow(field('生活費'))).toBe(true)
     expect(isTouchedRow(field('家賃'))).toBe(false)
 
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '毎月の支出を足す' }))
     expect(goalKinds()).toEqual(['childCost', 'childCost', 'custom'])
     const amount = field('月額')
@@ -110,7 +123,7 @@ describe('計画（T6）', () => {
 
     // 開き直しても、直した計画と印が残る
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/living'
     render(<AppRouter />)
     expect(screen.queryByText('見本')).toBeNull()
     expect(field('生活費').value).toBe('31')
@@ -123,6 +136,7 @@ describe('計画（T6）', () => {
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
     const before = localStorage.getItem(PLAN_STORAGE_V2_KEY)
 
+    showSection('暮らし')
     fireEvent.change(field('生活費'), { target: { value: '-5' } })
     expect(screen.getByRole('alert').textContent).toContain('0 以上')
     fireEvent.change(field('生活費'), { target: { value: 'あ' } })
@@ -133,6 +147,7 @@ describe('計画（T6）', () => {
   it('毎月のカードの終わりを始まりより前にすると、保存を止めて理由を出す。直すと保存する', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '毎月の支出を足す' }))
     const before = localStorage.getItem(PLAN_STORAGE_V2_KEY)
     const from = Number(field('から').value)
@@ -149,6 +164,7 @@ describe('計画（T6）', () => {
   it('カードの型を一度きりに替え、オフにし、2 回押して消す', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '毎月の支出を足す' }))
 
     fireEvent.click(screen.getByRole('radio', { name: '一度きり' }))
@@ -171,6 +187,7 @@ describe('計画（T6）', () => {
   it('型を毎月 ⇄ 一度きりで替えると、雛形に戻った金額・時期の印も外れる', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '毎月の支出を足す' }))
     fireEvent.change(field('月額'), { target: { value: '3' } })
     fireEvent.change(field('から'), { target: { value: String(Number(field('から').value) + 1) } })
@@ -192,11 +209,11 @@ describe('計画（T6）', () => {
     expect(stored().touched).toContain('goals.goal-1.amount')
   })
 
-  it('子ともう 1 人の「外す」は 2 回押し。外すとその行の印も外れる', () => {
+  it('子とパートナーの「外す」は 2 回押し。外すとその行の印も外れる', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-    const family = screen.getByRole('region', { name: '家族' })
-    fireEvent.change(field('1 人目'), { target: { value: '2011' } })
+    const family = familyPage()
+    fireEvent.change(field('1 人目の子の生まれ年'), { target: { value: '2011' } })
     const childKey = stored().touched.find((key) => key.startsWith('children.'))
     expect(childKey).toBeTruthy()
 
@@ -211,10 +228,30 @@ describe('計画（T6）', () => {
     fireEvent.click(within(family).getByRole('button', { name: '子を足す' }))
     expect(within(family).getByRole('button', { name: '2 人目の子を外す' })).toBeTruthy()
 
-    fireEvent.click(within(family).getByRole('button', { name: 'もう 1 人を外す' }))
-    expect(within(family).queryByRole('button', { name: 'もう 1 人を足す' })).toBeNull()
-    fireEvent.click(within(family).getByRole('button', { name: 'もう 1 人を本当に外す' }))
-    expect(within(family).getByRole('button', { name: 'もう 1 人を足す' })).toBeTruthy()
+    fireEvent.click(within(family).getByRole('button', { name: 'パートナーを外す' }))
+    expect(within(family).queryByRole('button', { name: 'パートナーを足す' })).toBeNull()
+    fireEvent.click(within(family).getByRole('button', { name: 'パートナーを本当に外す' }))
+    expect(within(family).getByRole('button', { name: 'パートナーを足す' })).toBeTruthy()
+    // 本人には「外す」が無い。パートナーを足すと、その行の右に「外す」が戻る
+    expect(within(family).queryByRole('button', { name: '本人を外す' })).toBeNull()
+    fireEvent.click(within(family).getByRole('button', { name: 'パートナーを足す' }))
+    expect(field('パートナーの生まれ年')).toBeTruthy()
+    expect(within(family).getByRole('button', { name: 'パートナーを外す' })).toBeTruthy()
+  })
+
+  it('家族は 1 人 1 行：見える字は「本人」「パートナー」「1 人目」で、読み上げは「本人の生まれ年」など（T21）', () => {
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    const family = familyPage()
+    expect(field('本人の生まれ年')).toBeTruthy()
+    expect(field('パートナーの生まれ年')).toBeTruthy()
+    expect(screen.getByRole('combobox', { name: '1 人目の子の生まれ月' })).toBeTruthy()
+    // 「外す」は、その人の欄と同じ行（同じ .plan__person）にある
+    const partnerRow = field('パートナーの生まれ年').closest('.plan__person')
+    expect(partnerRow?.querySelector('button')?.getAttribute('aria-label')).toBe('パートナーを外す')
+    // 画面のどこにも「もう 1 人」を出さない
+    expect(document.body.textContent).not.toContain('もう 1 人')
+    expect(within(family).queryByRole('heading', { name: '本人' })).toBeNull()
   })
 
   it('2 回押しの確かめは、数秒で元に戻る（フォーカスが動かないブラウザでも）', () => {
@@ -222,7 +259,7 @@ describe('計画（T6）', () => {
     try {
       render(<AppRouter />)
       fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-      const family = screen.getByRole('region', { name: '家族' })
+      const family = familyPage()
       fireEvent.click(within(family).getByRole('button', { name: '1 人目の子を外す' }))
       expect(within(family).getByRole('button', { name: '1 人目の子を本当に外す' })).toBeTruthy()
       act(() => {
@@ -247,37 +284,34 @@ describe('計画（T6）', () => {
     expect(screen.queryByText('見本')).toBeNull()
   })
 
-  it('見本の世帯に戻す（T23）：見本のあいだは出ず、自分の計画では 2 回押しで保存を消して「ながめる」の見本に戻り、開き直しても見本のまま', () => {
-    // jsdom は window.scrollTo を持たない（呼ぶと「未実装」を出す）ので、先頭へ送ったことだけを見る
-    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
-    try {
-      window.location.hash = '#/plan'
-      render(<AppRouter />)
-      expect(screen.queryByRole('button', { name: '見本の世帯に戻す' })).toBeNull()
+  it('見本の世帯に戻す（T23）：見本のあいだは出ず、自分の計画では目標のページの下で 2 回押しで保存を消して「ながめる」の見本に戻り、開き直しても見本のまま', () => {
+    window.location.hash = '#/plan/goals'
+    render(<AppRouter />)
+    expect(screen.queryByRole('button', { name: '見本の世帯に戻す' })).toBeNull()
 
-      fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-      fireEvent.change(field('生活費'), { target: { value: '31' } })
-      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('暮らし')
+    fireEvent.change(field('生活費'), { target: { value: '31' } })
+    expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
+    // 目標のページのいちばん下にだけ出す
+    expect(screen.queryByRole('button', { name: '見本の世帯に戻す' })).toBeNull()
+    showSection('目標')
 
-      // 1 回目は確かめの言葉に変わるだけで、何も消さない
-      fireEvent.click(screen.getByRole('button', { name: '見本の世帯に戻す' }))
-      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
-      fireEvent.click(screen.getByRole('button', { name: '入れた数字を消して戻す' }))
+    // 1 回目は確かめの言葉に変わるだけで、何も消さない
+    fireEvent.click(screen.getByRole('button', { name: '見本の世帯に戻す' }))
+    expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).not.toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '入れた数字を消して戻す' }))
 
-      expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBeNull()
-      expect(window.location.hash).toBe('#/')
-      expect(scrollTo).toHaveBeenCalled()
-      expect(screen.getByText('見本')).toBeTruthy()
-      expect(screen.getByRole('button', { name: '自分の数字にする' })).toBeTruthy()
+    expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBeNull()
+    expect(window.location.hash).toBe('#/')
+    expect(screen.getByText('見本')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '自分の数字にする' })).toBeTruthy()
 
-      cleanup()
-      window.location.hash = '#/plan'
-      render(<AppRouter />)
-      expect(screen.getByText('見本')).toBeTruthy()
-      expect(field('生活費').matches(':disabled')).toBe(true)
-    } finally {
-      scrollTo.mockRestore()
-    }
+    cleanup()
+    window.location.hash = '#/plan/living'
+    render(<AppRouter />)
+    expect(screen.getByText('見本')).toBeTruthy()
+    expect(field('生活費').matches(':disabled')).toBe(true)
   })
 
   it('見本の世帯に戻そうとして保存を消せなければ、自分の計画のまま「計画」に留まって知らせる（T23）', () => {
@@ -290,11 +324,12 @@ describe('計画（T6）', () => {
       fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
       const before = localStorage.getItem(PLAN_STORAGE_V2_KEY)
 
+      showSection('目標')
       fireEvent.click(screen.getByRole('button', { name: '見本の世帯に戻す' }))
       fireEvent.click(screen.getByRole('button', { name: '入れた数字を消して戻す' }))
 
       expect(screen.getByRole('alert').textContent).toContain('見本に戻していません')
-      expect(window.location.hash).toBe('#/plan')
+      expect(window.location.hash).toBe('#/plan/goals')
       expect(screen.queryByText('見本')).toBeNull()
       expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBe(before)
       expect(consoleError).toHaveBeenCalled()
@@ -309,6 +344,7 @@ describe('計画（T6）', () => {
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
     const before = localStorage.getItem(PLAN_STORAGE_V2_KEY)
 
+    showSection('暮らし')
     fireEvent.change(field('市区町村'), { target: { value: '府中市' } })
     expect(screen.getByRole('alert').textContent).toContain('候補から選んで')
     expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBe(before)
@@ -333,6 +369,190 @@ describe('計画（T6）', () => {
   })
 })
 
+describe('4 つの区分と案内（T21）', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    window.location.hash = ''
+  })
+  afterEach(() => {
+    cleanup()
+  })
+
+  /** 保存の案内の進み具合（無ければ undefined） */
+  const storedGuide = (): unknown =>
+    (JSON.parse(localStorage.getItem(PLAN_STORAGE_V2_KEY) ?? '{}') as { guide?: unknown }).guide
+
+  /** 区分の帯の字（「1 家族済み」のように、読み上げの「済み」も入る） */
+  const navTexts = () =>
+    within(screen.getByRole('navigation', { name: '計画の区分' }))
+      .getAllByRole('link')
+      .map((link) => link.textContent)
+
+  it('自分の数字にする → 家族 → 次へ ×3 → 目標を足す → 要る年収を見る で「ながめる」に着き、案内が外れる', () => {
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    expect(window.location.hash).toBe('#/plan/family')
+    expect(storedGuide()).toEqual({ done: [] })
+    const title = screen.getByRole('heading', { level: 1 })
+    expect(title.textContent).toBe('家族の生まれ年を入れましょう')
+    // 題へフォーカスが移る（読み上げが新しい題を読む）
+    expect(document.activeElement).toBe(title)
+    expect(screen.getByText('薄い数字は仮の値です。自分の数字に直せます。')).toBeTruthy()
+    expect(
+      screen.getByText('入力した数字はこのブラウザに保存されます。外へは送りません。'),
+    ).toBeTruthy()
+    // 家族には「戻る」が無い。今いる区分は aria-current="step"
+    expect(screen.queryByRole('button', { name: '戻る' })).toBeNull()
+    expect(
+      within(screen.getByRole('navigation', { name: '計画の区分' }))
+        .getByRole('link', { name: /^1 家族/ })
+        .getAttribute('aria-current'),
+    ).toBe('step')
+
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    expect(window.location.hash).toBe('#/plan/income')
+    expect(storedGuide()).toEqual({ done: ['family'] })
+    expect(navTexts()).toEqual(['1 家族✓済み', '2 収入', '3 暮らし', '4 目標'])
+    expect(screen.getByText('年収は、税金と社会保険を引かれる前の金額です。')).toBeTruthy()
+    // 収入の小見出しは「本人」「パートナー」。ここには「外す」を置かない
+    expect(screen.getByRole('heading', { name: '本人' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'パートナー' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /を外す$/ })).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: '次へ：暮らし' }))
+    expect(window.location.hash).toBe('#/plan/living')
+    fireEvent.click(screen.getByRole('button', { name: '戻る' }))
+    expect(window.location.hash).toBe('#/plan/income')
+    fireEvent.click(screen.getByRole('button', { name: '次へ：暮らし' }))
+    fireEvent.click(screen.getByRole('button', { name: '次へ：目標' }))
+    expect(window.location.hash).toBe('#/plan/goals')
+    expect(storedGuide()).toEqual({ done: ['family', 'income', 'living'] })
+    expect(screen.getByText('金額や時期は、あとから何度でも直せます。')).toBeTruthy()
+    // 目標の区分には仮の値の注を出さない
+    expect(screen.queryByText('薄い数字は仮の値です。自分の数字に直せます。')).toBeNull()
+
+    // 自分で足した目標が無いあいだは線の「目標はあとで足す」。足すと「要る年収を見る」
+    expect(screen.getByRole('button', { name: '目標はあとで足す' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
+    expect(screen.queryByRole('button', { name: '目標はあとで足す' })).toBeNull()
+    // 足したあとも案内は続いている（欄を直して保存しても guide は残る）
+    expect(storedGuide()).toEqual({ done: ['family', 'income', 'living'] })
+    fireEvent.click(screen.getByRole('button', { name: '要る年収を見る' }))
+
+    expect(window.location.hash).toBe('#/')
+    expect(storedGuide()).toBeUndefined()
+    expect(screen.getByRole('region', { name: '概要' })).toBeTruthy()
+
+    // 案内を終えたあとは、済みの印も案内の注も出さない
+    fireEvent.click(screen.getByRole('link', { name: '計画' }))
+    expect(window.location.hash).toBe('#/plan/family')
+    expect(navTexts()).toEqual(['1 家族', '2 収入', '3 暮らし', '4 目標'])
+    expect(screen.queryByText('薄い数字は仮の値です。自分の数字に直せます。')).toBeNull()
+    expect(
+      screen.queryByText('入力した数字はこのブラウザに保存されます。外へは送りません。'),
+    ).toBeNull()
+  })
+
+  it('途中で閉じて開き直すと、「計画」は済んでいない最初の区分から始まる', () => {
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    fireEvent.click(screen.getByRole('button', { name: '次へ：暮らし' }))
+
+    cleanup()
+    window.location.hash = ''
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('link', { name: '計画' }))
+    expect(window.location.hash).toBe('#/plan/living')
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(
+      '毎月の暮らしにかかるお金は？',
+    )
+  })
+
+  it('知らない区分名は家族へ。前の版のリンク（/plan?goal=）は目標の区分のそのカードへ', () => {
+    window.location.hash = '#/plan/assumptions'
+    render(<AppRouter />)
+    expect(window.location.hash).toBe('#/plan/family')
+    cleanup()
+
+    const goalId = openPlanSession(localStorage, todayYearMonth(new Date())).plan.goals[0]?.id
+    if (goalId === undefined) throw new Error('見本に目標が無い')
+    window.location.hash = `#/plan?goal=${goalId}`
+    render(<AppRouter />)
+    expect(window.location.hash).toBe(`#/plan/goals?goal=${goalId}`)
+    expect(document.querySelector('details[open]')).not.toBeNull()
+  })
+
+  it('誤りのある欄があると「次へ」で進まず、その欄へフォーカスを移す。畳みの中なら畳みを開く', () => {
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+
+    // 家族：読めない生まれ年
+    const birth = field('本人の生まれ年')
+    fireEvent.change(birth, { target: { value: 'あ' } })
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    expect(window.location.hash).toBe('#/plan/family')
+    expect(document.activeElement).toBe(birth)
+    expect(storedGuide()).toEqual({ done: [] })
+    fireEvent.change(birth, { target: { value: '1985' } })
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    expect(window.location.hash).toBe('#/plan/income')
+
+    // 収入：畳みの中の欄をまたぐ問題（見込みに同じ年が 2 つ）。畳みは開いて、その行の欄へ
+    const folds = document.querySelectorAll<HTMLDetailsElement>('details.fold')
+    const selfFold = folds[0]
+    if (selfFold === undefined) throw new Error('収入の畳みが無い')
+    expect(selfFold.open).toBe(false)
+    fireEvent.click(selfFold.querySelector('summary') as Element)
+    fireEvent.click(within(selfFold).getByRole('button', { name: '見込みを足す' }))
+    fireEvent.click(within(selfFold).getByRole('button', { name: '見込みを足す' }))
+    const years = within(selfFold).getAllByLabelText<HTMLInputElement>(/^この年から/)
+    const [first, second] = years
+    if (first === undefined || second === undefined) throw new Error('見込みの行が 2 つ無い')
+    fireEvent.change(second, { target: { value: first.value } })
+    expect(screen.getByRole('status').textContent).toContain('直すまで保存しません')
+    // 畳みを閉じても、「次へ」で開いてその欄へ
+    selfFold.open = false
+    fireEvent.click(screen.getByRole('button', { name: '次へ：暮らし' }))
+    expect(window.location.hash).toBe('#/plan/income')
+    expect(selfFold.open).toBe(true)
+    expect(document.activeElement).toBe(first)
+  })
+
+  it('ほかの区分に欄をまたぐ問題があるときは進まず、上の知らせへ送る', () => {
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
+    fireEvent.click(screen.getByRole('button', { name: '毎月の支出を足す' }))
+    fireEvent.change(field('まで'), { target: { value: String(Number(field('から').value) - 1) } })
+    showSection('家族')
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    expect(window.location.hash).toBe('#/plan/family')
+    expect(document.activeElement?.className).toBe('plan__alerts')
+  })
+
+  it('見本の世帯のあいだも 4 つの区分を行き来でき、畳みは開ける。最後のボタンは「ながめる」へ移るだけ', () => {
+    window.location.hash = '#/plan/income'
+    render(<AppRouter />)
+    const fold = document.querySelector<HTMLDetailsElement>('details.fold')
+    if (fold === null) throw new Error('畳みが無い')
+    fireEvent.click(fold.querySelector('summary') as Element)
+    expect(fold.open).toBe(true)
+    expect(
+      within(fold)
+        .getByLabelText(/^副業の所得/)
+        .matches(':disabled'),
+    ).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: '次へ：暮らし' }))
+    expect(window.location.hash).toBe('#/plan/living')
+    fireEvent.click(screen.getByRole('button', { name: '次へ：目標' }))
+    // 見本には家などの目標があるので「要る年収を見る」
+    fireEvent.click(screen.getByRole('button', { name: '要る年収を見る' }))
+    expect(window.location.hash).toBe('#/')
+    expect(localStorage.getItem(PLAN_STORAGE_V2_KEY)).toBeNull()
+  })
+})
+
 describe('家のカード（T7）', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -349,6 +569,7 @@ describe('家のカード（T7）', () => {
   it('自分の数字にする → 家を足す → 頭金を変える → 毎月いくらと「ながめる」が変わり、開き直しても残る', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     expect(storedHome()).toBeDefined()
 
@@ -381,7 +602,7 @@ describe('家のカード（T7）', () => {
     expect(within(goals).getByText('家')).toBeTruthy()
 
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     expect(storedHome()?.downPayment).toBe(8000000)
     expect(screen.getByText('家')).toBeTruthy()
@@ -414,6 +635,7 @@ describe('車のカード（T8）', () => {
     const before = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!before.ok) throw new Error(before.message)
     fireEvent.click(screen.getByRole('link', { name: '計画' }))
+    showSection('目標')
 
     fireEvent.click(screen.getByRole('button', { name: '車を足す' }))
     expect(storedCar()?.payment).toEqual({ type: 'cash' })
@@ -455,7 +677,7 @@ describe('車のカード（T8）', () => {
     expect(within(goals).getByText('車')).toBeTruthy()
 
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     expect(storedCar()?.payment).toEqual({ type: 'loan', years: 4 })
     expect(screen.getByText('車')).toBeTruthy()
@@ -503,6 +725,7 @@ describe('子の費用のカード（T9）', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
     expect(storedChildCosts().map((g) => g.childId)).toEqual(['child-1', 'child-2'])
+    showSection('目標')
     const before = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!before.ok) throw new Error(before.message)
 
@@ -550,20 +773,23 @@ describe('子の費用のカード（T9）', () => {
     expect(within(goals).getByText(name)).toBeTruthy()
     fireEvent.click(screen.getByRole('link', { name: '計画' }))
 
-    const family = screen.getByRole('region', { name: '家族' })
+    // 案内の途中（どの区分も済んでいない）なので、「計画」のタブは家族から開く
+    const family = familyPage()
     fireEvent.click(within(family).getByRole('button', { name: '子を足す' }))
     expect(storedChildCosts().map((g) => g.childId)).toEqual(['child-1', 'child-2', 'child-3'])
+    showSection('目標')
     expect(screen.getByText('子の費用（3人目）')).toBeTruthy()
 
-    fireEvent.click(within(family).getByRole('button', { name: '1 人目の子を外す' }))
-    fireEvent.click(within(family).getByRole('button', { name: '1 人目の子を本当に外す' }))
+    showSection('家族')
+    fireEvent.click(within(familyPage()).getByRole('button', { name: '1 人目の子を外す' }))
+    fireEvent.click(within(familyPage()).getByRole('button', { name: '1 人目の子を本当に外す' }))
     expect(storedChildCosts().map((g) => g.childId)).toEqual(['child-2', 'child-3'])
     // 外した子のカードの印は残らない。残った子のカードの印は残る
     expect(stored().touched.some((key) => key.startsWith('goals.childcost-child-1'))).toBe(false)
     expect(stored().touched).toContain('goals.childcost-child-2.highSchool')
 
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     expect(storedChildCosts().map((g) => g.childId)).toEqual(['child-2', 'child-3'])
     expect(storedChildCosts()[0]?.schools.highSchool).toBe('private')
@@ -616,7 +842,7 @@ describe('目標の重さ（T11）', () => {
   }
 
   it('見本のまま（入力が止まっている）でも、全部のカードの見出しに重さが出て、外して計算し直した差と同じ言葉になる', async () => {
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     const plan = openPlanSession(localStorage, todayYearMonth(new Date())).plan
     await waitFor(() => expect(weights().size).toBe(plan.goals.length), { timeout: 20000 })
@@ -639,6 +865,7 @@ describe('目標の重さ（T11）', () => {
   it('自分の数字にする → 家を足す → 見出しに重さが出る → オフにすると「ながめる」のいちばん高い段が、出ていた数字のぶんだけ下がる → 開き直しても同じ', async () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     const card = openCard()
     await waitFor(() => expect(weightIn(card)).toMatch(/^外すと [\d,]+万円下がる$/), {
@@ -649,6 +876,7 @@ describe('目標の重さ（T11）', () => {
     fireEvent.click(screen.getByRole('link', { name: 'ながめる' }))
     const withHome = highestStepOnScreen()
     fireEvent.click(screen.getByRole('link', { name: '計画' }))
+    showSection('目標')
 
     const homeCard = cardNamed('家')
     if (!homeCard.hasAttribute('open'))
@@ -671,6 +899,7 @@ describe('目標の重さ（T11）', () => {
   it('保存が止まっているあいだは、直したカードと、消したカードの id を使い回した別のカードに前の重さを出さない', async () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     await waitFor(() => expect(weightIn(cardNamed('家'))).toMatch(/下がる$/), { timeout: 20000 })
 
@@ -730,6 +959,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
     const before = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!before.ok) throw new Error(before.message)
+    showSection('目標')
     // 回す前は、子の費用のカードが児童手当を収入の帯で出している
     expect(bandsNamed('児童手当（2人目）').map((band) => band.kind)).toEqual(['income'])
 
@@ -773,7 +1003,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
     expect(within(goals).getByText('大学資金（2人目）')).toBeTruthy()
 
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     expect(storedUniversity()).toEqual([
       expect.objectContaining({
@@ -785,7 +1015,8 @@ describe('大学資金・老後資金のカード（T10）', () => {
     expect(screen.getByText('大学資金（2人目）')).toBeTruthy()
 
     // 子を外すと、その子の大学資金のカードも消える
-    const family = screen.getByRole('region', { name: '家族' })
+    showSection('家族')
+    const family = familyPage()
     fireEvent.click(within(family).getByRole('button', { name: '2 人目の子を外す' }))
     fireEvent.click(within(family).getByRole('button', { name: '2 人目の子を本当に外す' }))
     expect(storedUniversity()).toEqual([])
@@ -805,6 +1036,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
   it('大学資金を足すと私立理系で入る → 私立文系・国立を選ぶと目標額と月の積立が替わり、保存される（D37）', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '大学資金（2人目）を足す' }))
     const card = openCard()
 
@@ -854,6 +1086,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
   it('進路を持たない前の保存の大学資金のカードは、どれも選ばずに開き、目標額はそのまま。選んだときに初めて替わる', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '大学資金（2人目）を足す' }))
     // 保存を T10 のころの形（進路なし・目標額 418 万円）に書き換えて、開き直す
     const raw = JSON.parse(localStorage.getItem(PLAN_STORAGE_V2_KEY) ?? '{}') as {
@@ -866,7 +1099,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
     })
     localStorage.setItem(PLAN_STORAGE_V2_KEY, JSON.stringify(raw))
     cleanup()
-    window.location.hash = '#/plan'
+    window.location.hash = '#/plan/goals'
     render(<AppRouter />)
     const summary = screen.getByText('大学資金（2人目）').closest('summary')
     if (summary === null) throw new Error('大学資金のカードが無い')
@@ -895,6 +1128,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
   it('老後資金を足すと、期限は年上の大人の退職の年で入り、足すボタンは消える', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '老後資金を足す' }))
     expect(screen.queryByRole('button', { name: '老後資金を足す' })).toBeNull()
     const card = openCard()

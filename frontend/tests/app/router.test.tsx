@@ -125,8 +125,12 @@ describe('AppRouter', () => {
 
   it('タブで計画・見直すへ移れる', () => {
     render(<AppRouter />)
+    // 「計画」は 4 つの区分のページ。案内の無い見本では家族から開き、題（h1）は区分の題（T21）
     fireEvent.click(screen.getByRole('link', { name: '計画' }))
-    expect(screen.getByRole('heading', { name: '計画' })).toBeTruthy()
+    expect(window.location.hash).toBe('#/plan/family')
+    expect(
+      screen.getByRole('heading', { level: 1, name: '家族の生まれ年を入れましょう' }),
+    ).toBeTruthy()
     fireEvent.click(screen.getByRole('link', { name: '見直す' }))
     expect(screen.getByRole('heading', { name: '見直す' })).toBeTruthy()
     fireEvent.click(screen.getByRole('link', { name: 'ながめる' }))

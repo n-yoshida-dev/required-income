@@ -53,6 +53,8 @@ describe('見直す（T12）', () => {
   it('自分の数字にする → 家と車 → 家をオフにすると階段と数字がその場で変わり、離れると元のまま。「この案にする」で残る', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
+    fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     fireEvent.click(screen.getByRole('button', { name: '車を足す' }))
 
@@ -111,9 +113,34 @@ describe('見直す（T12）', () => {
     expect(toggle('家').checked).toBe(false)
   })
 
+  it('案内の途中で「この案にする」を押しても、案内の進み具合（guide）は保存に残る（T21）', () => {
+    /** 保存の中の案内の進み具合（無ければ undefined） */
+    const storedGuide = (): unknown =>
+      (JSON.parse(localStorage.getItem(PLAN_STORAGE_V2_KEY) ?? '{}') as { guide?: unknown }).guide
+
+    render(<AppRouter />)
+    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    // 家族だけ済ませて、目標の区分で家を足す（案内はまだ終えていない）
+    fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
+    fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
+    fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
+    expect(storedGuide()).toEqual({ done: ['family'] })
+
+    goTo('見直す')
+    fireEvent.click(toggle('家'))
+    fireEvent.click(screen.getByRole('button', { name: 'この案にする' }))
+    expect(stored().plan.goals.find((goal) => goal.kind === 'home')?.enabled).toBe(false)
+    // 案を今の計画にしても、案内は続いている（「計画」を開くと、済んでいない最初の区分＝収入から）
+    expect(storedGuide()).toEqual({ done: ['family'] })
+    goTo('計画')
+    expect(window.location.hash).toBe('#/plan/income')
+  })
+
   it('家を 2 年ずらす・元に戻す。動かした値は今の計画と見分けられる', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
+    fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     goTo('見直す')
 
@@ -143,13 +170,17 @@ describe('見直す（T12）', () => {
 
     // 自分の数字にすると「計画」へ移る（見本のカードは持ち込まない）
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-    expect(screen.getByRole('heading', { name: '計画' })).toBeTruthy()
+    expect(
+      screen.getByRole('heading', { level: 1, name: '家族の生まれ年を入れましょう' }),
+    ).toBeTruthy()
     expect(stored().plan.goals.some((goal) => goal.kind === 'home')).toBe(false)
   })
 
   it('家の価格は頭金より下へ押せない（押すだけで計算できない案を作らない）', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
+    fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     goTo('見直す')
 
@@ -179,7 +210,7 @@ describe('見直す（T12）', () => {
     render(
       <MemoryRouter>
         <ReviewPage
-          session={{ plan, origin: 'saved', touched: [], storageProblem: null }}
+          session={{ plan, origin: 'saved', touched: [], storageProblem: null, guide: null }}
           result={result}
           onAdopt={() => ({ ok: true, saved: true })}
           onStartOwn={() => undefined}

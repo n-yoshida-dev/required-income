@@ -11,6 +11,7 @@ import { sampleLifePlan, syncChildCostGoals } from '../domain/plan/defaults'
 import { evaluate } from '../domain/plan/evaluate'
 import type { Evaluation, LifePlan, YearMonth } from '../domain/plan/types'
 import { yearMonth } from '../domain/plan/yearMonth'
+import { startGuide, type Guide } from '../features/plan/guide'
 import {
   clearPlanV2,
   loadPlanV2,
@@ -31,6 +32,11 @@ export type PlanSession = {
   touched: string[]
   /** 保存があったのに見本で開いたときの訳。それ以外は null */
   storageProblem: StorageProblem | null
+  /**
+   * 案内の進み具合（T21）。null は案内のあいだでない（見本・案内を終えた・案内が入る前の保存）。
+   * 「自分の数字にする」で始まり、最後のボタンで外れる
+   */
+  guide: Guide | null
 }
 
 /**
@@ -80,6 +86,7 @@ export function openPlanSession(storage: PlanStorageV2, today: YearMonth): PlanS
       origin: 'saved',
       touched: loaded.touched,
       storageProblem: null,
+      guide: loaded.guide,
     }
   }
   return sampleSession(
@@ -152,6 +159,7 @@ function sampleSession(today: YearMonth, storageProblem: StorageProblem | null):
     origin: 'sample',
     touched: [],
     storageProblem,
+    guide: null,
   }
 }
 
@@ -161,7 +169,8 @@ function sampleSession(today: YearMonth, storageProblem: StorageProblem | null):
  * 目標カードは空にして始める（見本のカードを持ち込まない。見本の数字と自分の数字が混ざらないように。
  * 見本に家・車などのカードが増えても外し漏れないよう、見本のカードを選り分けずに全部外す）。
  * ただし子の費用のカードは子ごとに付く物なので、家族に子がいれば、その子の雛形のカード（すべて公立・塾なし）を付ける。
- * 家族・暮らし・前提は見本の値を残し、直した欄の印は空（すべて既定値のまま）にする
+ * 家族・暮らし・前提は見本の値を残し、直した欄の印は空（すべて既定値のまま）にする。
+ * 案内（T21）を始める（どの区分も済んでいない。画面は「計画」の家族へ移る）
  */
 export function startOwnPlan(session: PlanSession): PlanSession {
   // 子の費用のカードは子ごとに付く（SPEC §2.1）ので、見本のカードを外したあと、子の数だけ雛形のカードを付け直す
@@ -171,7 +180,20 @@ export function startOwnPlan(session: PlanSession): PlanSession {
     origin: 'saved',
     touched: [],
     storageProblem: null,
+    guide: startGuide(),
   }
+}
+
+/**
+ * 案内の進み具合だけを変えて保存する（「次へ」で区分を済みにしたとき・最後のボタンで案内を終えたとき。T21）。
+ * 計画と印は今の物のまま書き直す。端末に書けなければ false（画面が知らせる）
+ */
+export function saveGuide(
+  session: Pick<PlanSession, 'plan' | 'touched'>,
+  guide: Guide | null,
+  storage: PlanStorageV2,
+): boolean {
+  return savePlanV2(session.plan, session.touched, storage, guide)
 }
 
 /**
@@ -196,16 +218,22 @@ export function returnToSample(
  * - 計算できない（契約違反）ときは保存しない。理由を返し、画面が出す（保存の前に止める）
  * - 計算できたら保存する。端末に書けなかったら `saved: false`（画面が知らせる。計算の結果は使う）
  *
- * 欄をまたぐ問題（`features/plan/planIssues.ts`）は、呼ぶ前に画面が確かめる
+ * 欄をまたぐ問題（`features/plan/planIssues.ts`）は、呼ぶ前に画面が確かめる。
+ * 案内の途中なら、その進み具合（`guide`）も一緒に書く（書かないと、直すたびに案内が消える）
  */
 export function commitPlan(
   plan: LifePlan,
   touched: readonly string[],
   storage: PlanStorageV2,
+  guide: Guide | null = null,
 ): { ok: true; evaluation: Evaluation; saved: boolean } | { ok: false; message: string } {
   const result = evaluatePlan(plan)
   if (!result.ok) return result
-  return { ok: true, evaluation: result.evaluation, saved: savePlanV2(plan, touched, storage) }
+  return {
+    ok: true,
+    evaluation: result.evaluation,
+    saved: savePlanV2(plan, touched, storage, guide),
+  }
 }
 
 /**

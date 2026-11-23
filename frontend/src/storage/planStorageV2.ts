@@ -6,12 +6,14 @@
  * - `touched` は利用者が直した項目の印（既定値のままの欄と見分けるため。中身の書き方は「計画」の画面（T6）が決める）
  * - 読むときに Zod で形を確かめる。壊れていたら理由を返し、見本の世帯で開くかは呼び出し側が決める
  * - 前の版の保存（`…plan.v1`・`…scenarios.v1`）は読まないし、消さない（D35）
+ * - 案内の進み具合（`guide`。T21）は任意の項目。無い保存（案内が入る前）もそのまま読む。`guide` だけ壊れていても計画は開く
  *
  * 保存先は引数で受け取る（テストで差し替えるため。ブラウザでは `localStorage`）。入力はどこにも送らない。
  */
 
 import { z } from 'zod'
 import type { Goal, LifePlan, Month } from '../domain/plan/types'
+import { knownSections, type Guide } from '../features/plan/guide'
 
 /** localStorage のキー。形を変えて古い保存を読めなくなるときは末尾の版を上げる */
 export const PLAN_STORAGE_V2_KEY = 'life-plan-simulator.plan.v2'
@@ -34,7 +36,7 @@ export type StoredPlan = Omit<LifePlan, 'baseYearMonth'>
 /** 読んだ結果。無い・読めた・壊れていた、を分けて返す */
 export type LoadPlanResult =
   | { kind: 'empty' }
-  | { kind: 'loaded'; plan: StoredPlan; touched: string[] }
+  | { kind: 'loaded'; plan: StoredPlan; touched: string[]; guide: Guide | null }
   | { kind: 'broken'; reason: string }
 
 // ---------------------------------------------------------------------------
@@ -173,18 +175,26 @@ const planFile = z.object({
   touched: z.array(z.string()),
 })
 
+/**
+ * 案内の進み具合（T21）。計画とは別に確かめる（ここだけ壊れていても計画は開くため）。
+ * 区分の id は文字列で受け、知らない id は読むときに捨てる（区分の名前が変わっても計画を開けるように）
+ */
+const guideField = z.object({ done: z.array(z.string()) })
+
 // ---------------------------------------------------------------------------
 // 読み書き
 // ---------------------------------------------------------------------------
 
 /**
  * 計画を保存する。`LifePlan` をそのまま渡してよく、起点の年月は書かない（保存する項目だけを選んで書く）。
- * 直した項目の印は重ねずに並べ替えて持つ。容量超過などで書けなければ false（呼び出し側が利用者に知らせる）
+ * 直した項目の印は重ねずに並べ替えて持つ。案内の進み具合（`guide`）は案内の途中だけ書き、null なら書かない。
+ * 容量超過などで書けなければ false（呼び出し側が利用者に知らせる）
  */
 export function savePlanV2(
   plan: StoredPlan,
   touched: readonly string[],
   storage: PlanStorageV2,
+  guide: Guide | null = null,
 ): boolean {
   const stored: StoredPlan = {
     adults: plan.adults,
@@ -199,6 +209,7 @@ export function savePlanV2(
     version: FORMAT_VERSION,
     plan: stored,
     touched: [...new Set(touched)].sort(),
+    ...(guide === null ? {} : { guide: { done: knownSections(guide.done) } }),
   }
   try {
     storage.setItem(PLAN_STORAGE_V2_KEY, JSON.stringify(file))
@@ -247,5 +258,27 @@ export function loadPlanV2(storage: PlanStorageV2): LoadPlanResult {
     const where = first && first.path.length > 0 ? `（${first.path.join('.')}）` : ''
     return { kind: 'broken', reason: `保存の形が合いません${where}` }
   }
-  return { kind: 'loaded', plan: parsed.data.plan, touched: parsed.data.touched }
+  return {
+    kind: 'loaded',
+    plan: parsed.data.plan,
+    touched: parsed.data.touched,
+    guide: readGuide(json),
+  }
+}
+
+/**
+ * 保存から案内の進み具合を読む。無ければ null（案内を終えた、または案内が入る前の保存）。
+ * 形が合わなければ案内を終えた扱い（null）にし、計画はそのまま開く（理由は console に残す。握りつぶさない）
+ */
+function readGuide(json: unknown): Guide | null {
+  if (typeof json !== 'object' || json === null || !('guide' in json)) return null
+  const parsed = guideField.safeParse(json.guide)
+  if (!parsed.success) {
+    console.warn(
+      '保存した案内の進み具合を読めなかったので、案内を終えた扱いで開きます',
+      parsed.error,
+    )
+    return null
+  }
+  return { done: knownSections(parsed.data.done) }
 }

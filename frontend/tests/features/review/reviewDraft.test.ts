@@ -150,11 +150,11 @@ describe('目標の時期と金額', () => {
 })
 
 describe('収入と利回り', () => {
-  it('副業は働く大人ごと、年収はもう 1 人だけ', () => {
+  it('副業は働く大人ごと、年収はパートナーだけ', () => {
     const adults = reviewAdults(samplePlan())
     expect(adults.map((adult) => [adult.title, adult.showsIncome])).toEqual([
       ['本人', false],
-      ['もう 1 人', true],
+      ['パートナー', true],
     ])
   })
 

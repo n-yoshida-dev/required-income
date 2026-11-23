@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { appDefaults, sampleHousehold } from '../../src/data/appData'
 import { sampleLifePlan } from '../../src/domain/plan/defaults'
 import { yearMonth } from '../../src/domain/plan/yearMonth'
@@ -44,6 +44,84 @@ describe('savePlanV2・loadPlanV2', () => {
       kind: 'loaded',
       plan: rest,
       touched: ['living.monthlyRent'],
+      guide: null,
+    })
+  })
+
+  describe('案内の進み具合（guide。T21）', () => {
+    it('案内の途中なら guide を書き、読むと同じ進み具合に戻る。null なら書かない', () => {
+      const { storage, items } = memoryStorage()
+      savePlanV2(plan, [], storage, { done: ['family', 'income'] })
+      const raw = JSON.parse(items.get(PLAN_STORAGE_V2_KEY) ?? '{}') as Record<string, unknown>
+      expect(raw.guide).toEqual({ done: ['family', 'income'] })
+      expect(raw.version).toBe(2)
+      const loaded = loadPlanV2(storage)
+      expect(loaded.kind === 'loaded' ? loaded.guide : 'x').toEqual({ done: ['family', 'income'] })
+
+      savePlanV2(plan, [], storage, null)
+      expect(JSON.parse(items.get(PLAN_STORAGE_V2_KEY) ?? '{}')).not.toHaveProperty('guide')
+      const finished = loadPlanV2(storage)
+      expect(finished.kind === 'loaded' ? finished.guide : 'x').toBeNull()
+    })
+
+    it('guide の無い保存（案内が入る前）は、そのまま開ける（guide は null）', () => {
+      const { baseYearMonth: _base, ...rest } = plan
+      const { storage } = memoryStorage({
+        [PLAN_STORAGE_V2_KEY]: JSON.stringify({
+          app: 'life-plan-simulator',
+          version: 2,
+          plan: rest,
+          touched: ['living.monthlyRent'],
+        }),
+      })
+      expect(loadPlanV2(storage)).toEqual({
+        kind: 'loaded',
+        plan: rest,
+        touched: ['living.monthlyRent'],
+        guide: null,
+      })
+    })
+
+    it('知らない区分の id は捨てる', () => {
+      const { baseYearMonth: _base, ...rest } = plan
+      const { storage } = memoryStorage({
+        [PLAN_STORAGE_V2_KEY]: JSON.stringify({
+          app: 'life-plan-simulator',
+          version: 2,
+          plan: rest,
+          touched: [],
+          guide: { done: ['income', 'assumptions', 'family'] },
+        }),
+      })
+      const loaded = loadPlanV2(storage)
+      expect(loaded.kind === 'loaded' ? loaded.guide : 'x').toEqual({
+        done: ['family', 'income'],
+      })
+    })
+
+    it('guide だけ壊れていても計画は開く（案内を終えた扱いの null）', () => {
+      const { baseYearMonth: _base, ...rest } = plan
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      try {
+        for (const guide of ['family', { done: 'family' }, { done: [1, 2] }, null]) {
+          const { storage } = memoryStorage({
+            [PLAN_STORAGE_V2_KEY]: JSON.stringify({
+              app: 'life-plan-simulator',
+              version: 2,
+              plan: rest,
+              touched: ['living.monthlyRent'],
+              guide,
+            }),
+          })
+          const loaded = loadPlanV2(storage)
+          expect(loaded.kind).toBe('loaded')
+          expect(loaded.kind === 'loaded' ? loaded.guide : 'x').toBeNull()
+          expect(loaded.kind === 'loaded' ? loaded.touched : null).toEqual(['living.monthlyRent'])
+        }
+        expect(warn).toHaveBeenCalled()
+      } finally {
+        warn.mockRestore()
+      }
     })
   })
 

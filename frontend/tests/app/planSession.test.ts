@@ -1,13 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   commitPlan,
   evaluatePlan,
   openAndEvaluate,
   openPlanSession,
   returnToSample,
+  saveGuide,
   startOwnPlan,
   todayYearMonth,
 } from '../../src/app/planSession'
+import { markDone, resumeSection, startGuide } from '../../src/features/plan/guide'
 import { appDefaults } from '../../src/data/appData'
 import { childCostGoalTemplate } from '../../src/domain/plan/defaults'
 import type { Goal } from '../../src/domain/plan/types'
@@ -96,6 +98,74 @@ describe('openPlanSession', () => {
     const session = openPlanSession(memoryStorage({ [PLAN_STORAGE_V2_KEY]: 'x' }), today)
     expect(session.origin).toBe('sample')
     expect(session.storageProblem?.kind).toBe('unreadable')
+    expect(session.guide).toBeNull()
+  })
+})
+
+describe('案内の進み具合（T21）', () => {
+  it('自分の数字にすると案内が始まり、保存して開き直すと家族から始まる', () => {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    expect(own.guide).toEqual({ done: [] })
+    const committed = commitPlan(own.plan, own.touched, storage, own.guide)
+    expect(committed.ok).toBe(true)
+    const reopened = openPlanSession(storage, today)
+    expect(reopened.guide).toEqual({ done: [] })
+    expect(resumeSection(reopened.guide)).toBe('family')
+  })
+
+  it('途中の保存（家族と収入が済み）から開くと、暮らしから再開する。欄を直して保存しても進み具合は残る', () => {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    const guide = markDone(markDone(startGuide(), 'family'), 'income')
+    expect(saveGuide(own, guide, storage)).toBe(true)
+    const reopened = openPlanSession(storage, today)
+    expect(reopened.guide).toEqual({ done: ['family', 'income'] })
+    expect(resumeSection(reopened.guide)).toBe('living')
+
+    const rent = { ...reopened.plan, living: { ...reopened.plan.living, monthlyRent: 85000 } }
+    commitPlan(rent, ['living.monthlyRent'], storage, reopened.guide)
+    expect(resumeSection(openPlanSession(storage, today).guide)).toBe('living')
+  })
+
+  it('案内を終えて保存すると guide が外れ、開き直すと家族（案内なし）', () => {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    saveGuide(own, { done: ['family', 'income', 'living'] }, storage)
+    saveGuide(own, null, storage)
+    const reopened = openPlanSession(storage, today)
+    expect(reopened.origin).toBe('saved')
+    expect(reopened.guide).toBeNull()
+    expect(resumeSection(reopened.guide)).toBe('family')
+  })
+
+  it('guide の無い保存（案内が入る前）は案内なしでそのまま開く', () => {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    savePlanV2(own.plan, ['living.monthlyRent'], storage)
+    const reopened = openPlanSession(storage, today)
+    expect(reopened.origin).toBe('saved')
+    expect(reopened.guide).toBeNull()
+    expect(reopened.touched).toEqual(['living.monthlyRent'])
+  })
+
+  it('guide だけ壊れた保存でも、計画は自分の計画のまま開く', () => {
+    const storage = memoryStorage()
+    const own = startOwnPlan(openPlanSession(storage, today))
+    savePlanV2(own.plan, ['living.monthlyRent'], storage)
+    const raw = JSON.parse(storage.getItem(PLAN_STORAGE_V2_KEY) ?? '{}') as Record<string, unknown>
+    raw.guide = { done: 'family' }
+    storage.setItem(PLAN_STORAGE_V2_KEY, JSON.stringify(raw))
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      const { session, result } = openAndEvaluate(storage, today)
+      expect(session.origin).toBe('saved')
+      expect(session.storageProblem).toBeNull()
+      expect(session.guide).toBeNull()
+      expect(result.ok).toBe(true)
+    } finally {
+      warn.mockRestore()
+    }
   })
 })
 

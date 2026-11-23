@@ -21,6 +21,7 @@ import type { Goal, LifePlan, Rate, YearMonth, Yen } from '../../domain/plan/typ
 import { addMonths, monthIndex } from '../../domain/plan/yearMonth'
 import { INPUT_LIMITS } from '../plan/inputLimits'
 import { touchedKey, withTouched } from '../plan/touched'
+import { adultName } from '../shared/adultNames'
 import { formatPercent, manNumber } from '../shared/format'
 import { REVIEW_LIMITS, REVIEW_STEPS } from './reviewSteps'
 
@@ -296,9 +297,9 @@ export function stepReturnRate(plan: LifePlan, direction: Direction): LifePlan {
  */
 export function reviewAdults(plan: LifePlan): {
   id: string
-  /** 「本人」「もう 1 人」（大人が 1 人なら null） */
+  /** 「本人」「パートナー」（大人が 1 人なら null。言葉は `shared/adultNames.ts`） */
   title: string | null
-  /** 年収の欄を出すか（もう 1 人だけ） */
+  /** 年収の欄を出すか（パートナーだけ） */
   showsIncome: boolean
   selfEmployed: boolean
 }[] {
@@ -308,16 +309,13 @@ export function reviewAdults(plan: LifePlan): {
       : [
           {
             id: adult.id,
-            title: plan.adults.length === 1 ? null : ADULT_TITLES[index === 0 ? 0 : 1],
+            title: plan.adults.length === 1 ? null : adultName(index),
             showsIncome: index > 0,
             selfEmployed: adult.workStyle === 'selfEmployed',
           },
         ],
   )
 }
-
-/** 大人の呼び方（「計画」の家族の見出しと同じ） */
-const ADULT_TITLES = ['本人', 'もう 1 人'] as const
 
 // ---------------------------------------------------------------------------
 // 今の計画と比べる

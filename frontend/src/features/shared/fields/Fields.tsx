@@ -27,6 +27,11 @@ const MONTHS: readonly Month[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 /** どの欄にもある項目 */
 type BaseProps = {
   label: string
+  /**
+   * 読み上げにだけ足す名前の続き（見える字は `label` だけ）。
+   * 「本人」の行の欄を「本人の生まれ年」と読ませるときに使う（家族のページの 1 人 1 行。T21）
+   */
+  labelHidden?: string
   /** 直した欄か。false なら既定値のまま */
   touched: boolean
   /** 欄の外で見つかった問題（年が逆など）。あれば欄の下に出す */
@@ -37,6 +42,7 @@ type BaseProps = {
 function FieldRow({
   id,
   label,
+  labelHidden,
   touched,
   error,
   note,
@@ -44,6 +50,7 @@ function FieldRow({
 }: {
   id: string
   label: string
+  labelHidden?: string
   touched: boolean
   error: string | null
   /** 欄の下に出す短い補足（自治体の名前など） */
@@ -57,6 +64,7 @@ function FieldRow({
     <div className={className} data-touched={touched}>
       <label className="field__label" htmlFor={id}>
         {label}
+        {labelHidden === undefined ? null : <span className="visually-hidden">{labelHidden}</span>}
         {touched ? null : <span className="visually-hidden">（既定値のまま）</span>}
       </label>
       <span className="field__control">{children}</span>
@@ -91,6 +99,7 @@ type NumberRule = {
  */
 function NumberField({
   label,
+  labelHidden,
   touched,
   issue,
   value,
@@ -119,7 +128,14 @@ function NumberField({
   }
 
   return (
-    <FieldRow id={id} label={label} touched={touched} error={error ?? issue ?? null} note={note}>
+    <FieldRow
+      id={id}
+      label={label}
+      labelHidden={labelHidden}
+      touched={touched}
+      error={error ?? issue ?? null}
+      note={note}
+    >
       <input
         id={id}
         type="text"
@@ -237,6 +253,8 @@ export function IntegerField(
  */
 export function YearMonthField({
   label,
+  labelHidden,
+  monthLabel,
   touched,
   issue,
   value,
@@ -248,6 +266,8 @@ export function YearMonthField({
   onChange: (value: YearMonth) => void
   minYear: number
   maxYear: number
+  /** 月の欄の読み上げの名前。無ければ「<label>の月」 */
+  monthLabel?: string
 }) {
   const id = useId()
   const [yearText, setYearText] = useState(String(value.year))
@@ -260,7 +280,13 @@ export function YearMonthField({
   }
 
   return (
-    <FieldRow id={id} label={label} touched={touched} error={error ?? issue ?? null}>
+    <FieldRow
+      id={id}
+      label={label}
+      labelHidden={labelHidden}
+      touched={touched}
+      error={error ?? issue ?? null}
+    >
       <input
         id={id}
         type="text"
@@ -288,7 +314,7 @@ export function YearMonthField({
       <span className="field__unit">年</span>
       <select
         className="field__input field__input--month"
-        aria-label={`${label}の月`}
+        aria-label={monthLabel ?? `${label}の月`}
         value={value.month}
         onChange={(event) => {
           const month = MONTHS.find((m) => m === Number(event.target.value))

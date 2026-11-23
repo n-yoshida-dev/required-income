@@ -1,17 +1,33 @@
 /**
  * 画面の切り替え（SPEC §1・§4）。HashRouter で 3 つの画面を持ち、下に 3 つのタブを置く。
  *
- * - `/#/` ながめる（開いたら最初に出る）／`/#/plan` 計画／`/#/review` 見直す
+ * - `/#/` ながめる（開いたら最初に出る）／`/#/plan/<区分>` 計画（家族・収入・暮らし・目標。T21）／`/#/review` 見直す
+ * - `/#/plan` は「再開する区分」（案内の途中なら済んでいない最初の区分、それ以外は家族）へ置き換える。知らない区分名は家族へ
  * - HashRouter にするのは、vite の `base` が `'./'` で GitHub Pages に置くため（パスのルーターだと再読み込みで 404 になる）
  * - 計画はここで持つ。開いたときに保存から読んで計算し、「計画」で直すたびに確かめて・計算して・保存する（SPEC §4.2）。
- *   「ながめる」は最後に計算できた計画を出す
+ *   「ながめる」は最後に計算できた計画を出す。案内の進み具合（`guide`）も計画と一緒に持ち、保存する（SPEC §5）
  */
 
-import { useState } from 'react'
-import { HashRouter, Navigate, NavLink, Route, Routes } from 'react-router'
+import { useState, type ReactNode } from 'react'
+import {
+  HashRouter,
+  Navigate,
+  NavLink,
+  Route,
+  Routes,
+  useParams,
+  useSearchParams,
+} from 'react-router'
 import { peakGross } from '../domain/plan/impact'
 import type { LifePlan } from '../domain/plan/types'
 import { HomePage } from '../features/home/HomePage'
+import {
+  isPlanSection,
+  markDone,
+  resumeSection,
+  type Guide,
+  type PlanSectionId,
+} from '../features/plan/guide'
 import { PlanPage } from '../features/plan/PlanPage'
 import { planIssues } from '../features/plan/planIssues'
 import { ReviewPage } from '../features/review/ReviewPage'
@@ -21,6 +37,7 @@ import {
   commitPlan,
   openAndEvaluate,
   returnToSample,
+  saveGuide,
   startOwnPlan,
   todayYearMonth,
   type EvaluationResult,
@@ -81,7 +98,7 @@ export function AppRouter() {
       setState((current) => ({ ...current, draft, commitError: null }))
       return
     }
-    const committed = commitPlan(plan, touched, storage)
+    const committed = commitPlan(plan, touched, storage, base.guide)
     if (!committed.ok) {
       setState((current) => ({ ...current, draft, commitError: committed.message }))
       return
@@ -102,7 +119,7 @@ export function AppRouter() {
   const adopt = (plan: LifePlan, touched: string[]): AdoptResult => {
     const [issue] = planIssues(plan).values()
     if (issue !== undefined) return { ok: false, message: issue }
-    const committed = commitPlan(plan, touched, storage)
+    const committed = commitPlan(plan, touched, storage, state.session.guide)
     if (!committed.ok) return committed
     setState((current) => ({
       session: { ...current.session, plan, touched, origin: 'saved', storageProblem: null },
@@ -137,7 +154,46 @@ export function AppRouter() {
     return true
   }
 
+  /**
+   * 案内の進み具合を変えて保存する（T21）。計画と印は最後に保存した物のまま書き直す。
+   * 案内のあいだでなければ何もしない。端末に書けなければ、ほかの保存と同じく知らせる
+   */
+  const changeGuide = (next: (guide: Guide) => Guide | null) => {
+    const guide = state.session.guide
+    if (guide === null) return
+    const changed = next(guide)
+    const saved = saveGuide(state.session, changed, storage)
+    setState((current) => ({
+      ...current,
+      session: { ...current.session, guide: changed },
+      saveFailed: !saved,
+    }))
+  }
+
   const issues = planIssues(state.draft.plan)
+
+  /** 計画の 1 つの区分のページ。知らない区分名は家族へ置き換える */
+  const planPage = (section: PlanSectionId): ReactNode => (
+    <PlanPage
+      section={section}
+      guide={state.session.guide}
+      plan={state.draft.plan}
+      evaluatedPlan={state.session.plan}
+      peak={state.result.ok ? peakGross(state.result.evaluation.steps) : null}
+      touched={state.draft.touched}
+      issues={issues}
+      origin={state.session.origin}
+      storageProblem={state.session.storageProblem}
+      notices={state.result.ok ? state.result.evaluation.notices : []}
+      commitError={state.commitError}
+      saveFailed={state.saveFailed}
+      onEdit={(plan, touched) => edit(plan, touched)}
+      onStartOwn={startOwn}
+      onBackToSample={backToSample}
+      onAdvance={(done) => changeGuide((guide) => markDone(guide, done))}
+      onFinish={() => changeGuide(() => null)}
+    />
+  )
 
   return (
     <HashRouter>
@@ -150,26 +206,8 @@ export function AppRouter() {
                 <HomePage session={state.session} result={state.result} onStartOwn={startOwn} />
               }
             />
-            <Route
-              path="/plan"
-              element={
-                <PlanPage
-                  plan={state.draft.plan}
-                  evaluatedPlan={state.session.plan}
-                  peak={state.result.ok ? peakGross(state.result.evaluation.steps) : null}
-                  touched={state.draft.touched}
-                  issues={issues}
-                  origin={state.session.origin}
-                  storageProblem={state.session.storageProblem}
-                  notices={state.result.ok ? state.result.evaluation.notices : []}
-                  commitError={state.commitError}
-                  saveFailed={state.saveFailed}
-                  onEdit={(plan, touched) => edit(plan, touched)}
-                  onStartOwn={startOwn}
-                  onBackToSample={backToSample}
-                />
-              }
-            />
+            <Route path="/plan" element={<PlanResume guide={state.session.guide} />} />
+            <Route path="/plan/:section" element={<PlanSectionRoute render={planPage} />} />
             <Route
               path="/review"
               element={
@@ -185,8 +223,9 @@ export function AppRouter() {
           </Routes>
         </main>
         <nav className="tabs" aria-label="画面">
+          {/* 「計画」は /plan/... のどこにいても「今いる」にする（end は「ながめる」だけ） */}
           {TABS.map((tab) => (
-            <NavLink key={tab.to} to={tab.to} end className="tabs__link">
+            <NavLink key={tab.to} to={tab.to} end={tab.to === '/'} className="tabs__link">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 {tab.icon}
               </svg>
@@ -197,4 +236,29 @@ export function AppRouter() {
       </div>
     </HashRouter>
   )
+}
+
+/**
+ * `/#/plan` を開いたとき、再開する区分へ置き換える（ブラウザの戻るで `/#/plan` に戻らないよう replace）。
+ * 前の版のリンク（`/plan?goal=<id>`）は目標の区分へ、`?goal` を付けたまま送る
+ */
+function PlanResume({ guide }: { guide: Guide | null }) {
+  const [searchParams] = useSearchParams()
+  const search = searchParams.toString()
+  const section = searchParams.has('goal') ? 'goals' : resumeSection(guide)
+  return (
+    <Navigate
+      to={{ pathname: `/plan/${section}`, search: search === '' ? '' : `?${search}` }}
+      replace
+    />
+  )
+}
+
+/** `/#/plan/<区分>` の区分の名前を読み、知っている名前ならそのページを描く。知らない名前は家族へ置き換える */
+function PlanSectionRoute({ render }: { render: (section: PlanSectionId) => ReactNode }) {
+  const { section } = useParams()
+  if (section === undefined || !isPlanSection(section)) {
+    return <Navigate to="/plan/family" replace />
+  }
+  return render(section)
 }
