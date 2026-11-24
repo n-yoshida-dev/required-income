@@ -68,6 +68,8 @@
   --person-remove-width: 3.6875rem;
   --radius: 0.75rem; /* 選んだ段の柱の上・内訳の下・概要の枠 */
   --radius-small: 0.25rem; /* 見本の印・入れる欄 */
+  /* ボタン（T24・D50）。角は「入れる欄 4px → ボタン 8px → まとめる枠 12px」の 3 段で、小さい物ほど小さい角 */
+  --radius-button: 0.5rem;
   /* 入力欄の幅 */
   --input-number: 6.5rem;
   --input-year: 4.5rem;
@@ -238,7 +240,7 @@ button {
   min-height: var(--tap-min);
   padding: 0 1.125rem;
   border: 0;
-  border-radius: calc(var(--tap-min) / 2);
+  border-radius: var(--radius-button);
   background: var(--ink);
   color: var(--paper);
   font-size: var(--size-mid);
@@ -320,7 +322,7 @@ button {
   justify-content: center;
   min-height: var(--tap-min);
   padding: 0 1.125rem;
-  border-radius: calc(var(--tap-min) / 2);
+  border-radius: var(--radius-button);
   background: var(--ink);
   color: var(--paper);
   font-size: var(--size-mid);
@@ -1296,7 +1298,7 @@ button {
 .plan__next {
   min-height: var(--tap-min);
   padding: 0 1.125rem;
-  border-radius: calc(var(--tap-min) / 2);
+  border-radius: var(--radius-button);
   font-size: var(--size-mid);
   cursor: pointer;
 }
@@ -1394,7 +1396,7 @@ button {
   min-height: var(--tap-min);
   padding: 0 0.875rem;
   border: 1.5px solid var(--ink);
-  border-radius: calc(var(--tap-min) / 2);
+  border-radius: var(--radius-button);
   background: none;
   font-size: var(--size-mid);
   cursor: pointer;
@@ -1800,12 +1802,12 @@ button {
   margin-right: auto;
 }
 
-/* この案にする・自分の数字にする：入口と同じ墨で塗った丸い端のボタン */
+/* この案にする・自分の数字にする：入口と同じ墨で塗った角 8px のボタン */
 .review__adopt,
 .review__reset {
   min-height: var(--tap-min);
   border: 1.5px solid var(--ink);
-  border-radius: calc(var(--tap-min) / 2);
+  border-radius: var(--radius-button);
   font-size: var(--size-mid);
   white-space: nowrap;
   cursor: pointer;
@@ -1818,7 +1820,7 @@ button {
   font-weight: 700;
 }
 
-/* 元に戻す：墨の線の丸い端のボタン（入口より 1 段弱く） */
+/* 元に戻す：墨の線の角 8px のボタン（入口より 1 段弱く） */
 .review__reset {
   padding: 0 0.875rem;
   background: none;
