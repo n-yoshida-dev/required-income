@@ -299,6 +299,35 @@ button {
   border-radius: var(--radius);
 }
 
+/*
+ * 目標がまだ無いとき（T25）：概要の枠の場所に 1 文と塗りのボタン 1 つだけ。
+ * 文は見出しの文と同じ大きさで、入りきる幅では 1 行、入りきらないときだけ文節で折り返す。ボタンは枠の幅いっぱい（「計画」の「次へ」と同じ形）
+ */
+.home__empty {
+  gap: 0.875rem;
+}
+
+.home__empty-sentence {
+  font-size: var(--size-lead);
+  font-weight: 700;
+  line-height: 1.5;
+  word-break: auto-phrase;
+}
+
+.home__go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  padding: 0 1.125rem;
+  border-radius: calc(var(--tap-min) / 2);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--size-mid);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 /* 足りているときの 2 行（「やりたいことを全部やっても、」「今の年収 900万円で足ります」）。行の中は文節で折り返す */
 .summary__line {
   display: block;

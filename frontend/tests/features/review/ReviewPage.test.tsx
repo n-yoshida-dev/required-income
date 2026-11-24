@@ -41,6 +41,17 @@ function goTo(tab: 'ながめる' | '計画' | '見直す') {
   fireEvent.click(screen.getByRole('link', { name: tab }))
 }
 
+/**
+ * 自分の数字にして、案内をすぐ終える（目標の区分の「目標はあとで足す」）。そのあと「計画」のタブへ戻る。
+ * 入力の途中は「ながめる」が結果を出さないので（W35）、「ながめる」の階段と比べるテストはこれで始める
+ */
+function startOwnFinished(): void {
+  fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+  fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
+  fireEvent.click(screen.getByRole('button', { name: '目標はあとで足す' }))
+  goTo('計画')
+}
+
 describe('見直す（T12）', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -52,7 +63,7 @@ describe('見直す（T12）', () => {
 
   it('自分の数字にする → 家と車 → 家をオフにすると階段と数字がその場で変わり、離れると元のまま。「この案にする」で残る', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
     // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
     fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))

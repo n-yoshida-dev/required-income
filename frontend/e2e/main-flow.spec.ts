@@ -88,9 +88,13 @@ test('目標を足す → 階段が変わる → 見直して採用 → 開き�
   await page.getByRole('button', { name: '自分の数字にする' }).click()
   await expect(page.getByRole('heading', { level: 1, name: FAMILY_TITLE })).toBeVisible()
 
-  // 目標を足す前の階段を覚えておく
+  // 入力の途中の「ながめる」は、結果（概要の枠と階段）を出さず「続きを入れる」だけ（T25）
   await goTo(page, 'ながめる')
-  const before = await shownStairs(page)
+  await expect(page.getByRole('link', { name: '続きを入れる' })).toBeVisible()
+  await expect(page.getByRole('region', { name: '概要' })).toHaveCount(0)
+  await expect(page.getByRole('group', { name: '階段' })).toHaveCount(0)
+  await expectNoHorizontalOverflow(page, '入力の途中の「ながめる」')
+  const before: string[] = []
 
   // 「計画」の目標の区分で家を足す（雛形の値で入り、その場で保存される）
   await goTo(page, '計画')
@@ -98,8 +102,15 @@ test('目標を足す → 階段が変わる → 見直して採用 → 開き�
   await page.getByRole('button', { name: '家を足す' }).click()
   await expectNoHorizontalOverflow(page, '「計画」')
 
-  // 3. 「ながめる」に戻ると、階段が足す前と変わっている
+  // 目標を足しても、入力の途中なら「ながめる」は「続きを入れる」だけ（見本の値が残っているため。W35）
   await goTo(page, 'ながめる')
+  await expect(page.getByRole('link', { name: '続きを入れる' })).toBeVisible()
+  await expect(page.getByRole('region', { name: '概要' })).toHaveCount(0)
+
+  // 3. 「要る年収を見る」で入力を終えると、概要の枠と階段が出る
+  await goTo(page, '計画')
+  await showSection(page, '目標')
+  await page.getByRole('button', { name: '要る年収を見る' }).click()
   await expect(page.getByRole('region', { name: '概要' })).toBeVisible()
   const withHome = await changedStairs(page, before)
 
@@ -163,8 +174,8 @@ test('大学資金を足す → 進路（私立理系・私立文系・国立）
   await expect(target).toHaveValue(science)
   await expectNoHorizontalOverflow(page, '大学資金のカードを開いた「計画」')
 
-  // 私立理系のときの階段を覚えておく
-  await goTo(page, 'ながめる')
+  // 私立理系のときの階段を覚えておく（入力の途中は結果が出ないので、「要る年収を見る」で入力を終える。W35）
+  await page.getByRole('button', { name: '要る年収を見る' }).click()
   const withScience = await shownStairs(page)
 
   // 「計画」に戻ってカードを開き、私立文系 → 国立と選ぶと、目標額がその進路の額に替わる
@@ -281,6 +292,48 @@ test('自分の数字にする → 家族 → 次へ ×3 → 目標を 1 つ足�
   await expect(page.getByText('済み')).toHaveCount(0)
 
   expect(errors, '画面のエラー').toEqual([])
+})
+
+// T25：案内を目標なしで終えると、「ながめる」は「目標を足す」だけを出し、押すと目標の区分へ。
+// 途中で閉じて開き直したときは「続きを入れる」で、済んでいない最初の区分へ
+test('目標なしで案内を終える → 「目標を足す」 → 目標の区分 / 途中なら「続きを入れる」 → 続きの区分', async ({
+  page,
+}) => {
+  await page.goto('./')
+  await shownStairs(page)
+  await page.getByRole('button', { name: '自分の数字にする' }).click()
+  await expect(page.getByRole('heading', { level: 1, name: FAMILY_TITLE })).toBeVisible()
+
+  // 家族を済ませて閉じ、開き直す → 「続きを入れる」で収入の区分へ
+  await page.getByRole('button', { name: '次へ：収入' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: '今の収入を入れましょう' }),
+  ).toBeVisible()
+  await page.goto('./')
+  await page.reload()
+  await page.getByRole('link', { name: '続きを入れる' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: '今の収入を入れましょう' }),
+  ).toBeVisible()
+
+  // 残りを進め、目標を足さずに終える
+  await page.getByRole('button', { name: '次へ：暮らし' }).click()
+  await page.getByRole('button', { name: '次へ：目標' }).click()
+  await page.getByRole('button', { name: '目標はあとで足す' }).click()
+
+  await expect(page.getByRole('link', { name: '目標を足す' })).toBeVisible()
+  await expect(page.getByRole('link', { name: '続きを入れる' })).toHaveCount(0)
+  await expect(page.getByRole('region', { name: '概要' })).toHaveCount(0)
+  await expectNoHorizontalOverflow(page, '案内を目標なしで終えた「ながめる」')
+
+  await page.getByRole('link', { name: '目標を足す' }).click()
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'やりたいことをひとつ足してみましょう' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: '車を足す' }).click()
+  await goTo(page, 'ながめる')
+  await expect(page.getByRole('region', { name: '概要' })).toBeVisible()
+  expect((await shownStairs(page)).length).toBeGreaterThan(0)
 })
 
 // T21 の完成の条件 3：幅 375px・高さ 812px で、家族・収入・暮らしの「次へ」が送らずに見える（下のタブ 3.5rem の上、756px まで）。

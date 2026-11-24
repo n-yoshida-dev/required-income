@@ -59,6 +59,17 @@ function showSection(label: '家族' | '収入' | '暮らし' | '目標'): void 
   fireEvent.click(within(nav).getByRole('link', { name: new RegExp(`^\\d ${label}`) }))
 }
 
+/**
+ * 自分の数字にして、案内をすぐ終える（目標の区分の「目標はあとで足す」）。そのあと「計画」のタブで家族の区分に戻る。
+ * 入力の途中は「ながめる」が結果を出さないので（W35）、「ながめる」の結果を見るテストはこれで始める
+ */
+function startOwnFinished(): void {
+  fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+  showSection('目標')
+  fireEvent.click(screen.getByRole('button', { name: '目標はあとで足す' }))
+  fireEvent.click(screen.getByRole('link', { name: '計画' }))
+}
+
 /** 家族の区分のページ（題で探す） */
 function familyPage(): HTMLElement {
   return screen.getByRole('region', { name: '家族の生まれ年を入れましょう' })
@@ -84,7 +95,7 @@ describe('計画（T6）', () => {
 
   it('ながめる → 自分の数字にする → 生活費を直す → カードを足す → ながめるが変わり、開き直しても残る', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
 
     // 見本のカードは持ち込まず、すぐ保存される。家族と暮らしは既定値のまま。
     // 子の費用のカードだけは子ごとに付く（見本の子 2 人ぶん。T9）
@@ -568,7 +579,7 @@ describe('家のカード（T7）', () => {
 
   it('自分の数字にする → 家を足す → 頭金を変える → 毎月いくらと「ながめる」が変わり、開き直しても残る', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
     showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     expect(storedHome()).toBeDefined()
@@ -630,7 +641,7 @@ describe('車のカード（T8）', () => {
 
   it('自分の数字にする → 車を足す → 現金からローンに替える → 帯が積立から返済に変わり、「ながめる」が変わり、開き直しても残る', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
     fireEvent.click(screen.getByRole('link', { name: 'ながめる' }))
     const before = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!before.ok) throw new Error(before.message)
@@ -769,8 +780,9 @@ describe('子の費用のカード（T9）', () => {
     const after = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!after.ok) throw new Error(after.message)
     expect(after.evaluation.years).not.toEqual(before.evaluation.years)
-    const goals = screen.getByRole('list', { name: '目標' })
-    expect(within(goals).getByText(name)).toBeTruthy()
+    // 入力の途中なので、「ながめる」は「続きを入れる」だけ（目標の一覧は出さない。T25）
+    expect(screen.getByRole('link', { name: '続きを入れる' })).toBeTruthy()
+    expect(screen.queryByRole('list', { name: '目標' })).toBeNull()
     fireEvent.click(screen.getByRole('link', { name: '計画' }))
 
     // 案内の途中（どの区分も済んでいない）なので、「計画」のタブは家族から開く
@@ -864,7 +876,7 @@ describe('目標の重さ（T11）', () => {
 
   it('自分の数字にする → 家を足す → 見出しに重さが出る → オフにすると「ながめる」のいちばん高い段が、出ていた数字のぶんだけ下がる → 開き直しても同じ', async () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
     showSection('目標')
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     const card = openCard()
@@ -956,7 +968,7 @@ describe('大学資金・老後資金のカード（T10）', () => {
 
   it('自分の数字にする → 大学資金を足す → 目標額を変えると月額と到達額が変わる → 児童手当を回さないと子の費用に児童手当が出て月額が増える → 「ながめる」が変わり、開き直しても残る', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
+    startOwnFinished()
     const before = evaluatePlan(openPlanSession(localStorage, todayYearMonth(new Date())).plan)
     if (!before.ok) throw new Error(before.message)
     showSection('目標')

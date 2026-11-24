@@ -16,6 +16,7 @@ import { startTransition, useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
 import type { StorageProblem } from '../../app/planSession'
 import type { LifePlan, Notice, PeakGross } from '../../domain/plan/types'
+import { ownGoalCount } from '../home/homeStart'
 import { ConfirmButton } from '../shared/ConfirmButton'
 import { StartOwnButton, StorageProblemAlert } from '../shared/StartOwn'
 import { FamilySection } from './FamilySection'
@@ -160,7 +161,7 @@ export function PlanPage({
   const previous = previousSection(section)
   const next = nextSection(section)
   // 自分で足した目標（子の費用のカードは子ごとに付くので数えない）
-  const ownGoals = plan.goals.filter((goal) => goal.kind !== 'childCost').length
+  const ownGoals = ownGoalCount(plan.goals)
   const sectionNote = SECTION_NOTES[section]
 
   /** 区分へ移る（URL を替える。先頭へ送るのと題へのフォーカスは上の effect） */

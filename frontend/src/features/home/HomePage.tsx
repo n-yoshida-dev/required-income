@@ -4,6 +4,7 @@
  *
  * 計算は呼び出し側（`app/router.tsx`）が済ませて渡す。ここは並べるだけ。
  * 計算できなかった（計画が契約に反している）ときは、理由を出して「計画」へ案内する。
+ * 自分の計画で、入力の途中か、自分で足した目標がまだ無いときは、概要の枠の場所に 1 文とボタン 1 つだけを出す（T25・D49。`homeStart.ts`）。
  */
 
 import { startTransition, useMemo, useState } from 'react'
@@ -17,6 +18,7 @@ import { StairsChart } from '../shared/StairsChart'
 import { StartOwnButton, StorageProblemAlert } from '../shared/StartOwn'
 import { GoalList } from './GoalList'
 import { goalSummaries } from './goalSummary'
+import { homeStart } from './homeStart'
 import { noticeLines } from './noticeText'
 import { StepBreakdown } from './StepBreakdown'
 import { Summary } from './Summary'
@@ -34,6 +36,9 @@ export function HomePage({ session, result, onStartOwn }: Props) {
   const [selected, setSelected] = useState<number | null>(null)
   const names = useMemo(() => ownerNames(session.plan), [session.plan])
   const goals = useMemo(() => goalSummaries(session.plan, appDefaults), [session.plan])
+  // 目標がまだ無いときに、結果の代わりに出す物（T25）。ふつうの「ながめる」なら null
+  // 計算できない計画は、目標が無くても先に誤りを知らせる（「計画を直す」で直す所へ案内するため）
+  const start = result.ok ? homeStart(session.origin, session.plan.goals, session.guide) : null
   // 押した段（内訳を出す段）。換算は `fromYear` で段と対応する（SPEC §3.9）
   const selectedStep =
     result.ok && selected !== null ? result.evaluation.steps[selected] : undefined
@@ -68,7 +73,17 @@ export function HomePage({ session, result, onStartOwn }: Props) {
 
       <StorageProblemAlert className="home__alert" storageProblem={session.storageProblem} />
 
-      {result.ok ? (
+      {start !== null ? (
+        // 目標がまだ無い（T25）：結果を答えのように見せず、今やること 1 つだけ。図・一覧・知らせは出さない
+        <section className="summary home__empty" aria-labelledby="home-empty-sentence">
+          <p id="home-empty-sentence" className="home__empty-sentence">
+            {start.sentence}
+          </p>
+          <Link className="home__go" to={start.to}>
+            {start.action}
+          </Link>
+        </section>
+      ) : result.ok ? (
         <>
           <Summary
             step={result.evaluation.nextStep}
@@ -118,7 +133,7 @@ export function HomePage({ session, result, onStartOwn }: Props) {
         </p>
       )}
 
-      <GoalList goals={goals} />
+      {start !== null ? null : <GoalList goals={goals} />}
     </div>
   )
 }
