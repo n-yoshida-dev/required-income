@@ -19,6 +19,7 @@ import { StartOwnButton, StorageProblemAlert } from '../shared/StartOwn'
 import { GoalList } from './GoalList'
 import { goalSummaries } from './goalSummary'
 import { homeStart } from './homeStart'
+import { HomeStartPanel } from './HomeStartPanel'
 import { noticeLines } from './noticeText'
 import { StepBreakdown } from './StepBreakdown'
 import { Summary } from './Summary'
@@ -74,15 +75,8 @@ export function HomePage({ session, result, onStartOwn }: Props) {
       <StorageProblemAlert className="home__alert" storageProblem={session.storageProblem} />
 
       {start !== null ? (
-        // 目標がまだ無い（T25）：結果を答えのように見せず、今やること 1 つだけ。図・一覧・知らせは出さない
-        <section className="summary home__empty" aria-labelledby="home-empty-sentence">
-          <p id="home-empty-sentence" className="home__empty-sentence">
-            {start.sentence}
-          </p>
-          <Link className="home__go" to={start.to}>
-            {start.action}
-          </Link>
-        </section>
+        // 入力の途中か目標がまだ無い（T25・D49）：結果を答えのように見せず、今やること 1 つだけ。図・一覧・知らせは出さない
+        <HomeStartPanel start={start} />
       ) : result.ok ? (
         <>
           <Summary

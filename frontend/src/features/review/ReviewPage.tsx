@@ -6,6 +6,7 @@
  * - 上に留める所：数字 2 つ（次の段・いちばん高い段）・階段（今の計画の薄い線と案）・「元に戻す」「この案にする」。
  *   下の欄を動かしている間も見える。高さは状態で伸び縮みしない（押した欄の位置が動かない）。段の内訳・知らせ・結果の知らせは流れる所に出す
  * - 見本の世帯のままなら、動かして試せるが保存はできないので、「この案にする」の代わりに「自分の数字にする」を出す
+ * - 自分の計画で、入力の途中か、自分で足した目標がまだ無いときは、案を作らず「ながめる」と同じ 1 文とボタン 1 つだけ（`homeStart.ts`）
  * - アプリはどれかを勧めない（D31）。動かした結果を見せるだけ
  */
 
@@ -18,6 +19,8 @@ import {
   type PlanSession,
 } from '../../app/planSession'
 import type { LifePlan } from '../../domain/plan/types'
+import { homeStart } from '../home/homeStart'
+import { HomeStartPanel } from '../home/HomeStartPanel'
 import { StepBreakdown } from '../home/StepBreakdown'
 import { noticeLines } from '../home/noticeText'
 import { manNumber } from '../shared/format'
@@ -39,8 +42,26 @@ type Props = {
   onStartOwn: () => void
 }
 
-/** 見直すの画面 */
-export function ReviewPage({ session, result, onAdopt, onStartOwn }: Props) {
+/**
+ * 見直すの画面。自分の計画で、入力の途中か、自分で足した目標がまだ無いときは、案を作らずに今やること 1 つだけを出す
+ * （「ながめる」と同じ決め方。見本の値が残った途中の計画の数字を、答えのように見せないため。D49 と同じ理由）
+ */
+export function ReviewPage(props: Props) {
+  const { session, result } = props
+  // 計算できない計画は、先に誤りを知らせる（「ながめる」と同じ）
+  const start = result.ok ? homeStart(session.origin, session.plan.goals, session.guide) : null
+  if (start === null) return <ReviewBoard {...props} />
+  return (
+    <div className="review">
+      <h1 className="visually-hidden">見直す</h1>
+      <StorageProblemAlert className="review__alert" storageProblem={session.storageProblem} />
+      <HomeStartPanel start={start} />
+    </div>
+  )
+}
+
+/** 案を動かして試す所（数字・階段・動かす欄） */
+function ReviewBoard({ session, result, onAdopt, onStartOwn }: Props) {
   const navigate = useNavigate()
   const base = session.plan
   const [draft, setDraft] = useState<LifePlan>(base)

@@ -106,6 +106,12 @@ test('目標を足す → 階段が変わる → 見直して採用 → 開き�
   await goTo(page, 'ながめる')
   await expect(page.getByRole('link', { name: '続きを入れる' })).toBeVisible()
   await expect(page.getByRole('region', { name: '概要' })).toHaveCount(0)
+  // 「見直す」も同じ。数字・階段・動かす欄を出さない
+  await goTo(page, '見直す')
+  await expect(page.getByRole('link', { name: '続きを入れる' })).toBeVisible()
+  await expect(page.getByRole('group', { name: '階段' })).toHaveCount(0)
+  await expect(page.getByRole('checkbox', { name: '家' })).toHaveCount(0)
+  await expectNoHorizontalOverflow(page, '入力の途中の「見直す」')
 
   // 3. 「要る年収を見る」で入力を終えると、概要の枠と階段が出る
   await goTo(page, '計画')
@@ -325,6 +331,12 @@ test('目標なしで案内を終える → 「目標を足す」 → 目標の�
   await expect(page.getByRole('link', { name: '続きを入れる' })).toHaveCount(0)
   await expect(page.getByRole('region', { name: '概要' })).toHaveCount(0)
   await expectNoHorizontalOverflow(page, '案内を目標なしで終えた「ながめる」')
+
+  // 「見直す」も「目標を足す」だけ（動かす欄が子の費用だけの案を出さない）
+  await goTo(page, '見直す')
+  await expect(page.getByRole('link', { name: '目標を足す' })).toBeVisible()
+  await expect(page.getByRole('group', { name: '階段' })).toHaveCount(0)
+  await expectNoHorizontalOverflow(page, '案内を目標なしで終えた「見直す」')
 
   await page.getByRole('link', { name: '目標を足す' }).click()
   await expect(

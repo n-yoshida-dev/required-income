@@ -124,33 +124,41 @@ describe('見直す（T12）', () => {
     expect(toggle('家').checked).toBe(false)
   })
 
-  it('案内の途中で「この案にする」を押しても、案内の進み具合（guide）は保存に残る（T21）', () => {
-    /** 保存の中の案内の進み具合（無ければ undefined） */
-    const storedGuide = (): unknown =>
-      (JSON.parse(localStorage.getItem(PLAN_STORAGE_V2_KEY) ?? '{}') as { guide?: unknown }).guide
-
+  it('入力の途中は、目標を足していても数字・階段・動かす欄を出さず「続きを入れる」だけ。押すと済んでいない最初の区分へ（D49）', () => {
     render(<AppRouter />)
     fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
     // 家族だけ済ませて、目標の区分で家を足す（案内はまだ終えていない）
     fireEvent.click(screen.getByRole('button', { name: '次へ：収入' }))
     fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
-    expect(storedGuide()).toEqual({ done: ['family'] })
 
     goTo('見直す')
-    fireEvent.click(toggle('家'))
-    fireEvent.click(screen.getByRole('button', { name: 'この案にする' }))
-    expect(stored().plan.goals.find((goal) => goal.kind === 'home')?.enabled).toBe(false)
-    // 案を今の計画にしても、案内は続いている（「計画」を開くと、済んでいない最初の区分＝収入から）
-    expect(storedGuide()).toEqual({ done: ['family'] })
-    goTo('計画')
+    expect(screen.getByText('自分の数字を入れている途中です')).toBeTruthy()
+    expect(screen.queryByRole('group', { name: '階段' })).toBeNull()
+    expect(screen.queryByText('次の段', { selector: 'dt' })).toBeNull()
+    expect(screen.queryByRole('checkbox', { name: '家' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'この案にする' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('link', { name: '続きを入れる' }))
     expect(window.location.hash).toBe('#/plan/income')
+  })
+
+  it('入力を終えて、自分で足した目標がまだ無いときは「目標を足す」だけ。押すと目標の区分へ（T25 と同じ）', () => {
+    render(<AppRouter />)
+    startOwnFinished()
+
+    goTo('見直す')
+    expect(screen.getByText('やりたいことが、まだ入っていません')).toBeTruthy()
+    expect(screen.queryByRole('group', { name: '階段' })).toBeNull()
+    expect(screen.queryByRole('checkbox', { name: '子の費用（1人目）' })).toBeNull()
+
+    fireEvent.click(screen.getByRole('link', { name: '目標を足す' }))
+    expect(window.location.hash).toBe('#/plan/goals')
   })
 
   it('家を 2 年ずらす・元に戻す。動かした値は今の計画と見分けられる', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-    // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
+    startOwnFinished()
     fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     goTo('見直す')
@@ -189,8 +197,7 @@ describe('見直す（T12）', () => {
 
   it('家の価格は頭金より下へ押せない（押すだけで計算できない案を作らない）', () => {
     render(<AppRouter />)
-    fireEvent.click(screen.getByRole('button', { name: '自分の数字にする' }))
-    // 「自分の数字にする」で家族の区分へ移る。目標カードは目標の区分（T21）
+    startOwnFinished()
     fireEvent.click(screen.getByRole('link', { name: /^4 目標/ }))
     fireEvent.click(screen.getByRole('button', { name: '家を足す' }))
     goTo('見直す')
